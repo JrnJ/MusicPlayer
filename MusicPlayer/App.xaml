@@ -7,6 +7,11 @@
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="White" />
         </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#353535" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
         
         <!-- AlbumSong-->
         <Style TargetType="Border" x:Key="AlbumSong">

@@ -78,12 +78,36 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
+                <!-- Sidemenu -->
                 <Grid Grid.Column="0" Background="#151515">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
 
+                    <StackPanel Grid.Row="0">
+                        <Button Height="40" Content="My Music"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1">
+                        <DockPanel Height="40" x:Name="sideMenuPlaylists">
+                            <Button Content="My Playlists" />
+                            <Button Width="{Binding ElementName=sideMenuPlaylists, Path=ActualHeight}" 
+                                    Content="+" HorizontalAlignment="Right" Click="AddPlaylistClick"/>
+                        </DockPanel>
+                        <StackPanel x:Name="spAlbums">
+                            <Border Height="40">
+                                <Grid>
+                                    <Button Content="Playlist 1"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
+                <!-- /Sidemenu -->
 
                 <!-- Album Viewer -->
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="1" x:Name="GridAlbumViewer" Visibility="Visible">
                     <StackPanel Margin="20" HorizontalAlignment="Left" Width="700">
                         <!-- Playlist Info -->
                         <DockPanel Margin="0,0,0,8">
@@ -118,28 +142,5 @@
             </Grid>
             <!-- /Controls -->
         </Grid>
-
-        <!--<Canvas>
-            --><!-- Console --><!--
-            <Border BorderBrush="#303030" BorderThickness="1">
-                <Grid Width="980" Height="512">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    --><!-- Frame--><!--
-                    <Grid Grid.Row="0" Background="#000">
-                        <Grid VerticalAlignment="Center">
-                            <TextBlock x:Name="tblConsoleTitle" Text="Console"/>
-                        </Grid>
-                    </Grid>
-                    --><!-- /Frame--><!--
-                    <TextBlock Grid.Row="1" x:Name="tblConsole" 
-                                   Background="#0c0c0c" Foreground="#cccccc" FontSize="14" FontFamily="Consolas"
-                                   Text="185;6" />
-                </Grid>
-            </Border>
-            --><!-- /Console --><!--
-        </Canvas>-->
     </Grid>
 </Window>

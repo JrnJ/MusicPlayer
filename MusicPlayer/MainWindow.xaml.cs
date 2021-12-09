@@ -21,6 +21,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 using Windows.Media;
+using System.Collections.ObjectModel;
 
 namespace MusicPlayer
 {
@@ -44,6 +45,15 @@ namespace MusicPlayer
             set { _volume = value; OnPropertyChanged(); MediaPlayer.Volume = value; }
         }
 
+        private ObservableCollection<Playlist> _playlists;
+
+        public ObservableCollection<Playlist> Playlists
+        {
+            get { return _playlists; }
+            set { _playlists = value; }
+        }
+
+
         public Playlist CurrentPlaylist = new Playlist(0, null, null);
         public Border CurrentUISong = new Border();
         public Song CurrentSong;
@@ -53,6 +63,10 @@ namespace MusicPlayer
         public bool IsPlaying = false;
 
         public bool LeftMouseDownOnSlider = false;
+        public string[] LookForMusic = { 
+            "C:/Users/jeroe/OneDrive - Summacollege/Overzetten/Music/Random",
+            "C:/Users/jeroe/OneDrive - Summacollege/Overzetten/Music/Trap Electro Etc"
+        };
 
         // DLL
         [DllImport("Kernel32")]
@@ -66,7 +80,7 @@ namespace MusicPlayer
             InitializeComponent();
             //AllocConsole();
             Debugger = new Debugger(this);
-            Debugger.SetActive(true);
+            Debugger.SetActive(false);
             //Debugger.Title = "Console";
 
             //MediaControls = SystemMediaTransportControls.GetForCurrentView();
@@ -78,7 +92,16 @@ namespace MusicPlayer
             // C:/Users/jeroe/OneDrive - Summacollege/Overzetten/Music/Random
             // D:/Music/Anime
 
-            CurrentPlaylist = MusicHandler.GetMusicFromFolder("C:/Users/jeroe/OneDrive - Summacollege/Overzetten/Music/Random");
+            // Load Playlists
+            Playlists = new ObservableCollection<Playlist>();
+            Playlists = FileHandler.GetPlaylistsLocation();
+
+            for (int i = 0; i < LookForMusic.Length; i++)
+            {
+                Playlists.Add(MusicHandler.GetMusicFromFolder(LookForMusic[i]));
+            }
+
+            CurrentPlaylist = Playlists[0];
             if (CurrentPlaylist == null)
             {
                 MessageBox.Show("Folder location not found!");
@@ -412,6 +435,11 @@ namespace MusicPlayer
             }
         }
 
+        private void AddPlaylistClick(object sender, RoutedEventArgs e)
+        {
+            spAlbums.Children.Add(CreateAlbumUI());
+        }
+
         public Border CreateSongUI(Song song, int index = 0)
         {
             // Create UI Elements
@@ -489,6 +517,37 @@ namespace MusicPlayer
 
             // Return new UI element
             return borderContainer;
+        }
+
+        public Border CreateAlbumUI()
+        {
+            Border border = new()
+            {
+                Height = 40,
+            };
+
+            Grid grid = new()
+            {
+
+            };
+
+            Button button = new()
+            {
+                Content = "Playlist",
+            };
+            button.Click += SelectPlaylistClick;
+
+            // Add Children
+            grid.Children.Add(button);
+
+            border.Child = grid;
+
+            return border;
+        }
+
+        private void SelectPlaylistClick(object sender, RoutedEventArgs e)
+        {
+            GridAlbumViewer.Visibility = Visibility.Collapsed;
         }
 
         private string RegisterAndOrSetName(string name, object obj)

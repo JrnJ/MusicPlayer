@@ -47,30 +47,6 @@ namespace MusicPlayer.Classes
             }
         }
 
-        public static Playlist GetMusicFromYouTubeVideo(string url)
-        {
-            try
-            {
-                return null;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
-        public static Playlist GetMusicFromYouTubePlayList(string url)
-        {
-            try
-            {
-                return null;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
         public static bool IsMusic(string fileName)
         {
             return fileName.Contains(".mp3");
