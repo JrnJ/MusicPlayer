@@ -45,9 +45,9 @@ namespace MusicPlayer
             set { _volume = value; OnPropertyChanged(); MediaPlayer.Volume = value; }
         }
 
-        private ObservableCollection<Playlist> _playlists;
+        private List<Playlist> _playlists;
 
-        public ObservableCollection<Playlist> Playlists
+        public List<Playlist> Playlists
         {
             get { return _playlists; }
             set { _playlists = value; }
@@ -89,26 +89,24 @@ namespace MusicPlayer
             ConfigureMediaPlayer();
 
             // Load Playlist
-            // C:/Users/jeroe/OneDrive - Summacollege/Overzetten/Music/Random
-            // D:/Music/Anime
+            Playlists = FileHandler.GetPlaylists();
 
-            // Load Playlists
-            Playlists = new ObservableCollection<Playlist>();
-            Playlists = FileHandler.GetPlaylistsLocation();
+            // Save playlist
+            //if (!FileHandler.SavePlaylistsLocation(Playlists))
+            //{
+            //    MessageBox.Show("Could not save to file!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
 
-            for (int i = 0; i < LookForMusic.Length; i++)
-            {
-                Playlists.Add(MusicHandler.GetMusicFromFolder(LookForMusic[i]));
-            }
-
-            CurrentPlaylist = Playlists[0];
-            if (CurrentPlaylist == null)
+            if (Playlists == null)
             {
                 MessageBox.Show("Folder location not found!");
             }
             else
             {
-                LoadPlaylist(CurrentPlaylist);
+                for (int i = 0; i < Playlists.Count; i++)
+                {
+                    LoadPlaylist(Playlists[i]);
+                }
             }
 
             // Instantiate Track Controls
@@ -244,7 +242,7 @@ namespace MusicPlayer
             MediaPlayer.Pause();
 
             //MediaPlayer.Open();
-            MediaPlayer.SetUriSource(song.Path);
+            MediaPlayer.SetUriSource(new Uri(song.Path));
 
             // Reset background
             CurrentUISong.Style = Application.Current.FindResource("AlbumSong") as Style;
