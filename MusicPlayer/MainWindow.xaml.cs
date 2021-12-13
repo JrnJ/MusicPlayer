@@ -28,21 +28,19 @@ namespace MusicPlayer
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Window
     {
         // Classes
-        public Windows.Media.Playback.MediaPlayer MediaPlayer;
         public DispatcherTimer Timer = new DispatcherTimer();
         public SystemMediaTransportControls MediaControls;
         public Debugger Debugger;
-        //public MusicEvents MusicEvents = new MusicEvents();
 
-        private double _volume;
+        private Windows.Media.Playback.MediaPlayer _mediaPlayer;
 
-        public double Volume
+        public Windows.Media.Playback.MediaPlayer MediaPlayer
         {
-            get { return _volume; }
-            set { _volume = value; OnPropertyChanged(); MediaPlayer.Volume = value; }
+            get { return _mediaPlayer; }
+            set { _mediaPlayer = value; }
         }
 
         private List<Playlist> _playlists;
@@ -53,10 +51,26 @@ namespace MusicPlayer
             set { _playlists = value; }
         }
 
+        private Playlist _currentPlaylist;
 
-        public Playlist CurrentPlaylist = new Playlist(0, null, null);
+        public Playlist CurrentPlaylist
+        {
+            get { return _currentPlaylist; }
+            set { _currentPlaylist = value; }
+        }
+
+        private Settings _settings;
+
+        public Settings Settings
+        {
+            get { return _settings; }
+            set { _settings = value; }
+        }
+
+
         public Border CurrentUISong = new Border();
         public Song CurrentSong;
+
         public int CurrentSongIndex = 0;
 
         public double SongTotalMs;
@@ -81,38 +95,40 @@ namespace MusicPlayer
             //AllocConsole();
             Debugger = new Debugger(this);
             Debugger.SetActive(false);
-            //Debugger.Title = "Console";
-
-            //MediaControls = SystemMediaTransportControls.GetForCurrentView();
-            //MediaControls.ButtonPressed += MediaControls_ButtonPressed;
 
             ConfigureMediaPlayer();
+            ConfigurePlaylists();
+            ConfigureSettings();
 
+            DataContext = this;
+        }
+
+        public void ConfigurePlaylists()
+        {
             // Load Playlist
             Playlists = FileHandler.GetPlaylists();
 
-            // Save playlist
-            //if (!FileHandler.SavePlaylistsLocation(Playlists))
-            //{
-            //    MessageBox.Show("Could not save to file!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
-
             if (Playlists == null)
             {
-                MessageBox.Show("Folder location not found!");
+                MessageBox.Show("No playlists found!");
             }
             else
             {
+                CurrentPlaylist = Playlists[0];
+                LoadPlaylist(Playlists[0]);
+
                 for (int i = 0; i < Playlists.Count; i++)
                 {
-                    LoadPlaylist(Playlists[i]);
+                    spPlaylists.Children.Add(CreatePlaylistTabUI(Playlists[i]));
                 }
             }
+        }
 
-            // Instantiate Track Controls
-            //sliderSongTimePlayed.ApplyTemplate();
-
-            DataContext = this;
+        private void ConfigureSettings()
+        {
+            // Load Settings
+            Settings = FileHandler.GetSettings();
+            MediaPlayer.Volume = Settings.Volume;
         }
 
         private void ConfigureMediaPlayer()
@@ -122,6 +138,7 @@ namespace MusicPlayer
             // Mediaplayer events
             MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
             MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
+            MediaPlayer.VolumeChanged += MediaPlayerVolumeChanged;
             MediaPlayer.CommandManager.IsEnabled = true;
 
             // try get next song to work
@@ -130,9 +147,6 @@ namespace MusicPlayer
             // Instantiate Timer
             Timer.Interval = new TimeSpan(0, 0, 1);
             Timer.Tick += Timer_Tick;
-
-            // Specific Controls
-            Volume = 0.5;
         }
 
         #region MediaPlayerEvents
@@ -148,6 +162,12 @@ namespace MusicPlayer
         {
             // Call to MainWindow thread
             Dispatcher.Invoke(() => { MediaEnded(); });
+        }
+
+        private void MediaPlayerVolumeChanged(Windows.Media.Playback.MediaPlayer sender, object args)
+        {
+            // Apply volume change to settings
+            Settings.Volume = MediaPlayer.Volume;
         }
         #endregion MediaPlayerEvents
 
@@ -192,6 +212,7 @@ namespace MusicPlayer
             UpdateTime();
         }
 
+        // Converst milliseconds to a time format
         private static string MsToTime(double ms)
         { 
             string time = new DateTime().AddMilliseconds(ms).ToString("H:mm:ss");
@@ -349,10 +370,10 @@ namespace MusicPlayer
                 #region ChangeVolume
                 // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
                 case Key.NumPad8:
-                    Volume += 0.05;
+                    Settings.Volume += 0.05;
                     break;
                 case Key.NumPad2:
-                    Volume -= 0.05;
+                    Settings.Volume -= 0.05;
                     break;
                 #endregion ChangeVolume
                 default:
@@ -423,19 +444,21 @@ namespace MusicPlayer
 
         public void LoadPlaylist(Playlist playlist)
         {
-            tblPlaylistTitle.Text = playlist.Name;
+            //tblPlaylistTitle.Text = playlist.Name;
+            CurrentPlaylist = playlist;
+            spPlaylistSongs.Children.Clear();
 
             // Loop thru all songs
             for (int i = 0; i < playlist.Songs.Count; i++)
             {
                 // Add song to screen
-                AlbumSongs.Children.Add(CreateSongUI(playlist.Songs[i], i));
+                spPlaylistSongs.Children.Add(CreateSongUI(playlist.Songs[i], i)); 
             }
         }
 
         private void AddPlaylistClick(object sender, RoutedEventArgs e)
         {
-            spAlbums.Children.Add(CreateAlbumUI());
+            
         }
 
         public Border CreateSongUI(Song song, int index = 0)
@@ -517,35 +540,40 @@ namespace MusicPlayer
             return borderContainer;
         }
 
-        public Border CreateAlbumUI()
+        public Border CreatePlaylistTabUI(Playlist playlist)
         {
             Border border = new()
             {
                 Height = 40,
             };
+            border.MouseDown += SelectPlaylistClick;
+            border.Name = RegisterAndOrSetName($"Playlist{playlist.Id}", border);
 
             Grid grid = new()
             {
 
             };
 
-            Button button = new()
+            TextBlock tbl = new()
             {
-                Content = "Playlist",
+                Text = playlist.Name,
             };
-            button.Click += SelectPlaylistClick;
 
             // Add Children
-            grid.Children.Add(button);
+            grid.Children.Add(tbl);
 
             border.Child = grid;
 
             return border;
         }
 
-        private void SelectPlaylistClick(object sender, RoutedEventArgs e)
+        private void SelectPlaylistClick(object sender, MouseButtonEventArgs e)
         {
-            GridAlbumViewer.Visibility = Visibility.Collapsed;
+            // Load that playlist5
+            int playlistId = int.Parse((sender as Border).Name.Replace("Playlist", ""));
+
+            Playlist playlist = Playlists.Find(x => x.Id == playlistId);
+            LoadPlaylist(playlist);
         }
 
         private string RegisterAndOrSetName(string name, object obj)
@@ -566,11 +594,27 @@ namespace MusicPlayer
             PlayMusic();
         }
 
-        // At Bottom pls
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string name = null)
+        #region Playlist Controls
+        private void PlaylistSongsClick(object sender, RoutedEventArgs e)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            PlaylistSettings.Visibility = Visibility.Collapsed;
+            PlaylistArtists.Visibility = Visibility.Collapsed;
+            PlaylistSongs.Visibility = Visibility.Visible;
         }
+
+        private void PlaylistArtistsClick(object sender, RoutedEventArgs e)
+        {
+            PlaylistSettings.Visibility = Visibility.Collapsed;
+            PlaylistSongs.Visibility = Visibility.Collapsed;
+            PlaylistArtists.Visibility = Visibility.Visible;
+        }
+
+        private void PlaylistSettingsClick(object sender, RoutedEventArgs e)
+        {
+            PlaylistArtists.Visibility = Visibility.Collapsed;
+            PlaylistSongs.Visibility = Visibility.Collapsed;
+            PlaylistSettings.Visibility = Visibility.Visible;
+        }
+        #endregion Playlist Controls
     }
 }

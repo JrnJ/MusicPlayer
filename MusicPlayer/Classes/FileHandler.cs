@@ -12,6 +12,10 @@ namespace MusicPlayer.Classes
     public static class FileHandler
     {
         #region READ
+        /// <summary>
+        /// Gets all the playlists from the playlists.json file
+        /// </summary>
+        /// <returns></returns>
         public static List<Playlist> GetPlaylists()
         {
             try
@@ -35,30 +39,20 @@ namespace MusicPlayer.Classes
             }
         }
 
-        public static Song GetSong(string path)
+        /// <summary>
+        /// Gets all settings from the settings.json file
+        /// </summary>
+        /// <returns></returns>
+        public static Settings GetSettings()
         {
             try
             {
-                //// Check if song is music
-                //if (IsMusic(path))
-                //{
-                //    // Get file
-                //    TagLib.File tFile = TagLib.File.Create(path);
+                string json = File.ReadAllText("C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/settings.json");
+                Settings settings = JsonConvert.DeserializeObject<Settings>(json);
 
-                //    TagLib.Picture pic = new TagLib.Picture("../../../Images/SongImagePlaceholder.png");
-                //    //TagLib.Picture pic = null;
-
-                //    // Add song to songs
-                //    return new Song(new Uri(path), tFile.Tag.Title, null, null, tFile.Tag.Comment,
-                //        tFile.Tag.FirstPerformer, tFile.Tag.FirstAlbumArtist, tFile.Tag.Album, tFile.Tag.Year, id, tFile.Tag.FirstGenre, pic, tFile.Properties.Duration.TotalMilliseconds,
-                //        tFile.Properties.AudioBitrate
-                //        );
-                //}
-
-
-                return null;
+                return settings;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -66,6 +60,11 @@ namespace MusicPlayer.Classes
         #endregion READ 
 
         #region WRITE
+        /// <summary>
+        /// Saves given Playlists to playlists.json
+        /// </summary>
+        /// <param name="playlists"></param>
+        /// <returns>True if save was succesful</returns>
         public static bool SavePlaylistsLocation(List<Playlist> playlists)
         {
             try
@@ -88,10 +87,24 @@ namespace MusicPlayer.Classes
             }
         }
 
-        public static bool SaveSettings()
+        /// <summary>
+        /// Saves given settings to settings.json
+        /// </summary>
+        /// <returns>True if save was succesful</returns>
+        public static bool SaveSettings(Settings settings)
         {
             try
             {
+                // serialize JSON to a string and then write string to a file
+                File.WriteAllText(@"C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/settings.json", JsonConvert.SerializeObject(settings));
+
+                // serialize JSON directly to a file
+                using (StreamWriter file = File.CreateText(@"C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/settings.json"))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(file, settings);
+                }
+
                 return true;
             }
             catch (Exception)
@@ -100,10 +113,5 @@ namespace MusicPlayer.Classes
             }
         }
         #endregion WRITE
-
-        public static bool IsMusic(string fileName)
-        {
-            return fileName.Contains(".mp3");
-        }
     }
 }

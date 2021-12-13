@@ -63,7 +63,7 @@
                         <!-- /Controls -->
                         <!-- Volume -->
                         <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
-                            <Slider Width="100" Style="{StaticResource SongTime}" Value="{Binding Volume, Mode=TwoWay}"
+                            <Slider Width="100" Style="{StaticResource SongTime}" Value="{Binding MediaPlayer.Volume, Mode=TwoWay}"
                                 Minimum="0" Maximum="1"
                                 />
                         </DockPanel>
@@ -85,38 +85,53 @@
                         <RowDefinition />
                     </Grid.RowDefinitions>
 
+                    <!-- Selections -->
                     <StackPanel Grid.Row="0">
                         <Button Height="40" Content="My Music"/>
                     </StackPanel>
+                    <!-- /Selections -->
 
+                    <!-- Playlists -->
                     <StackPanel Grid.Row="1">
                         <DockPanel Height="40" x:Name="sideMenuPlaylists">
                             <Button Content="My Playlists" />
                             <Button Width="{Binding ElementName=sideMenuPlaylists, Path=ActualHeight}" 
                                     Content="+" HorizontalAlignment="Right" Click="AddPlaylistClick"/>
                         </DockPanel>
-                        <StackPanel x:Name="spAlbums">
+                        <StackPanel x:Name="spPlaylists">
                             <Border Height="40">
                                 <Grid>
-                                    <Button Content="Playlist 1"/>
+                                    <TextBlock Text="Playlist 1"/>
                                 </Grid>
                             </Border>
                         </StackPanel>
                     </StackPanel>
+                    <!-- /Playlists -->
                 </Grid>
                 <!-- /Sidemenu -->
 
-                <!-- Album Viewer -->
-                <Grid Grid.Column="1" x:Name="GridAlbumViewer" Visibility="Visible">
+                <!-- Playlist Viewer -->
+                <Grid Grid.Column="1">
                     <StackPanel Margin="20" HorizontalAlignment="Left" Width="700">
                         <!-- Playlist Info -->
                         <DockPanel Margin="0,0,0,8">
-                            <TextBlock x:Name="tblPlaylistTitle" Text="My Playlist" FontSize="30" FontWeight="Bold" Foreground="White"/>
+                            <Button Content="Songs" Click="PlaylistSongsClick" Height="30" />
+                            <Button Content="Artists" Click="PlaylistArtistsClick" Height="30" />
+                            <Button Content="Settings" Click="PlaylistSettingsClick" Height="30" />
+                        </DockPanel>
+                        <DockPanel Margin="0,0,0,8">
+                            <!--<TextBlock />-->
+                            <TextBox Text="{Binding CurrentPlaylist.Name}" 
+                                     FontSize="30" FontWeight="Bold" Foreground="White" 
+                                     Background="Transparent" BorderThickness="0" CaretBrush="White" 
+                                     IsReadOnly="True"
+                                     />
                         </DockPanel>
                         <!-- /Playlist Info -->
+                        
                         <!-- Songs -->
-                        <ScrollViewer Style="{StaticResource AlbumScrollbar}" Height="650">
-                            <StackPanel x:Name="AlbumSongs" Margin="0, 0, 8, 0">
+                        <ScrollViewer Style="{StaticResource AlbumScrollbar}" Height="650" x:Name="PlaylistSongs">
+                            <StackPanel x:Name="spPlaylistSongs" Margin="0, 0, 8, 0">
                                 <!-- Sample Border -->
                                 <!--<Border Style="{StaticResource AlbumSong}" MouseDown="AlbumSongMouseDown">
                                 <DockPanel Height="50">
@@ -136,9 +151,29 @@
                             </StackPanel>
                         </ScrollViewer>
                         <!-- /Songs -->
+
+                        <!-- Artists -->
+                        <Grid x:Name="PlaylistArtists">
+                            <Border>
+                                <Grid>
+                                    <Button Width="40" Height="40" Content="Art" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        <!-- /Artists -->
+
+                        <!-- Settings -->
+                        <Grid x:Name="PlaylistSettings">
+                            <Border>
+                                <Grid>
+                                    <Button Width="40" Height="40" Content="Set" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        <!-- /Settings -->
                     </StackPanel>
                 </Grid>
-                <!-- /Album Viewer -->
+                <!-- /Playlist Viewer -->
             </Grid>
             <!-- /Controls -->
         </Grid>
