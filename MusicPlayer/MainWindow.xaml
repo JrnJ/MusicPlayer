@@ -64,7 +64,8 @@
                         <!-- Volume -->
                         <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
                             <Slider Width="100" Style="{StaticResource SongTime}" Value="{Binding MediaPlayer.Volume, Mode=TwoWay}"
-                                Minimum="0" Maximum="1"
+                                    Minimum="0" Maximum="1"
+                                    PreviewMouseLeftButtonUp="Slider_PreviewMouseLeftButtonUp"
                                 />
                         </DockPanel>
                         <!-- /Volume -->
@@ -87,7 +88,7 @@
 
                     <!-- Selections -->
                     <StackPanel Grid.Row="0">
-                        <Button Height="40" Content="My Music"/>
+                        <Button Height="40" Content="My Music" Click="Button_Click"/>
                     </StackPanel>
                     <!-- /Selections -->
 
@@ -99,9 +100,21 @@
                                     Content="+" HorizontalAlignment="Right" Click="AddPlaylistClick"/>
                         </DockPanel>
                         <StackPanel x:Name="spPlaylists">
-                            <Border Height="40">
+                            <Border Padding="0,8,0,8">
                                 <Grid>
-                                    <TextBlock Text="Playlist 1"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Playlist 1" FontSize="18"/>
+                                        <DockPanel>
+                                            <TextBlock DataContext="{Binding Playlists[0]}" FontSize="12">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0} Songs, {1}">
+                                                        <Binding Path="Songs.Count" />
+                                                        <Binding Path="PlaylistDuration" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </DockPanel>
+                                    </StackPanel>
                                 </Grid>
                             </Border>
                         </StackPanel>
@@ -119,14 +132,22 @@
                             <Button Content="Artists" Click="PlaylistArtistsClick" Height="30" />
                             <Button Content="Settings" Click="PlaylistSettingsClick" Height="30" />
                         </DockPanel>
-                        <DockPanel Margin="0,0,0,8">
+                        <StackPanel Margin="0,0,0,8" VerticalAlignment="Center">
                             <!--<TextBlock />-->
-                            <TextBox Text="{Binding CurrentPlaylist.Name}" 
-                                     FontSize="30" FontWeight="Bold" Foreground="White" 
-                                     Background="Transparent" BorderThickness="0" CaretBrush="White" 
-                                     IsReadOnly="True"
-                                     />
-                        </DockPanel>
+                            <TextBlock Text="{Binding CurrentPlaylist.Name}" 
+                                     FontSize="30" FontWeight="Bold" Foreground="White" />
+                            <TextBlock Text="{Binding CurrentPlaylist.Description}" 
+                                       FontSize="16"/>
+                            <TextBlock DataContext="{Binding CurrentPlaylist}" 
+                                       FontSize="12">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} Songs, {1}">
+                                        <Binding Path="Songs.Count" />
+                                        <Binding Path="PlaylistDuration" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
                         <!-- /Playlist Info -->
                         
                         <!-- Songs -->

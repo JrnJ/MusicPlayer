@@ -22,13 +22,14 @@ using System.Runtime.CompilerServices;
 
 using Windows.Media;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace MusicPlayer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IMultiValueConverter
     {
         // Classes
         public DispatcherTimer Timer = new DispatcherTimer();
@@ -59,6 +60,14 @@ namespace MusicPlayer
             set { _currentPlaylist = value; }
         }
 
+        private Playlist _myMusic;
+
+        public Playlist MyMusic
+        {
+            get { return _myMusic; }
+            set { _myMusic = value; }
+        }
+
         private Settings _settings;
 
         public Settings Settings
@@ -66,7 +75,6 @@ namespace MusicPlayer
             get { return _settings; }
             set { _settings = value; }
         }
-
 
         public Border CurrentUISong = new Border();
         public Song CurrentSong;
@@ -77,10 +85,6 @@ namespace MusicPlayer
         public bool IsPlaying = false;
 
         public bool LeftMouseDownOnSlider = false;
-        public string[] LookForMusic = { 
-            "C:/Users/jeroe/OneDrive - Summacollege/Overzetten/Music/Random",
-            "C:/Users/jeroe/OneDrive - Summacollege/Overzetten/Music/Trap Electro Etc"
-        };
 
         // DLL
         [DllImport("Kernel32")]
@@ -114,7 +118,6 @@ namespace MusicPlayer
             }
             else
             {
-                CurrentPlaylist = Playlists[0];
                 LoadPlaylist(Playlists[0]);
 
                 for (int i = 0; i < Playlists.Count; i++)
@@ -129,6 +132,13 @@ namespace MusicPlayer
             // Load Settings
             Settings = FileHandler.GetSettings();
             MediaPlayer.Volume = Settings.Volume;
+            MyMusic = new Playlist(0, new List<Song>(), "My Music", "All music from all folders.");
+
+            // Create a playlist of all songs
+            for (int i = 0; i < Settings.MusicFolders.Count; i++)
+            {
+                MyMusic.Songs.AddRange(FileHandler.GetSongsFromFolder(Settings.MusicFolders[i]));
+            }
         }
 
         private void ConfigureMediaPlayer()
@@ -203,56 +213,13 @@ namespace MusicPlayer
             sliderSongTimePlayed.Value = MediaPlayer.Position.TotalMilliseconds;
 
             // Update UI
-            tblCurrentTime.Text = MsToTime(MediaPlayer.Position.TotalMilliseconds);
+            tblCurrentTime.Text = HelperMethods.MsToTime(MediaPlayer.Position.TotalMilliseconds);
         }
         #endregion MusicThings
 
         private void Timer_Tick(object sender, EventArgs e)
         {
             UpdateTime();
-        }
-
-        // Converst milliseconds to a time format
-        private static string MsToTime(double ms)
-        { 
-            string time = new DateTime().AddMilliseconds(ms).ToString("H:mm:ss");
-            string finalTime = "";
-
-            string[] timeStamps = time.Split(':');
-
-            // Check if strin contains something other than 0
-            for (int i = 0; i < timeStamps.Length; i++)
-            {
-                foreach (char c in timeStamps[i])
-                {
-                    if (c != '0')
-                    {
-                        finalTime += timeStamps[i] + ":";
-                        break;
-                    }
-                }
-            }
-
-            if (finalTime.Length > 0)
-            {
-                // Remove last :
-                finalTime = finalTime.Remove(finalTime.Length - 1);
-
-                if (finalTime.Length < 4)
-                {
-                    finalTime = "0:" + finalTime;
-                }
-                else if (finalTime[0].ToString() == "0")
-                {
-                    finalTime = finalTime.Remove(0, 1);
-                }
-            }
-            else
-            {
-                finalTime = "0:00";
-            }
-
-            return finalTime;
         }
 
         private void OpenMedia(Song song)
@@ -280,7 +247,7 @@ namespace MusicPlayer
 
             // Update UI
             SongTotalMs = song.Length;
-            tblFinalTime.Text = MsToTime(SongTotalMs);
+            tblFinalTime.Text = HelperMethods.MsToTime(SongTotalMs);
             sliderSongTimePlayed.Maximum = SongTotalMs;
 
             PlayMusic();
@@ -384,7 +351,10 @@ namespace MusicPlayer
         private void sliderSongTimePlayed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             LeftMouseDownOnSlider = true;
-            double value = sliderSongTimePlayed.Maximum / sliderSongTimePlayed.ActualWidth * e.GetPosition(sliderSongTimePlayed).X;
+            //Track track = sliderSongTimePlayed.Template.FindName("PART_Track", sliderSongTimePlayed) as Track;
+            // This value is for getting the thubs width to play in accout if thats even needed
+
+            double value = sliderSongTimePlayed.Maximum / (sliderSongTimePlayed.ActualWidth + 0) * e.GetPosition(sliderSongTimePlayed).X;
             sliderSongTimePlayed.Value = value;
 
             // Pause timer
@@ -444,7 +414,6 @@ namespace MusicPlayer
 
         public void LoadPlaylist(Playlist playlist)
         {
-            //tblPlaylistTitle.Text = playlist.Name;
             CurrentPlaylist = playlist;
             spPlaylistSongs.Children.Clear();
 
@@ -508,7 +477,7 @@ namespace MusicPlayer
 
             TextBlock tblSongLength = new TextBlock()
             {
-                Text = MsToTime(song.Length),
+                Text = HelperMethods.MsToTime(song.Length),
                 // ONLY IF ALL NUMBERS AFTER : ARE 0 REMOVE THEM 4:10 != 4:1
                 Foreground = new SolidColorBrush(Color.FromRgb(153, 153, 153))
             };
@@ -541,28 +510,68 @@ namespace MusicPlayer
         }
 
         public Border CreatePlaylistTabUI(Playlist playlist)
-        {
+        {  
+            //                                     < TextBlock DataContext = "{Binding Playlists[0]}" FontSize = "12" >
+        
+            //                                            < TextBlock.Text >
+        
+            //                                                < MultiBinding StringFormat = "{}{0} Songs, {1}" >
+         
+            //                                                     < Binding Path = "Songs.Count" />
+          
+            //                                                      < Binding Path = "PlaylistDuration" />
+           
+            //                                                   </ MultiBinding >
+           
+            //                                               </ TextBlock.Text >
+           
+            //                                           </ TextBlock >
+
             Border border = new()
             {
-                Height = 40,
+                Padding = new Thickness(0, 8, 0, 8)
             };
             border.MouseDown += SelectPlaylistClick;
             border.Name = RegisterAndOrSetName($"Playlist{playlist.Id}", border);
 
-            Grid grid = new()
+            StackPanel sp = new()
+            {
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            TextBlock tblPlaylistName = new()
+            {
+                // Binding
+                FontSize = 18
+            };
+            Binding tblPlaylistNameTextBinding = new Binding("Name");
+            tblPlaylistNameTextBinding.Source = Playlists[playlist.Id];
+            BindingOperations.SetBinding(tblPlaylistName, TextBlock.TextProperty, tblPlaylistNameTextBinding);
+
+            DockPanel dp = new()
             {
 
             };
 
-            TextBlock tbl = new()
+            TextBlock tblPlaylistInfo = new()
             {
-                Text = playlist.Name,
+                
             };
+            MultiBinding tblPlaylistInfoMultiBinding = new MultiBinding();
+            object[] idk = { Playlists[playlist.Id].Songs.Count, Playlists[playlist.Id].PlaylistDuration };
+            //tblPlaylistInfoMultiBinding.Converter = Convert(idk, null, tblPlaylistInfo, null);
+
+            tblPlaylistInfoMultiBinding.Bindings.Add(new Binding("Songs.Count") { Source =  Playlists[playlist.Id] });
+            tblPlaylistInfoMultiBinding.Bindings.Add(new Binding("PlaylistDuration") { Source =  Playlists[playlist.Id] });
+            //BindingOperations.SetBinding(tblPlaylistInfo, TextBlock.TextProperty, tblPlaylistInfoMultiBinding);
 
             // Add Children
-            grid.Children.Add(tbl);
+            dp.Children.Add(tblPlaylistName);
+            dp.Children.Add(tblPlaylistInfo);
 
-            border.Child = grid;
+            sp.Children.Add(dp);
+
+            border.Child = sp;
 
             return border;
         }
@@ -616,5 +625,26 @@ namespace MusicPlayer
             PlaylistSettings.Visibility = Visibility.Visible;
         }
         #endregion Playlist Controls
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            LoadPlaylist(MyMusic);
+        }
+
+        private void Slider_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // Save settings
+            FileHandler.SaveSettings(Settings);
+        }
+
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            return String.Format("{0} {1}", values[0], values[1]);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

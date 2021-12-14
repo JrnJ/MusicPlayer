@@ -15,14 +15,32 @@ namespace MusicPlayer.Classes
         [JsonProperty("Name")]
         public string Name { get; set; }
 
+        [JsonProperty("Description")]
+        public string Description { get; set; }
+
         [JsonProperty("Songs")]
         public List<Song> Songs { get; set; }
 
-        public Playlist(int id, string name, List<Song> songs)
+        public string PlaylistDuration
+        {
+            get
+            {
+                double totalMs = 0;
+                for (int i = 0; i < Songs.Count; i++)
+                {
+                    totalMs += Songs[i].Length;
+                }
+
+                return HelperMethods.MsToTime(totalMs);
+            }
+        }
+
+        public Playlist(int id, List<Song> songs, string name = "", string description = "")
         {
             Id = id;
-            Name = name;
             Songs = songs;
+            Name = name;
+            Description = description;
         }
     }
 }

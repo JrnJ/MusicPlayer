@@ -57,6 +57,30 @@ namespace MusicPlayer.Classes
                 return null;
             }
         }
+
+        public static List<Song> GetSongsFromFolder(string path)
+        {
+            try
+            {
+                List<Song> songs = new List<Song>();
+
+                string[] filePaths = Directory.GetFiles(path);
+
+                for (int i = 0; i < filePaths.Length; i++)
+                {
+                    if (IsMusic(filePaths[i]))
+                    {
+                        songs.Add(new Song(filePaths[i], i));
+                    }
+                }
+
+                return songs;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         #endregion READ 
 
         #region WRITE
@@ -113,5 +137,15 @@ namespace MusicPlayer.Classes
             }
         }
         #endregion WRITE
+
+        public static bool IsMusic(string path)
+        {
+            if (path.Contains(".mp3"))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
     }
 }
