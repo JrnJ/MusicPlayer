@@ -23,6 +23,11 @@ namespace MusicPlayer.Classes
                 string json = File.ReadAllText("C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/playlists.json");
                 List<Playlist> playlists = JsonConvert.DeserializeObject<List<Playlist>>(json);
 
+                if (playlists == null)
+                {
+                    return null;
+                }
+
                 for (int i = 0; i < playlists.Count; i++)
                 {
                     for (int i2 = 0; i2 < playlists[i].Songs.Count; i2++)

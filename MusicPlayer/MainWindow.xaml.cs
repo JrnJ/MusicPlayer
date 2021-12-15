@@ -137,7 +137,16 @@ namespace MusicPlayer
             // Create a playlist of all songs
             for (int i = 0; i < Settings.MusicFolders.Count; i++)
             {
-                MyMusic.Songs.AddRange(FileHandler.GetSongsFromFolder(Settings.MusicFolders[i]));
+                List<Song> songs = FileHandler.GetSongsFromFolder(Settings.MusicFolders[i]);
+
+                if (songs != null)
+                {
+                    MyMusic.Songs.AddRange(songs);
+                }
+                else
+                {
+
+                }
             }
         }
 
