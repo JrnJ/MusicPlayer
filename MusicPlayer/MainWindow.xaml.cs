@@ -29,7 +29,7 @@ namespace MusicPlayer
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, IMultiValueConverter
+    public partial class MainWindow : Window, INotifyPropertyChanged, IMultiValueConverter
     {
         // Classes
         public DispatcherTimer Timer = new DispatcherTimer();
@@ -57,7 +57,7 @@ namespace MusicPlayer
         public Playlist CurrentPlaylist
         {
             get { return _currentPlaylist; }
-            set { _currentPlaylist = value; }
+            set { _currentPlaylist = value; OnPropertyChanged(); }
         }
 
         private Playlist _myMusic;
@@ -407,7 +407,7 @@ namespace MusicPlayer
 
         private void RepeatClick(object sender, RoutedEventArgs e)
         {
-            int breakpoint = 0;
+
         }
 
         private void PreviousSongClick(object sender, RoutedEventArgs e)
@@ -439,7 +439,7 @@ namespace MusicPlayer
             
         }
 
-        public Border CreateSongUI(Song song, int index = 0)
+        public Border CreateSongUI(Song song, int index)
         {
             // Create UI Elements
             Border borderContainer = new Border()
@@ -612,29 +612,6 @@ namespace MusicPlayer
             PlayMusic();
         }
 
-        #region Playlist Controls
-        private void PlaylistSongsClick(object sender, RoutedEventArgs e)
-        {
-            PlaylistSettings.Visibility = Visibility.Collapsed;
-            PlaylistArtists.Visibility = Visibility.Collapsed;
-            PlaylistSongs.Visibility = Visibility.Visible;
-        }
-
-        private void PlaylistArtistsClick(object sender, RoutedEventArgs e)
-        {
-            PlaylistSettings.Visibility = Visibility.Collapsed;
-            PlaylistSongs.Visibility = Visibility.Collapsed;
-            PlaylistArtists.Visibility = Visibility.Visible;
-        }
-
-        private void PlaylistSettingsClick(object sender, RoutedEventArgs e)
-        {
-            PlaylistArtists.Visibility = Visibility.Collapsed;
-            PlaylistSongs.Visibility = Visibility.Collapsed;
-            PlaylistSettings.Visibility = Visibility.Visible;
-        }
-        #endregion Playlist Controls
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             LoadPlaylist(MyMusic);
@@ -646,6 +623,13 @@ namespace MusicPlayer
             FileHandler.SaveSettings(Settings);
         }
 
+        #region Interface Implementations
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             return String.Format("{0} {1}", values[0], values[1]);
@@ -654,6 +638,74 @@ namespace MusicPlayer
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+        #endregion Interface Implementations
+
+        private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            (sender as TextBox).IsReadOnly = !(sender as TextBox).IsReadOnly;
+
+            if ((sender as TextBox).IsReadOnly)
+            {
+                (sender as TextBox).Cursor = Cursors.Arrow;
+            }
+            else
+            {
+                (sender as TextBox).Cursor = Cursors.IBeam;
+            }
+        }
+
+        private void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            if ((sender as TextBox).IsReadOnly)
+            {
+                e.Handled.Equals(true);
+                if ((sender as TextBox).SelectionLength != 0)
+                    (sender as TextBox).SelectionLength = 0;
+            }
+        }
+
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key.Equals(Key.Enter))
+            {
+                TextBox_MouseDoubleClick(sender, null);
+                //Playlists.First(x => x.Id == CurrentPlaylist.Id).Name = (sender as TextBox).Text;
+
+                //FileHandler.SavePlaylistsLocation(Playlists);
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Show My Music and allow a selection
+        }
+
+        private void tbSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            tblSearch.Text = (sender as TextBox).Text == "" ? "Search..." : "";
+
+            // Check textbox
+            if (!string.IsNullOrWhiteSpace((sender as TextBox).Text))
+            {
+                spPlaylistSongs.Children.Clear();
+
+                for (int i = 0; i < MyMusic.Songs.Count; i++)
+                {
+                    // Check if song contains them
+                    if (!string.IsNullOrWhiteSpace(MyMusic.Songs[i].Title))
+                        if (MyMusic.Songs[i].Title.ToLower().Contains((sender as TextBox).Text.ToLower()))
+                            spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
+                }
+            }
+            else
+            {
+                spPlaylistSongs.Children.Clear();
+                for (int i = 0; i < MyMusic.Songs.Count; i++)
+                {
+                    spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
+                }
+            }
         }
     }
 }

@@ -13,7 +13,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />
-                <RowDefinition Height="120" />
+                <RowDefinition Height="100" />
             </Grid.RowDefinitions>
 
             <!-- Controls -->
@@ -23,7 +23,7 @@
                         <!-- Song Info -->
                         <DockPanel>
                             <!-- Image -->
-                            <Image Width="120" Source="Images/SongImagePlaceholder.png" />
+                            <Image Width="100" Source="Images/SongImagePlaceholder.png" />
                             <!-- /Image -->
                             <StackPanel VerticalAlignment="Center" Margin="20,0,0,0">
                                 <TextBlock x:Name="tblInfoSongTitle" Text="Unknown Song" FontSize="24" />
@@ -35,11 +35,11 @@
                         <StackPanel>
                             <!-- Buttons -->
                             <DockPanel Margin="0,15,0,0" HorizontalAlignment="Center">
-                                <Button Click="ShuffleClick" Height="50" Width="50" Content="S" Background="#252525"/>
-                                <Button Click="PreviousSongClick" Height="50" Width="50" Content="&#60;&#60;" Margin="10,0,10,0" Background="#252525"/>
-                                <Button Click="PausePlayClick" Height="50" Width="50" Content="P/P" Background="#252525" />
-                                <Button Click="NextSongClick" Height="50" Width="50" Content="&#62;&#62;" Margin="10,0,10,0" Background="#252525" />
-                                <Button Click="RepeatClick" Height="50" Width="50" Content="R" Background="#252525" />
+                                <Button Click="ShuffleClick" Height="40" Width="40" Content="S" Background="#252525"/>
+                                <Button Click="PreviousSongClick" Height="40" Width="40" Content="&#60;&#60;" Margin="10,0,10,0" Background="#252525"/>
+                                <Button Click="PausePlayClick" Height="40" Width="40" Content="P/P" Background="#252525" />
+                                <Button Click="NextSongClick" Height="40" Width="40" Content="&#62;&#62;" Margin="10,0,10,0" Background="#252525" />
+                                <Button Click="RepeatClick" Height="40" Width="40" Content="R" Background="#252525" />
                             </DockPanel>
                             <!-- /Buttons -->
                             <!-- TrackBar -->
@@ -127,15 +127,19 @@
                 <Grid Grid.Column="1">
                     <StackPanel Margin="20" HorizontalAlignment="Left" Width="700">
                         <!-- Playlist Info -->
-                        <DockPanel Margin="0,0,0,8">
-                            <Button Content="Songs" Click="PlaylistSongsClick" Height="30" />
-                            <Button Content="Artists" Click="PlaylistArtistsClick" Height="30" />
-                            <Button Content="Settings" Click="PlaylistSettingsClick" Height="30" />
-                        </DockPanel>
                         <StackPanel Margin="0,0,0,8" VerticalAlignment="Center">
                             <!--<TextBlock />-->
-                            <TextBlock Text="{Binding CurrentPlaylist.Name}" 
-                                     FontSize="30" FontWeight="Bold" Foreground="White" />
+                            <!--<TextBlock Text="{Binding CurrentPlaylist.Name}" 
+                                       FontSize="30" FontWeight="Bold" Foreground="White" 
+                                       />-->
+                            <TextBox Text="{Binding CurrentPlaylist.Name, Mode=TwoWay}"
+                                     FontSize="30" FontWeight="Bold" CaretBrush="White"
+                                     Foreground="White" Background="Transparent"
+                                     BorderThickness="0" TextAlignment="Left" Padding="-2,0,0,0"
+                                     IsReadOnly="True" IsReadOnlyCaretVisible="False"
+                                     MouseDoubleClick="TextBox_MouseDoubleClick" KeyDown="TextBox_KeyDown"
+                                     Cursor="Arrow"
+                                     />
                             <TextBlock Text="{Binding CurrentPlaylist.Description}" 
                                        FontSize="16"/>
                             <TextBlock DataContext="{Binding CurrentPlaylist}" 
@@ -147,9 +151,25 @@
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
+                            <DockPanel>
+                                <Button Height="30" Content="Add Song" Click="Button_Click_1"/>
+                                <Button Height="30" Content="Edit Title" />
+                                <Button Height="30" Content="Edit Description" />
+                                <Button Height="30" Content="Delete Playlist" />
+                            </DockPanel>
+                            <Grid>
+                                <TextBlock x:Name="tblSearch" Text="Search..." FontSize="24"
+                                           Foreground="Gray"/>
+                                <TextBox x:Name="tbSearch" FontSize="24"
+                                         Background="Transparent" Foreground="White"
+                                         CaretBrush="White"
+                                         Padding="-2.35,-1,0,0"
+                                         TextChanged="tbSearch_TextChanged"
+                                         />
+                            </Grid>
                         </StackPanel>
                         <!-- /Playlist Info -->
-                        
+
                         <!-- Songs -->
                         <ScrollViewer Style="{StaticResource AlbumScrollbar}" Height="650" x:Name="PlaylistSongs">
                             <StackPanel x:Name="spPlaylistSongs" Margin="0, 0, 8, 0">
@@ -172,26 +192,6 @@
                             </StackPanel>
                         </ScrollViewer>
                         <!-- /Songs -->
-
-                        <!-- Artists -->
-                        <Grid x:Name="PlaylistArtists">
-                            <Border>
-                                <Grid>
-                                    <Button Width="40" Height="40" Content="Art" />
-                                </Grid>
-                            </Border>
-                        </Grid>
-                        <!-- /Artists -->
-
-                        <!-- Settings -->
-                        <Grid x:Name="PlaylistSettings">
-                            <Border>
-                                <Grid>
-                                    <Button Width="40" Height="40" Content="Set" />
-                                </Grid>
-                            </Border>
-                        </Grid>
-                        <!-- /Settings -->
                     </StackPanel>
                 </Grid>
                 <!-- /Playlist Viewer -->
