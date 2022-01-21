@@ -94,7 +94,7 @@ namespace MusicPlayer.Classes
         /// </summary>
         /// <param name="playlists"></param>
         /// <returns>True if save was succesful</returns>
-        public static bool SavePlaylistsLocation(List<Playlist> playlists)
+        public static bool SavePlaylists(List<Playlist> playlists)
         {
             try
             {
@@ -136,8 +136,9 @@ namespace MusicPlayer.Classes
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine("ERROR: " + ex);
                 return false;
             }
         }

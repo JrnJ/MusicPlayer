@@ -127,6 +127,7 @@ namespace MusicPlayer
             }
         }
 
+        #region Configuration
         private void ConfigureSettings()
         {
             // Load Settings
@@ -167,6 +168,7 @@ namespace MusicPlayer
             Timer.Interval = new TimeSpan(0, 0, 1);
             Timer.Tick += Timer_Tick;
         }
+        #endregion Configuration
 
         #region MediaPlayerEvents
         private void MediaPlayerMediaOpened(Windows.Media.Playback.MediaPlayer sender, object args)
@@ -436,7 +438,11 @@ namespace MusicPlayer
 
         private void AddPlaylistClick(object sender, RoutedEventArgs e)
         {
-            
+            // Create sample template to add a new playlist
+            Playlist playlist = new Playlist(Playlists.Count, new List<Song>(), "New Playlist", "New Playlist");
+
+            Playlists.Add(playlist);
+            spPlaylists.Children.Add(CreatePlaylistTabUI(playlist));
         }
 
         public Border CreateSongUI(Song song, int index)
@@ -688,18 +694,21 @@ namespace MusicPlayer
             // Check textbox
             if (!string.IsNullOrWhiteSpace((sender as TextBox).Text))
             {
+                // Clear playlist
                 spPlaylistSongs.Children.Clear();
 
                 for (int i = 0; i < MyMusic.Songs.Count; i++)
                 {
                     // Check if song contains them
                     if (!string.IsNullOrWhiteSpace(MyMusic.Songs[i].Title))
-                        if (MyMusic.Songs[i].Title.ToLower().Contains((sender as TextBox).Text.ToLower()))
+                        if (MyMusic.Songs[i].Title.ToLower().Contains((sender as TextBox).Text.ToLower()) || 
+                            MyMusic.Songs[i].ContributingArtists.ToLower().Contains((sender as TextBox).Text.ToLower()))
                             spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
                 }
             }
             else
             {
+                // Clear and fill the search playlist
                 spPlaylistSongs.Children.Clear();
                 for (int i = 0; i < MyMusic.Songs.Count; i++)
                 {
