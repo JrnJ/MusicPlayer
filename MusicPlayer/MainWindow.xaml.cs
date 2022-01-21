@@ -107,26 +107,6 @@ namespace MusicPlayer
             DataContext = this;
         }
 
-        public void ConfigurePlaylists()
-        {
-            // Load Playlist
-            Playlists = FileHandler.GetPlaylists();
-
-            if (Playlists == null)
-            {
-                MessageBox.Show("No playlists found!");
-            }
-            else
-            {
-                LoadPlaylist(Playlists[0]);
-
-                for (int i = 0; i < Playlists.Count; i++)
-                {
-                    spPlaylists.Children.Add(CreatePlaylistTabUI(Playlists[i]));
-                }
-            }
-        }
-
         #region Configuration
         private void ConfigureSettings()
         {
@@ -167,6 +147,26 @@ namespace MusicPlayer
             // Instantiate Timer
             Timer.Interval = new TimeSpan(0, 0, 1);
             Timer.Tick += Timer_Tick;
+        }
+
+        public void ConfigurePlaylists()
+        {
+            // Load Playlist
+            Playlists = FileHandler.GetPlaylists();
+
+            if (Playlists == null)
+            {
+                MessageBox.Show("No playlists found!");
+            }
+            else
+            {
+                LoadPlaylist(Playlists[0]);
+
+                for (int i = 0; i < Playlists.Count; i++)
+                {
+                    spPlaylists.Children.Add(CreatePlaylistTabUI(Playlists[i]));
+                }
+            }
         }
         #endregion Configuration
 
@@ -443,8 +443,10 @@ namespace MusicPlayer
 
             Playlists.Add(playlist);
             spPlaylists.Children.Add(CreatePlaylistTabUI(playlist));
+            LoadPlaylist(playlist);
         }
 
+        #region CreateUI
         public Border CreateSongUI(Song song, int index)
         {
             // Create UI Elements
@@ -526,22 +528,6 @@ namespace MusicPlayer
 
         public Border CreatePlaylistTabUI(Playlist playlist)
         {  
-            //                                     < TextBlock DataContext = "{Binding Playlists[0]}" FontSize = "12" >
-        
-            //                                            < TextBlock.Text >
-        
-            //                                                < MultiBinding StringFormat = "{}{0} Songs, {1}" >
-         
-            //                                                     < Binding Path = "Songs.Count" />
-          
-            //                                                      < Binding Path = "PlaylistDuration" />
-           
-            //                                                   </ MultiBinding >
-           
-            //                                               </ TextBlock.Text >
-           
-            //                                           </ TextBlock >
-
             Border border = new()
             {
                 Padding = new Thickness(0, 8, 0, 8)
@@ -563,33 +549,30 @@ namespace MusicPlayer
             tblPlaylistNameTextBinding.Source = Playlists[playlist.Id];
             BindingOperations.SetBinding(tblPlaylistName, TextBlock.TextProperty, tblPlaylistNameTextBinding);
 
-            DockPanel dp = new()
-            {
+            DockPanel dpPlaylistInfo = new();
 
-            };
+            TextBlock tblPlaylistSongCount = new();
+            Binding tblSongCountBinding = new Binding("Songs.Count");
+            tblSongCountBinding.Source = Playlists[playlist.Id];
+            tblSongCountBinding.StringFormat = "{0} Songs, ";
+            BindingOperations.SetBinding(tblPlaylistSongCount, TextBlock.TextProperty, tblSongCountBinding);
 
-            TextBlock tblPlaylistInfo = new()
-            {
-                
-            };
-            MultiBinding tblPlaylistInfoMultiBinding = new MultiBinding();
-            object[] idk = { Playlists[playlist.Id].Songs.Count, Playlists[playlist.Id].PlaylistDuration };
-            //tblPlaylistInfoMultiBinding.Converter = Convert(idk, null, tblPlaylistInfo, null);
+            TextBlock tblPlaylistDuration = new();
+            Binding tblPlaylistDurationBinding = new Binding("PlaylistDuration");
+            tblPlaylistDurationBinding.Source = Playlists[playlist.Id];
+            BindingOperations.SetBinding(tblPlaylistDuration, TextBlock.TextProperty, tblPlaylistDurationBinding);
 
-            tblPlaylistInfoMultiBinding.Bindings.Add(new Binding("Songs.Count") { Source =  Playlists[playlist.Id] });
-            tblPlaylistInfoMultiBinding.Bindings.Add(new Binding("PlaylistDuration") { Source =  Playlists[playlist.Id] });
-            //BindingOperations.SetBinding(tblPlaylistInfo, TextBlock.TextProperty, tblPlaylistInfoMultiBinding);
+            dpPlaylistInfo.Children.Add(tblPlaylistSongCount);
+            dpPlaylistInfo.Children.Add(tblPlaylistDuration);
 
-            // Add Children
-            dp.Children.Add(tblPlaylistName);
-            dp.Children.Add(tblPlaylistInfo);
-
-            sp.Children.Add(dp);
+            sp.Children.Add(tblPlaylistName);
+            sp.Children.Add(dpPlaylistInfo);
 
             border.Child = sp;
 
             return border;
         }
+        #endregion CreateUI
 
         private void SelectPlaylistClick(object sender, MouseButtonEventArgs e)
         {

@@ -104,15 +104,9 @@
                                 <Grid>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock Text="Playlist 1" FontSize="18"/>
-                                        <DockPanel>
-                                            <TextBlock DataContext="{Binding Playlists[0]}" FontSize="12">
-                                                <TextBlock.Text>
-                                                    <MultiBinding StringFormat="{}{0} Songs, {1}">
-                                                        <Binding Path="Songs.Count" />
-                                                        <Binding Path="PlaylistDuration" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
+                                        <DockPanel DataContext="{Binding Playlists[0]}">
+                                            <TextBlock Text="{Binding Songs.Count, StringFormat='{}{0} Songs, '}" />
+                                            <TextBlock Text="{Binding PlaylistDuration}" />
                                         </DockPanel>
                                     </StackPanel>
                                 </Grid>
@@ -198,5 +192,22 @@
             </Grid>
             <!-- /Controls -->
         </Grid>
+
+        <!-- Popups -->
+        <Grid>
+            <StackPanel x:Name="popupSongOptions" Width="240" Height="400" Background="#151515">
+                <DockPanel>
+                    <TextBlock Text="==" />
+                    <TextBlock Text="Save to playlist" 
+                               FontSize="16" Margin="10,0,0,0"/>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock Text="==" />
+                    <TextBlock Text="Remove from playlist" 
+                               FontSize="16" Margin="10,0,0,0"/>
+                </DockPanel>
+            </StackPanel>
+        </Grid>
+        <!-- /Popups -->
     </Grid>
 </Window>
