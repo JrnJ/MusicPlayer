@@ -72,6 +72,7 @@
                     </Grid>
                 </DockPanel>
             </Grid>
+            <!-- Controls -->
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -100,7 +101,7 @@
                                     Content="+" HorizontalAlignment="Right" Click="AddPlaylistClick"/>
                         </DockPanel>
                         <StackPanel x:Name="spPlaylists">
-                            <Border Padding="0,8,0,8">
+                            <!--<Border Padding="0,8,0,8">
                                 <Grid>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock Text="Playlist 1" FontSize="18"/>
@@ -110,7 +111,7 @@
                                         </DockPanel>
                                     </StackPanel>
                                 </Grid>
-                            </Border>
+                            </Border>-->
                         </StackPanel>
                     </StackPanel>
                     <!-- /Playlists -->
@@ -126,7 +127,7 @@
                             <!--<TextBlock Text="{Binding CurrentPlaylist.Name}" 
                                        FontSize="30" FontWeight="Bold" Foreground="White" 
                                        />-->
-                            <TextBox Text="{Binding CurrentPlaylist.Name, Mode=TwoWay}"
+                            <TextBox Text="{Binding SelectedPlaylist.Name, Mode=TwoWay}"
                                      FontSize="30" FontWeight="Bold" CaretBrush="White"
                                      Foreground="White" Background="Transparent"
                                      BorderThickness="0" TextAlignment="Left" Padding="-2,0,0,0"
@@ -134,9 +135,9 @@
                                      MouseDoubleClick="TextBox_MouseDoubleClick" KeyDown="TextBox_KeyDown"
                                      Cursor="Arrow"
                                      />
-                            <TextBlock Text="{Binding CurrentPlaylist.Description}" 
+                            <TextBlock Text="{Binding SelectedPlaylist.Description}" 
                                        FontSize="16"/>
-                            <TextBlock DataContext="{Binding CurrentPlaylist}" 
+                            <TextBlock DataContext="{Binding SelectedPlaylist}" 
                                        FontSize="12">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} Songs, {1}">
@@ -149,7 +150,7 @@
                                 <Button Height="30" Content="Add Song" Click="Button_Click_1"/>
                                 <Button Height="30" Content="Edit Title" />
                                 <Button Height="30" Content="Edit Description" />
-                                <Button Height="30" Content="Delete Playlist" />
+                                <Button Height="30" Content="Delete Playlist" Click="DeletePlaylistClick" Tag="{Binding SelectedPlaylist.Id}"/>
                             </DockPanel>
                             <Grid>
                                 <TextBlock x:Name="tblSearch" Text="Search..." FontSize="24"
@@ -183,6 +184,9 @@
                                 </DockPanel>
                             </Border>-->
                                 <!-- /Sample Border -->
+                                <!--<Button 
+                                    Style="{StaticResource NewAlbumSong}" 
+                                    DataContext="{Binding SelectedPlaylist.Songs[0]}"/>-->
                             </StackPanel>
                         </ScrollViewer>
                         <!-- /Songs -->
@@ -195,7 +199,8 @@
 
         <!-- Popups -->
         <Grid>
-            <StackPanel x:Name="popupSongOptions" Width="240" Height="400" Background="#151515">
+            <StackPanel x:Name="popupSongOptions"
+                        Width="240" Height="400" Background="#151515" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <DockPanel>
                     <TextBlock Text="==" />
                     <TextBlock Text="Save to playlist" 

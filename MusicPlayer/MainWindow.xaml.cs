@@ -52,12 +52,12 @@ namespace MusicPlayer
             set { _playlists = value; }
         }
 
-        private Playlist _currentPlaylist;
+        private Playlist _selectedPlaylist;
 
-        public Playlist CurrentPlaylist
+        public Playlist SelectedPlaylist
         {
-            get { return _currentPlaylist; }
-            set { _currentPlaylist = value; OnPropertyChanged(); }
+            get { return _selectedPlaylist; }
+            set { _selectedPlaylist = value; OnPropertyChanged(); }
         }
 
         private Playlist _myMusic;
@@ -76,7 +76,7 @@ namespace MusicPlayer
             set { _settings = value; }
         }
 
-        public Border CurrentUISong = new Border();
+        public Button CurrentUISong = new Button();
         public Song CurrentSong;
 
         public int CurrentSongIndex = 0;
@@ -197,10 +197,10 @@ namespace MusicPlayer
         {
             PauseMusic();
 
-            if (CurrentPlaylist.Songs.Count - 1 > CurrentSongIndex)
+            if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
             {
                 CurrentSongIndex += 1;
-                OpenMedia(CurrentPlaylist.Songs[CurrentSongIndex]);
+                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
             }
         }
 
@@ -247,7 +247,7 @@ namespace MusicPlayer
             CurrentUISong.Style = Application.Current.FindResource("AlbumSong") as Style;
 
             // Change new background
-            CurrentUISong = FindName($"Song{CurrentSongIndex}") as Border;
+            CurrentUISong = FindName($"Song{CurrentSongIndex}") as Button;
             CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
 
             // Maybe change where this is placed
@@ -425,112 +425,49 @@ namespace MusicPlayer
 
         public void LoadPlaylist(Playlist playlist)
         {
-            CurrentPlaylist = playlist;
+            SelectedPlaylist = playlist;
             spPlaylistSongs.Children.Clear();
 
             // Loop thru all songs
             for (int i = 0; i < playlist.Songs.Count; i++)
             {
+                spPlaylistSongs.Children.Add(CreateSongUI(playlist.Songs[i], i));
+
                 // Add song to screen
-                spPlaylistSongs.Children.Add(CreateSongUI(playlist.Songs[i], i)); 
+                if (playlist.Songs[i] == CurrentSong)
+                {
+                    CurrentSongIndex = i;
+
+                    // Change new background
+                    CurrentUISong = FindName($"Song{CurrentSongIndex}") as Button;
+                    CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
+                }
             }
         }
 
-        private void AddPlaylistClick(object sender, RoutedEventArgs e)
-        {
-            // Create sample template to add a new playlist
-            Playlist playlist = new Playlist(Playlists.Count, new List<Song>(), "New Playlist", "New Playlist");
-
-            Playlists.Add(playlist);
-            spPlaylists.Children.Add(CreatePlaylistTabUI(playlist));
-            LoadPlaylist(playlist);
-        }
-
         #region CreateUI
-        public Border CreateSongUI(Song song, int index)
+        public Button CreateSongUI(Song song, int index)
         {
-            // Create UI Elements
-            Border borderContainer = new Border()
+            // Create UI Element
+            Button btn = new()
             {
-                Style = Application.Current.FindResource("AlbumSong") as Style
+                Style = Application.Current.FindResource("AlbumSong") as Style,
+                DataContext = song,
+                Tag = song.Id
             };
-            borderContainer.MouseDown += AlbumSongMouseDown;
-            borderContainer.Name = RegisterAndOrSetName($"Song{index}", borderContainer);
+            btn.Click += AlbumSongClick;
+            btn.MouseRightButtonDown += AlbumSongRightMouseDown;
+            btn.Name = RegisterAndOrSetName($"Song{index}", btn);
 
-            DockPanel dpContentDocker = new DockPanel()
-            {
-                Height = 50
-            };
-
-            TextBlock tblSongId = new TextBlock()
-            {
-                Text = song.Id.ToString(),
-                TextAlignment = TextAlignment.Center,
-                Width = 26
-            };
-
-            StackPanel spSongInfoDevider = new StackPanel()
-            {
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            TextBlock tblSongTitle = new TextBlock()
-            {
-                Text = song.Title
-            };
-
-            TextBlock tblSongAuthor = new TextBlock()
-            {
-                Text = song.ContributingArtists,
-                Foreground = new SolidColorBrush(Color.FromRgb(153, 153, 153)),
-                FontSize = 14
-            };
-
-            DockPanel dpRightSide = new DockPanel()
-            {
-                HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(0, 0, 16, 0)
-            };
-
-            TextBlock tblSongLength = new TextBlock()
-            {
-                Text = HelperMethods.MsToTime(song.Length),
-                // ONLY IF ALL NUMBERS AFTER : ARE 0 REMOVE THEM 4:10 != 4:1
-                Foreground = new SolidColorBrush(Color.FromRgb(153, 153, 153))
-            };
-
-            Button btnAction = new Button()
-            {
-                Content = "- - -",
-                Width = 30,
-                Height = 20,
-                HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(20, 0, 0, 0)
-            };
-
-            // Put UI elements together
-            spSongInfoDevider.Children.Add(tblSongTitle);
-            spSongInfoDevider.Children.Add(tblSongAuthor);
-
-            dpContentDocker.Children.Add(tblSongId);
-            dpContentDocker.Children.Add(spSongInfoDevider);
-
-            dpRightSide.Children.Add(tblSongLength);
-            dpRightSide.Children.Add(btnAction);
-
-            dpContentDocker.Children.Add(dpRightSide);
-
-            borderContainer.Child = dpContentDocker;
-
-            // Return new UI element
-            return borderContainer;
+            return btn;
         }
 
         public Border CreatePlaylistTabUI(Playlist playlist)
         {  
             Border border = new()
             {
-                Padding = new Thickness(0, 8, 0, 8)
+                Padding = new Thickness(0, 8, 0, 8),
+                Tag = playlist.Id
             };
             border.MouseDown += SelectPlaylistClick;
             border.Name = RegisterAndOrSetName($"Playlist{playlist.Id}", border);
@@ -574,6 +511,44 @@ namespace MusicPlayer
         }
         #endregion CreateUI
 
+        private void AlbumSongClick(object sender, RoutedEventArgs e)
+        {
+            CurrentSongIndex = int.Parse((sender as Button).Name.Replace("Song", ""));
+
+            OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+            PlayMusic();
+        }
+
+        private void AlbumSongRightMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Button btn = sender as Button;
+
+            // Check if Tags are the same
+            // If so, change visibility to Collapsed
+            // If not, move popup to new position
+
+            if (popupSongOptions.Tag != btn.Tag)
+            {
+                // Move popup to element
+                popupSongOptions.Tag = btn.Tag;
+
+                Point mousePos = PointToScreen(Mouse.GetPosition(Application.Current.Windows[0]));
+                popupSongOptions.Margin = new Thickness(
+                    mousePos.X,
+                    mousePos.Y,
+                    0, 0);
+
+                // Make element visible
+                popupSongOptions.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                // If Tags are the same the element is already open and should be closed
+                popupSongOptions.Visibility = Visibility.Collapsed;
+                popupSongOptions.Tag = null;
+            }
+        }
+
         private void SelectPlaylistClick(object sender, MouseButtonEventArgs e)
         {
             // Load that playlist5
@@ -591,14 +566,6 @@ namespace MusicPlayer
             RegisterName(name, obj);
 
             return name;
-        }
-
-        private void AlbumSongMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            CurrentSongIndex = int.Parse((sender as Border).Name.Replace("Song", ""));
-
-            OpenMedia(CurrentPlaylist.Songs[CurrentSongIndex]);
-            PlayMusic();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -698,6 +665,33 @@ namespace MusicPlayer
                     spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
                 }
             }
+        }
+
+        private void AddPlaylistClick(object sender, RoutedEventArgs e)
+        {
+            // Create sample template to add a new playlist
+            Playlist playlist = new Playlist(Playlists.Count, new List<Song>(), "New Playlist", "New Playlist");
+
+            Playlists.Add(playlist);
+            spPlaylists.Children.Add(CreatePlaylistTabUI(playlist));
+            LoadPlaylist(playlist);
+        }
+
+        private void DeletePlaylistClick(object sender, RoutedEventArgs e)
+        {
+            Playlists.Remove(Playlists.Where(x => x.Id == int.Parse((sender as Button).Tag.ToString())).First());
+
+            for (int i = 0; i < spPlaylists.Children.Count; i++)
+            {
+                string tag1 = (spPlaylists.Children[i] as Border).Tag.ToString();
+                string tag2 = (sender as Button).Tag.ToString();
+                if ((spPlaylists.Children[i] as Border).Tag.ToString() == (sender as Button).Tag.ToString())
+                {
+                    spPlaylists.Children.RemoveAt(i);
+                }
+            }
+
+            LoadPlaylist(MyMusic);
         }
     }
 }

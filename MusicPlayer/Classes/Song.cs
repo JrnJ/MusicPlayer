@@ -58,6 +58,8 @@ namespace MusicPlayer.Classes
         [JsonIgnore]
         public int Bitrate { get; private set; }
 
+        // Getters
+        public string StringTime => HelperMethods.MsToTime(Length);
 
         // Constructor
         public Song(string path, int id)
