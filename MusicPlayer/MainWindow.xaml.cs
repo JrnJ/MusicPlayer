@@ -14,22 +14,23 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Media;
 using System.Runtime.InteropServices;
-using MusicPlayer.Classes;
 using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-using Windows.Media;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using Windows.Media;
+using MusicPlayer.Classes;
+using MusicPlayer.Models;
 
 namespace MusicPlayer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged, IMultiValueConverter
+    public partial class MainWindow : Window, INotifyPropertyChanged, ICommand
     {
         // Classes
         public DispatcherTimer Timer = new DispatcherTimer();
@@ -78,6 +79,7 @@ namespace MusicPlayer
 
         public Button CurrentUISong = new Button();
         public Song CurrentSong;
+        public FrameworkElement OpenPopup;
 
         public int CurrentSongIndex = 0;
 
@@ -124,25 +126,25 @@ namespace MusicPlayer
                 {
                     MyMusic.Songs.AddRange(songs);
                 }
-                else
-                {
-
-                }
             }
         }
 
         private void ConfigureMediaPlayer()
         {
+            // Mediaplayer
             MediaPlayer = new Windows.Media.Playback.MediaPlayer();
 
             // Mediaplayer events
+            MediaPlayer.SystemMediaTransportControls.ButtonPressed += MediaPlayerButtonPressed;
             MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
             MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
             MediaPlayer.VolumeChanged += MediaPlayerVolumeChanged;
             MediaPlayer.CommandManager.IsEnabled = true;
+            MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
+            MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
 
             // try get next song to work
-            MediaPlayer.AutoPlay = true;
+            //MediaPlayer.AutoPlay = true;
 
             // Instantiate Timer
             Timer.Interval = new TimeSpan(0, 0, 1);
@@ -164,25 +166,32 @@ namespace MusicPlayer
 
                 for (int i = 0; i < Playlists.Count; i++)
                 {
-                    spPlaylists.Children.Add(CreatePlaylistTabUI(Playlists[i]));
+                    spPlaylists.Children.Add(CreatePlaylistItemUI(Playlists[i]));
                 }
             }
         }
         #endregion Configuration
 
         #region MediaPlayerEvents
-        private void MediaPlayerMediaOpened(Windows.Media.Playback.MediaPlayer sender, object args)
+
+        private void MediaPlayerButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
         {
-            if (CurrentSong != null)
-            {
-                UpdateSMTCDisplay(CurrentSong);
-            }
+            // Call to MainWindow thread
+            Dispatcher.Invoke(() => { ButtonPressed(sender, args); });
         }
 
         private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
         {
             // Call to MainWindow thread
             Dispatcher.Invoke(() => { MediaEnded(); });
+        }
+
+        private void MediaPlayerMediaOpened(Windows.Media.Playback.MediaPlayer sender, object args)
+        {
+            if (CurrentSong != null)
+            {
+                UpdateSMTCDisplay(CurrentSong);
+            }
         }
 
         private void MediaPlayerVolumeChanged(Windows.Media.Playback.MediaPlayer sender, object args)
@@ -193,6 +202,31 @@ namespace MusicPlayer
         #endregion MediaPlayerEvents
 
         #region MusicThings
+        public void ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
+        {
+            switch (args.Button)
+            {
+                case SystemMediaTransportControlsButton.Previous:
+                    PauseMusic();
+                    if (CurrentSongIndex >= 1)
+                    {
+                        CurrentSongIndex -= 1;
+                        OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+                        PlayMusic();
+                    }
+                    break;
+                case SystemMediaTransportControlsButton.Next:
+                    PauseMusic();
+                    if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
+                    {
+                        CurrentSongIndex += 1;
+                        OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+                        PlayMusic();
+                    }
+                    break;
+            }
+        }
+
         public void MediaEnded()
         {
             PauseMusic();
@@ -201,21 +235,23 @@ namespace MusicPlayer
             {
                 CurrentSongIndex += 1;
                 OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+                PlayMusic();
             }
         }
 
         private void UpdateSMTCDisplay(Song song)
         {
-            SystemMediaTransportControlsDisplayUpdater updater = MediaPlayer.SystemMediaTransportControls.DisplayUpdater;
-            updater.ClearAll();
-
-            updater.Type = MediaPlaybackType.Video;
-            updater.VideoProperties.Title = song.Title;
-            updater.VideoProperties.Subtitle = song.ContributingArtists;
-            updater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
+            SystemMediaTransportControls smtc = MediaPlayer.SystemMediaTransportControls;
+            smtc.DisplayUpdater.ClearAll();
+            smtc.IsNextEnabled = true;
+            smtc.IsPreviousEnabled = true;
+            smtc.DisplayUpdater.Type = MediaPlaybackType.Video;
+            smtc.DisplayUpdater.VideoProperties.Title = song.Title;
+            smtc.DisplayUpdater.VideoProperties.Subtitle = song.ContributingArtists;
+            smtc.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
 
             // Update the system media transport controls
-            updater.Update();
+            smtc.DisplayUpdater.Update();
         }
 
         private void UpdateTime()
@@ -448,154 +484,71 @@ namespace MusicPlayer
         #region CreateUI
         public Button CreateSongUI(Song song, int index)
         {
+            SongPlaylists songPlaylists = new()
+            {
+                Song = song,
+                Playlists = Playlists
+            };
+
             // Create UI Element
             Button btn = new()
             {
+                // LNIKID0 https://stackoverflow.com/questions/679933/wpf-binding-multiple-controls-to-different-datacontexts
                 Style = Application.Current.FindResource("AlbumSong") as Style,
-                DataContext = song,
+                DataContext = songPlaylists,
                 Tag = song.Id
             };
             btn.Click += AlbumSongClick;
-            btn.MouseRightButtonDown += AlbumSongRightMouseDown;
             btn.Name = RegisterAndOrSetName($"Song{index}", btn);
 
             return btn;
         }
 
-        public Border CreatePlaylistTabUI(Playlist playlist)
-        {  
-            Border border = new()
+        public Button CreatePlaylistItemUI(Playlist playlist)
+        {
+            Button btn = new()
             {
-                Padding = new Thickness(0, 8, 0, 8),
+                Style = Application.Current.FindResource("PlaylistItem") as Style,
+                DataContext = playlist,
                 Tag = playlist.Id
             };
-            border.MouseDown += SelectPlaylistClick;
-            border.Name = RegisterAndOrSetName($"Playlist{playlist.Id}", border);
+            btn.Click += PlaylistItemClick;
+            btn.Name = RegisterAndOrSetName($"PlaylistItem{playlist.Id}", btn);
 
-            StackPanel sp = new()
-            {
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            TextBlock tblPlaylistName = new()
-            {
-                // Binding
-                FontSize = 18
-            };
-            Binding tblPlaylistNameTextBinding = new Binding("Name");
-            tblPlaylistNameTextBinding.Source = Playlists[playlist.Id];
-            BindingOperations.SetBinding(tblPlaylistName, TextBlock.TextProperty, tblPlaylistNameTextBinding);
-
-            DockPanel dpPlaylistInfo = new();
-
-            TextBlock tblPlaylistSongCount = new();
-            Binding tblSongCountBinding = new Binding("Songs.Count");
-            tblSongCountBinding.Source = Playlists[playlist.Id];
-            tblSongCountBinding.StringFormat = "{0} Songs, ";
-            BindingOperations.SetBinding(tblPlaylistSongCount, TextBlock.TextProperty, tblSongCountBinding);
-
-            TextBlock tblPlaylistDuration = new();
-            Binding tblPlaylistDurationBinding = new Binding("PlaylistDuration");
-            tblPlaylistDurationBinding.Source = Playlists[playlist.Id];
-            BindingOperations.SetBinding(tblPlaylistDuration, TextBlock.TextProperty, tblPlaylistDurationBinding);
-
-            dpPlaylistInfo.Children.Add(tblPlaylistSongCount);
-            dpPlaylistInfo.Children.Add(tblPlaylistDuration);
-
-            sp.Children.Add(tblPlaylistName);
-            sp.Children.Add(dpPlaylistInfo);
-
-            border.Child = sp;
-
-            return border;
+            return btn;
         }
         #endregion CreateUI
 
-        private void AlbumSongClick(object sender, RoutedEventArgs e)
+        #region CreateUIEvents
+        private void PlaylistItemClick(object sender, RoutedEventArgs e)
         {
-            CurrentSongIndex = int.Parse((sender as Button).Name.Replace("Song", ""));
-
-            OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-            PlayMusic();
-        }
-
-        private void AlbumSongRightMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Button btn = sender as Button;
-
-            // Check if Tags are the same
-            // If so, change visibility to Collapsed
-            // If not, move popup to new position
-
-            if (popupSongOptions.Tag != btn.Tag)
-            {
-                // Move popup to element
-                popupSongOptions.Tag = btn.Tag;
-
-                Point mousePos = PointToScreen(Mouse.GetPosition(Application.Current.Windows[0]));
-                popupSongOptions.Margin = new Thickness(
-                    mousePos.X,
-                    mousePos.Y,
-                    0, 0);
-
-                // Make element visible
-                popupSongOptions.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                // If Tags are the same the element is already open and should be closed
-                popupSongOptions.Visibility = Visibility.Collapsed;
-                popupSongOptions.Tag = null;
-            }
-        }
-
-        private void SelectPlaylistClick(object sender, MouseButtonEventArgs e)
-        {
-            // Load that playlist5
-            int playlistId = int.Parse((sender as Border).Name.Replace("Playlist", ""));
+            int playlistId = int.Parse((sender as FrameworkElement).Tag.ToString());
 
             Playlist playlist = Playlists.Find(x => x.Id == playlistId);
             LoadPlaylist(playlist);
         }
 
-        private string RegisterAndOrSetName(string name, object obj)
+        private void AlbumSongClick(object sender, RoutedEventArgs e)
         {
-            if (FindName(name) != null)
-                UnregisterName(name);
+            CurrentSongIndex = int.Parse((sender as FrameworkElement).Name.Replace("Song", ""));
 
-            RegisterName(name, obj);
-
-            return name;
+            OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+            PlayMusic();
         }
+        #endregion CreateUIEvents
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        #region VolumeSlider
+        private void MyMusicClick(object sender, RoutedEventArgs e)
         {
             LoadPlaylist(MyMusic);
         }
 
-        private void Slider_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void VolumeSliderPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             // Save settings
             FileHandler.SaveSettings(Settings);
         }
-
-        #region Interface Implementations
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            return String.Format("{0} {1}", values[0], values[1]);
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion Interface Implementations
+        #endregion VolumeSlider
 
         private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -632,9 +585,27 @@ namespace MusicPlayer
             }
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        #region PlaylistSettings
+        private void DeletePlaylistClick(object sender, RoutedEventArgs e)
         {
-            // Show My Music and allow a selection
+            Playlists.Remove(Playlists.Where(x => x.Id == int.Parse((sender as Button).Tag.ToString())).First());
+
+            for (int i = 0; i < spPlaylists.Children.Count; i++)
+            {
+                if ((spPlaylists.Children[i] as FrameworkElement).Tag.ToString() == (sender as Button).Tag.ToString())
+                {
+                    if (MessageBox.Show("Are you sure?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        spPlaylists.Children.RemoveAt(i);
+
+                        FileHandler.SavePlaylists(Playlists);
+                    }
+                    
+                    break;
+                }
+            }
+
+            LoadPlaylist(MyMusic);
         }
 
         private void tbSearch_TextChanged(object sender, TextChangedEventArgs e)
@@ -666,32 +637,68 @@ namespace MusicPlayer
                 }
             }
         }
+        #endregion PlaylistSettings
 
+        #region PlaylistItemsMenu
         private void AddPlaylistClick(object sender, RoutedEventArgs e)
         {
             // Create sample template to add a new playlist
             Playlist playlist = new Playlist(Playlists.Count, new List<Song>(), "New Playlist", "New Playlist");
 
             Playlists.Add(playlist);
-            spPlaylists.Children.Add(CreatePlaylistTabUI(playlist));
+            spPlaylists.Children.Add(CreatePlaylistItemUI(playlist));
             LoadPlaylist(playlist);
-        }
 
-        private void DeletePlaylistClick(object sender, RoutedEventArgs e)
+            // Save Playlists
+            FileHandler.SavePlaylists(Playlists);
+        }
+        #endregion PlaylistsTab
+
+        // Keep at bottom
+        #region HelperMethods
+
+        // < ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! > //
+        //
+        // Place in HelperMethods.cs if possible
+        //
+        // < ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! > //
+
+        /// <summary>
+        /// Registers an object with a name
+        /// Unregisters if object already exists
+        /// </summary>
+        /// <param name="name">Object's x:Name</param>
+        /// <param name="obj">Object</param>
+        /// <returns></returns>
+        private string RegisterAndOrSetName(string name, object obj)
         {
-            Playlists.Remove(Playlists.Where(x => x.Id == int.Parse((sender as Button).Tag.ToString())).First());
+            if (FindName(name) != null)
+                UnregisterName(name);
 
-            for (int i = 0; i < spPlaylists.Children.Count; i++)
-            {
-                string tag1 = (spPlaylists.Children[i] as Border).Tag.ToString();
-                string tag2 = (sender as Button).Tag.ToString();
-                if ((spPlaylists.Children[i] as Border).Tag.ToString() == (sender as Button).Tag.ToString())
-                {
-                    spPlaylists.Children.RemoveAt(i);
-                }
-            }
+            RegisterName(name, obj);
 
-            LoadPlaylist(MyMusic);
+            return name;
         }
+        #endregion HelperMethods
+
+        #region Interface Implementations
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler CanExecuteChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Execute(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion Interface Implementations
     }
 }

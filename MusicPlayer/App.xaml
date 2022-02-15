@@ -13,16 +13,98 @@
             <Setter Property="Foreground" Value="White" />
         </Style>
 
+        <Style TargetType="ContextMenu">
+            <Setter Property="Background" Value="Red" /> <!--#151515-->
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="HasDropShadow" Value="False" />
+
+            <!--<Style.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type MenuItem}">
+                                <Border Height="30" Background="{TemplateBinding Background}">
+                                    <Button Background="Green">
+                                        <Button.Content>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border Background="{TemplateBinding Background}">
+                                                                <TextBlock Text="{TemplateBinding Property=Uid}" />
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="Blue"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Content>
+                                    </Button>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Style.Resources>-->
+        </Style>
+
+        <!-- PlaylistItem -->
+        <Style TargetType="Button" x:Key="PlaylistItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Height" Value="60" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Name}" FontSize="18"/>
+                                <DockPanel>
+                                    <TextBlock Text="{Binding Songs.Count, StringFormat='{}{0} Songs, '}"/>
+                                    <TextBlock Text="{Binding PlaylistDuration}"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#303030"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!-- /PlaylistItem -->
+
         <!-- AlbumSong-->
         <Style TargetType="Button" x:Key="AlbumSong">
             <Setter Property="Background" Value="#252525"/>
             <Setter Property="Height" Value="50" />
             <Setter Property="Margin" Value="0, 0, 0, 8" />
 
+            <Setter Property="ContextMenu">
+                <Setter.Value>
+                    <ContextMenu>
+                        <MenuItem Header="Play" />
+                        <MenuItem Header="Add to" ItemsSource="{Binding Playlists}" DisplayMemberPath="Name" MouseDown="MenuItem_MouseDown"/>
+                        <MenuItem Header="Delete from playlist" />
+
+                        <Separator />
+                        <MenuItem Header="Properties"/>
+                    </ContextMenu>
+                </Setter.Value>
+            </Setter>
+
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                        <Border DataContext="{Binding Song}" Background="{TemplateBinding Background}" CornerRadius="4">
                             <DockPanel>
                                 <TextBlock Text="{Binding Id}" TextAlignment="Center" Width="26"/>
                                 <StackPanel VerticalAlignment="Center">
@@ -37,7 +119,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            
+
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#303030"/>

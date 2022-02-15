@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusicPlayer"
         mc:Ignorable="d"
+        
         Title="Jrn Music Player" Width="800" Height="450" WindowState="Maximized"
         Background="#202020"
         Keyboard.KeyDown="Window_KeyDown"
@@ -65,7 +66,7 @@
                         <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
                             <Slider Width="100" Style="{StaticResource SongTime}" Value="{Binding MediaPlayer.Volume, Mode=TwoWay}"
                                     Minimum="0" Maximum="1"
-                                    PreviewMouseLeftButtonUp="Slider_PreviewMouseLeftButtonUp"
+                                    PreviewMouseLeftButtonUp="VolumeSliderPreviewMouseLeftButtonUp"
                                 />
                         </DockPanel>
                         <!-- /Volume -->
@@ -89,7 +90,7 @@
 
                     <!-- Selections -->
                     <StackPanel Grid.Row="0">
-                        <Button Height="40" Content="My Music" Click="Button_Click"/>
+                        <Button Height="40" Content="My Music" Click="MyMusicClick"/>
                     </StackPanel>
                     <!-- /Selections -->
 
@@ -100,19 +101,7 @@
                             <Button Width="{Binding ElementName=sideMenuPlaylists, Path=ActualHeight}" 
                                     Content="+" HorizontalAlignment="Right" Click="AddPlaylistClick"/>
                         </DockPanel>
-                        <StackPanel x:Name="spPlaylists">
-                            <!--<Border Padding="0,8,0,8">
-                                <Grid>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Playlist 1" FontSize="18"/>
-                                        <DockPanel DataContext="{Binding Playlists[0]}">
-                                            <TextBlock Text="{Binding Songs.Count, StringFormat='{}{0} Songs, '}" />
-                                            <TextBlock Text="{Binding PlaylistDuration}" />
-                                        </DockPanel>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>-->
-                        </StackPanel>
+                        <StackPanel x:Name="spPlaylists" />
                     </StackPanel>
                     <!-- /Playlists -->
                 </Grid>
@@ -147,7 +136,7 @@
                                 </TextBlock.Text>
                             </TextBlock>
                             <DockPanel>
-                                <Button Height="30" Content="Add Song" Click="Button_Click_1"/>
+                                <Button Height="30" Content="Add Song" />
                                 <Button Height="30" Content="Edit Title" />
                                 <Button Height="30" Content="Edit Description" />
                                 <Button Height="30" Content="Delete Playlist" Click="DeletePlaylistClick" Tag="{Binding SelectedPlaylist.Id}"/>
@@ -198,20 +187,19 @@
         </Grid>
 
         <!-- Popups -->
-        <Grid>
-            <StackPanel x:Name="popupSongOptions"
+        <Grid x:Name="gridPopups"  Visibility="Visible">
+            <!--Background="Transparent"-->
+            <!--<StackPanel x:Name="popupSongOptions"
                         Width="240" Height="400" Background="#151515" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <DockPanel>
-                    <TextBlock Text="==" />
-                    <TextBlock Text="Save to playlist" 
-                               FontSize="16" Margin="10,0,0,0"/>
+                    <Button Content="== Save To Playlist" />
                 </DockPanel>
                 <DockPanel>
                     <TextBlock Text="==" />
                     <TextBlock Text="Remove from playlist" 
                                FontSize="16" Margin="10,0,0,0"/>
                 </DockPanel>
-            </StackPanel>
+            </StackPanel>-->
         </Grid>
         <!-- /Popups -->
     </Grid>

@@ -89,6 +89,23 @@ namespace MusicPlayer.Classes
         #endregion READ 
 
         #region WRITE
+        //public static void SaveToJSON(T toSave, string filePath)
+        //{
+        //    Console.WriteLine("Saving File...");
+
+        //    try
+        //    {
+        //        string jsonstring = JsonConvert.SerializeObject(toSave);
+        //        File.WriteAllText(filePath, jsonstring);
+
+        //        Console.WriteLine("File saved succesfully");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("File could not be saved!\n" + ex);
+        //    }
+        //}
+
         /// <summary>
         /// Saves given Playlists to playlists.json
         /// </summary>
