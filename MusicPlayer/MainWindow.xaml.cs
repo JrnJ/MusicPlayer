@@ -515,8 +515,12 @@ namespace MusicPlayer
             {
                 Header = "Add to",
                 ItemsSource = songPlaylists.Playlists,
-                DisplayMemberPath = "Name"
+                DisplayMemberPath = "Name",
             };
+            Binding binding = new Binding("Id");
+            binding.Source = Playlists;
+            miPlaylists.SetBinding(MenuItem.TagProperty, binding);
+            miPlaylists.Click += MiAddToPlaylistClick;
 
             MenuItem miDeleteFromPlaylist = new()
             {
@@ -585,8 +589,15 @@ namespace MusicPlayer
                     break;
                 }
             }
+        }
 
-            
+        private void MiAddToPlaylistClick(object sender, RoutedEventArgs e)
+        {
+            // Add item to playlist
+            int songId = int.Parse(((sender as FrameworkElement).Parent as FrameworkElement).Tag.ToString());
+            string playlistId = "0";//(sender as FrameworkElement).Tag.ToString();
+
+            MessageBox.Show(songId.ToString() + " | " + playlistId.ToString());
         }
         #endregion CreateUIEvents
 
