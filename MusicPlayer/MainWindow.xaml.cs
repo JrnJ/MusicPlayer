@@ -30,7 +30,7 @@ namespace MusicPlayer
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged, ICommand
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         // Classes
         public DispatcherTimer Timer = new DispatcherTimer();
@@ -493,13 +493,47 @@ namespace MusicPlayer
             // Create UI Element
             Button btn = new()
             {
-                // LNIKID0 https://stackoverflow.com/questions/679933/wpf-binding-multiple-controls-to-different-datacontexts
                 Style = Application.Current.FindResource("AlbumSong") as Style,
                 DataContext = songPlaylists,
                 Tag = song.Id
             };
             btn.Click += AlbumSongClick;
             btn.Name = RegisterAndOrSetName($"Song{index}", btn);
+
+            ContextMenu cm = new()
+            {
+                Tag = songPlaylists.Song.Id
+            };
+
+            MenuItem miPlay = new()
+            {
+                Header = "Play"
+            };
+            miPlay.Click += MiPlayClick;
+
+            MenuItem miPlaylists = new()
+            {
+                Header = "Add to",
+                ItemsSource = songPlaylists.Playlists,
+                DisplayMemberPath = "Name"
+            };
+
+            MenuItem miDeleteFromPlaylist = new()
+            {
+                Header = "Remove"
+            };
+
+            MenuItem miProperties = new()
+            {
+                Header = "Properties"
+            };
+
+            cm.Items.Add(miPlay);
+            cm.Items.Add(miPlaylists);
+            cm.Items.Add(miDeleteFromPlaylist);
+
+            cm.Items.Add(miProperties);
+            btn.ContextMenu = cm;
 
             return btn;
         }
@@ -534,6 +568,25 @@ namespace MusicPlayer
 
             OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
             PlayMusic();
+        }
+
+        // ContextMenuEvents
+        private void MiPlayClick(object sender, RoutedEventArgs e)
+        {
+            int songId = int.Parse(((sender as FrameworkElement).Parent as FrameworkElement).Tag.ToString());
+
+            for (int i = 0; i < SelectedPlaylist.Songs.Count; i++)
+            {
+                if (SelectedPlaylist.Songs[i].Id == songId)
+                {
+                    CurrentSongIndex = SelectedPlaylist.Songs[i].Id;
+                    OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+                    PlayMusic();
+                    break;
+                }
+            }
+
+            
         }
         #endregion CreateUIEvents
 
@@ -683,21 +736,10 @@ namespace MusicPlayer
 
         #region Interface Implementations
         public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler CanExecuteChanged;
 
         private void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Execute(object parameter)
-        {
-            throw new NotImplementedException();
         }
         #endregion Interface Implementations
     }

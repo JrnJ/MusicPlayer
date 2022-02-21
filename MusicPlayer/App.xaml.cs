@@ -13,9 +13,6 @@ namespace MusicPlayer
     /// </summary>
     public partial class App : Application
     {
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("MenuItem_Click");
-        }
+
     }
 }

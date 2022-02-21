@@ -14,7 +14,8 @@
         </Style>
 
         <Style TargetType="ContextMenu">
-            <Setter Property="Background" Value="Red" /> <!--#151515-->
+            <Setter Property="Background" Value="#222222" />
+            <!--#151515-->
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="HasDropShadow" Value="False" />
 
@@ -53,6 +54,47 @@
             </Style.Resources>-->
         </Style>
 
+        <Style TargetType="RibbonApplicationSplitMenuItem">
+            <Setter Property="Background" Value="Green" />
+            <Setter Property="BorderBrush" Value="Green" />
+        </Style>
+
+        <Style TargetType="MenuItem">
+            <Setter Property="Background" Value="Red" />
+            <Setter Property="Foreground" Value="White" />
+
+
+            <!--<Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                        <Border Background="{TemplateBinding Background}" >
+                            <TextBlock Text="Hello" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>-->
+
+            <Style.Triggers>
+                <Trigger Property="Role" Value="TopLevelHeader">
+                    <Setter Property="Background" Value="Blue" />
+                </Trigger>
+
+                <Trigger Property="Role" Value="TopLevelItem">
+                    <Setter Property="Background" Value="Green" />
+                </Trigger>
+
+                <!--Item with extra Items inside Item-->
+                <Trigger Property="Role" Value="SubmenuHeader">
+                    <Setter Property="Background" Value="Cyan" />
+                </Trigger>
+
+                <!--Every Item-->
+                <Trigger Property="Role" Value="SubmenuItem">
+                    <Setter Property="Background" Value="Orange" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- PlaylistItem -->
         <Style TargetType="Button" x:Key="PlaylistItem">
             <Setter Property="Background" Value="Transparent"/>
@@ -87,19 +129,6 @@
             <Setter Property="Background" Value="#252525"/>
             <Setter Property="Height" Value="50" />
             <Setter Property="Margin" Value="0, 0, 0, 8" />
-
-            <Setter Property="ContextMenu">
-                <Setter.Value>
-                    <ContextMenu>
-                        <MenuItem Header="Play" />
-                        <MenuItem Header="Add to" ItemsSource="{Binding Playlists}" DisplayMemberPath="Name" MouseDown="MenuItem_MouseDown"/>
-                        <MenuItem Header="Delete from playlist" />
-
-                        <Separator />
-                        <MenuItem Header="Properties"/>
-                    </ContextMenu>
-                </Setter.Value>
-            </Setter>
 
             <Setter Property="Template">
                 <Setter.Value>
@@ -147,7 +176,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                        <Border DataContext="{Binding Song}" Background="{TemplateBinding Background}" CornerRadius="4">
                             <DockPanel>
                                 <Grid Width="26" Margin="16, 0, 0, 0">
                                     <Polygon Points="0,18, 10,25, 0,32" Fill="#dba531" HorizontalAlignment="Center">
@@ -535,7 +564,5 @@
             <Setter Property="IsMoveToPointEnabled" Value="True" />
         </Style>-->
         <!-- /Track -->
-        
-        
     </Application.Resources>
 </Application>

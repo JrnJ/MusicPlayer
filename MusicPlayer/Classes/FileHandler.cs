@@ -40,6 +40,8 @@ namespace MusicPlayer.Classes
             }
             catch (Exception ex)
             {
+                Console.WriteLine("ERROR: FileHandler.cs ln19" + ex);
+
                 return null;
             }
         }
@@ -59,6 +61,8 @@ namespace MusicPlayer.Classes
             }
             catch (Exception ex)
             {
+                Console.WriteLine("ERROR: FileHandler.cs ln53" + ex);
+
                 return null;
             }
         }
@@ -83,6 +87,8 @@ namespace MusicPlayer.Classes
             }
             catch (Exception ex)
             {
+                Console.WriteLine("ERROR: FileHandler.cs ln68" + ex);
+
                 return null;
             }
         }

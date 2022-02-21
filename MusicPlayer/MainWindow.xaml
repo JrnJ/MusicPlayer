@@ -97,7 +97,7 @@
                     <!-- Playlists -->
                     <StackPanel Grid.Row="1">
                         <DockPanel Height="40" x:Name="sideMenuPlaylists">
-                            <Button Content="My Playlists" />
+                            <Button Content="My Playlists"/>
                             <Button Width="{Binding ElementName=sideMenuPlaylists, Path=ActualHeight}" 
                                     Content="+" HorizontalAlignment="Right" Click="AddPlaylistClick"/>
                         </DockPanel>
@@ -183,7 +183,6 @@
                 </Grid>
                 <!-- /Playlist Viewer -->
             </Grid>
-            <!-- /Controls -->
         </Grid>
 
         <!-- Popups -->
