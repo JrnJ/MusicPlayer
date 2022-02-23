@@ -519,7 +519,7 @@ namespace MusicPlayer
             };
             Binding binding = new Binding("Id");
             binding.Source = Playlists;
-            miPlaylists.SetBinding(MenuItem.TagProperty, binding);
+            miPlaylists.SetBinding(TagProperty, binding);
             miPlaylists.Click += MiAddToPlaylistClick;
 
             MenuItem miDeleteFromPlaylist = new()

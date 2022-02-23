@@ -5,47 +5,20 @@ namespace MusicPlayer.Classes
 {
     public static class HelperMethods
     {
-        // Converst milliseconds to a time format
+        /// <summary>
+        /// Converst milliseconds to a h:m:ss string
+        /// </summary>
+        /// <param name="ms">Amount of time in milliseconds</param>
+        /// <returns>a h:m:ss string</returns>
         public static string MsToTime(double ms)
         {
-            string time = new DateTime().AddMilliseconds(ms).ToString("H:mm:ss");
-            string finalTime = "";
+            double hours = ms / 1000 / 60 / 60;
+            double minutes = hours % 1 * 60;
+            double seconds = Math.Floor(minutes % 1 * 60);
+            hours = Math.Floor(hours);
+            minutes = Math.Floor(minutes);
 
-            string[] timeStamps = time.Split(':');
-
-            // Check if strin contains something other than 0
-            for (int i = 0; i < timeStamps.Length; i++)
-            {
-                foreach (char c in timeStamps[i])
-                {
-                    if (c != '0')
-                    {
-                        finalTime += timeStamps[i] + ":";
-                        break;
-                    }
-                }
-            }
-
-            if (finalTime.Length > 0)
-            {
-                // Remove last :
-                finalTime = finalTime.Remove(finalTime.Length - 1);
-
-                if (finalTime.Length < 4)
-                {
-                    finalTime = "0:" + finalTime;
-                }
-                else if (finalTime[0].ToString() == "0")
-                {
-                    finalTime = finalTime.Remove(0, 1);
-                }
-            }
-            else
-            {
-                finalTime = "0:00";
-            }
-
-            return finalTime;
+            return (hours > 0 ? hours + ":" : "") + minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
         }
 
         public static Rect GetAbsolutePlacement(this FrameworkElement element, bool relativeToScreen = false)
