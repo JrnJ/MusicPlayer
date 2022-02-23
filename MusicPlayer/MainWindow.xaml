@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:MusicPlayer"
         mc:Ignorable="d"
         
-        Title="Jrn Music Player" Width="800" Height="450" WindowState="Maximized"
+        Title="Jrn Music Player" Width="800" Height="450" WindowState="Maximized" Icon="Images/logo_gold.png"
         Background="#202020"
         Keyboard.KeyDown="Window_KeyDown"
         >

@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\logo.png" />
+    <None Remove="Images\logo_gold.png" />
     <None Remove="Images\next_track.png" />
     <None Remove="Images\pause.png" />
     <None Remove="Images\play.png" />
@@ -23,6 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\logo_gold.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\next_track.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

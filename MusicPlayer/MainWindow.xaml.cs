@@ -516,9 +516,10 @@ namespace MusicPlayer
                 Header = "Add to",
                 ItemsSource = songPlaylists.Playlists,
                 DisplayMemberPath = "Name",
+                //Tag = "{Binding Id}"
             };
-            Binding binding = new Binding("Id");
-            binding.Source = Playlists;
+            Binding binding = new Binding("Name");
+            binding.Source = miPlaylists;
             miPlaylists.SetBinding(TagProperty, binding);
             miPlaylists.Click += MiAddToPlaylistClick;
 
@@ -595,7 +596,8 @@ namespace MusicPlayer
         {
             // Add item to playlist
             int songId = int.Parse(((sender as FrameworkElement).Parent as FrameworkElement).Tag.ToString());
-            string playlistId = "0";//(sender as FrameworkElement).Tag.ToString();
+            string playlistId = (sender as FrameworkElement).Tag.ToString();
+            FrameworkElement parent = sender as FrameworkElement;
 
             MessageBox.Show(songId.ToString() + " | " + playlistId.ToString());
         }
