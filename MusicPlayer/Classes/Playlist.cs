@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace MusicPlayer.Classes
         public string Description { get; set; }
 
         [JsonProperty("Songs")]
-        public List<Song> Songs { get; set; }
+        public ObservableCollection<Song> Songs { get; set; }
 
         public string PlaylistDuration
         {
@@ -35,7 +36,7 @@ namespace MusicPlayer.Classes
             }
         }
 
-        public Playlist(int id, List<Song> songs, string name = "", string description = "")
+        public Playlist(int id, ObservableCollection<Song> songs, string name = "", string description = "")
         {
             Id = id;
             Songs = songs;

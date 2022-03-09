@@ -45,12 +45,12 @@ namespace MusicPlayer
             set { _mediaPlayer = value; }
         }
 
-        private List<Playlist> _playlists;
+        private ObservableCollection<Playlist> _playlists;
 
-        public List<Playlist> Playlists
+        public ObservableCollection<Playlist> Playlists
         {
             get { return _playlists; }
-            set { _playlists = value; }
+            set { _playlists = value; OnPropertyChanged(); }
         }
 
         private Playlist _selectedPlaylist;
@@ -79,8 +79,6 @@ namespace MusicPlayer
 
         public Button CurrentUISong = new Button();
         public Song CurrentSong;
-        public FrameworkElement OpenPopup;
-
         public int CurrentSongIndex = 0;
 
         public double SongTotalMs;
@@ -115,7 +113,7 @@ namespace MusicPlayer
             // Load Settings
             Settings = FileHandler.GetSettings();
             MediaPlayer.Volume = Settings.Volume;
-            MyMusic = new Playlist(0, new List<Song>(), "My Music", "All music from all folders.");
+            MyMusic = new Playlist(0, new ObservableCollection<Song>(), "My Music", "All music from all folders.");
 
             // Create a playlist of all songs
             for (int i = 0; i < Settings.MusicFolders.Count; i++)
@@ -124,7 +122,11 @@ namespace MusicPlayer
 
                 if (songs != null)
                 {
-                    MyMusic.Songs.AddRange(songs);
+                    //MyMusic.Songs.AddRange(songs);
+                    for (int i2 = 0; i2 < songs.Count; i2++)
+                    {
+                        MyMusic.Songs.Add(songs[i2]);
+                    }
                 }
             }
         }
@@ -163,11 +165,6 @@ namespace MusicPlayer
             else
             {
                 LoadPlaylist(Playlists[0]);
-
-                for (int i = 0; i < Playlists.Count; i++)
-                {
-                    spPlaylists.Children.Add(CreatePlaylistItemUI(Playlists[i]));
-                }
             }
         }
         #endregion Configuration
@@ -264,6 +261,71 @@ namespace MusicPlayer
         }
         #endregion MusicThings
 
+        #region WindowEvents
+        private void WindowKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                #region Reverse
+                // Reverse 10s
+                case Key.J:
+                    SubtractTime(10);
+                    break;
+                // Reverse 5
+                case Key.Left:
+                    SubtractTime(5);
+                    break;
+                #endregion Reverse
+                #region Forward
+                // Forward 10s
+                case Key.L:
+                    AddTime(10);
+                    break;
+                // Forward 5
+                case Key.Right:
+                    AddTime(5);
+                    break;
+                #endregion Forward
+                #region Playpause
+                case Key.Space:
+                    if (IsPlaying)
+                        PauseMusic();
+                    else
+                        PlayMusic();
+                    break;
+                case Key.K:
+                    if (IsPlaying)
+                        PauseMusic();
+                    else
+                        PlayMusic();
+                    break;
+                #endregion Playpause
+
+                // Do this
+                // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
+                #region ChangeVolume
+                // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
+                case Key.NumPad8:
+                    Settings.Volume += 0.05;
+                    break;
+                case Key.NumPad2:
+                    Settings.Volume -= 0.05;
+                    break;
+                #endregion ChangeVolume
+                default:
+                    break;
+            }
+        }
+
+        private void WindowClosing(object sender, CancelEventArgs e)
+        {
+            // Minimize window
+            //WindowState = WindowState.Minimized;
+
+            //e.Cancel = true;
+        }
+        #endregion WindowEvents
+
         private void Timer_Tick(object sender, EventArgs e)
         {
             UpdateTime();
@@ -280,10 +342,12 @@ namespace MusicPlayer
             MediaPlayer.SetUriSource(new Uri(song.Path));
 
             // Reset background
-            CurrentUISong.Style = Application.Current.FindResource("AlbumSong") as Style;
+            if (CurrentUISong != null)
+                CurrentUISong.Style = Application.Current.FindResource("AlbumSong") as Style;
 
-            // Change new background
-            CurrentUISong = FindName($"Song{CurrentSongIndex}") as Button;
+            UIElement uiElement = (UIElement)icSongs.ItemContainerGenerator.ContainerFromIndex(CurrentSongIndex);
+            CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as Button;
+
             CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
 
             // Maybe change where this is placed
@@ -337,62 +401,6 @@ namespace MusicPlayer
         {
             MediaPlayer.Position = MediaPlayer.Position.Subtract(new TimeSpan(0, 0, amount));
             Timer_Tick(Timer, null);
-        }
-
-        // Shortcuts
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                #region Reverse
-                // Reverse 10s
-                case Key.J:
-                    SubtractTime(10);
-                    break;
-                // Reverse 5
-                case Key.Left:
-                    SubtractTime(5);
-                    break;
-                #endregion Reverse
-                #region Forward
-                // Forward 10s
-                case Key.L:
-                    AddTime(10);
-                    break;
-                // Forward 5
-                case Key.Right:
-                    AddTime(5);
-                    break;
-                #endregion Forward
-                #region Playpause
-                case Key.Space:
-                    if (IsPlaying)
-                        PauseMusic();
-                    else
-                        PlayMusic();
-                    break;
-                case Key.K:
-                    if (IsPlaying)
-                        PauseMusic();
-                    else
-                        PlayMusic();
-                    break;
-                #endregion Playpause
-
-                // Do this
-                // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
-                #region ChangeVolume
-                // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
-                case Key.NumPad8:
-                    Settings.Volume += 0.05;
-                    break;
-                case Key.NumPad2:
-                    Settings.Volume -= 0.05;
-                    break;
-                #endregion ChangeVolume
-                default:
-                    break;
-            }
         }
 
         private void sliderSongTimePlayed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -462,100 +470,88 @@ namespace MusicPlayer
         public void LoadPlaylist(Playlist playlist)
         {
             SelectedPlaylist = playlist;
-            spPlaylistSongs.Children.Clear();
 
             // Loop thru all songs
-            for (int i = 0; i < playlist.Songs.Count; i++)
-            {
-                spPlaylistSongs.Children.Add(CreateSongUI(playlist.Songs[i], i));
+            // ?!? => CurrentSongUi, I dont think this even has to be done
+            //for (int i = 0; i < playlist.Songs.Count; i++)
+            //{
+            //    spPlaylistSongs.Children.Add(CreateSongUI(playlist.Songs[i], i));
 
-                // Add song to screen
-                if (playlist.Songs[i] == CurrentSong)
-                {
-                    CurrentSongIndex = i;
+            //    // Add song to screen
+            //    if (playlist.Songs[i] == CurrentSong)
+            //    {
+            //        CurrentSongIndex = i;
 
-                    // Change new background
-                    CurrentUISong = FindName($"Song{CurrentSongIndex}") as Button;
-                    CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
-                }
-            }
+            //        // Change new background
+            //        CurrentUISong = FindName($"Song{CurrentSongIndex}") as Button;
+            //        CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
+            //    }
+            //}
         }
 
         #region CreateUI
-        public Button CreateSongUI(Song song, int index)
-        {
-            SongPlaylists songPlaylists = new()
-            {
-                Song = song,
-                Playlists = Playlists
-            };
+        //public Button CreateSongUI(Song song, int index)
+        //{
+        //    SongPlaylists songPlaylists = new()
+        //    {
+        //        Song = song,
+        //        Playlists = Playlists
+        //    };
 
-            // Create UI Element
-            Button btn = new()
-            {
-                Style = Application.Current.FindResource("AlbumSong") as Style,
-                DataContext = songPlaylists,
-                Tag = song.Id
-            };
-            btn.Click += AlbumSongClick;
-            btn.Name = RegisterAndOrSetName($"Song{index}", btn);
+        //    // Create UI Element
+        //    Button btn = new()
+        //    {
+        //        Style = Application.Current.FindResource("AlbumSong") as Style,
+        //        DataContext = songPlaylists,
+        //        Tag = song.Id
+        //    };
+        //    btn.Click += AlbumSongClick;
+        //    btn.Name = RegisterAndOrSetName($"Song{index}", btn);
 
-            ContextMenu cm = new()
-            {
-                Tag = songPlaylists.Song.Id
-            };
+        //    ContextMenu cm = new()
+        //    {
+        //        Tag = songPlaylists.Song.Id
+        //    };
 
-            MenuItem miPlay = new()
-            {
-                Header = "Play"
-            };
-            miPlay.Click += MiPlayClick;
+        //    MenuItem miPlay = new()
+        //    {
+        //        Header = "Play"
+        //    };
+        //    miPlay.Click += MiPlayClick;
 
-            MenuItem miPlaylists = new()
-            {
-                Header = "Add to",
-                ItemsSource = songPlaylists.Playlists,
-                DisplayMemberPath = "Name",
-                //Tag = "{Binding Id}"
-            };
-            Binding binding = new Binding("Name");
-            binding.Source = miPlaylists;
-            miPlaylists.SetBinding(TagProperty, binding);
-            miPlaylists.Click += MiAddToPlaylistClick;
+        //    MenuItem miPlaylists = new()
+        //    {
+        //        Style = Application.Current.FindResource("Test") as Style,
 
-            MenuItem miDeleteFromPlaylist = new()
-            {
-                Header = "Remove"
-            };
+        //        Header = "Add to",
+        //        ItemsSource = songPlaylists.Playlists,
+        //        //DisplayMemberPath = "Name",
+        //        //Tag = "{Binding Path=Id}"
+        //    };
+        //    Binding binding = new Binding("Name");
+        //    binding.Source = miPlaylists;
+        //    miPlaylists.SetBinding(TagProperty, binding);
+        //    miPlaylists.Click += MiAddToPlaylistClick;
 
-            MenuItem miProperties = new()
-            {
-                Header = "Properties"
-            };
+        //    MenuItem miDeleteFromPlaylist = new()
+        //    {
+        //        Header = "Remove"
+        //    };
 
-            cm.Items.Add(miPlay);
-            cm.Items.Add(miPlaylists);
-            cm.Items.Add(miDeleteFromPlaylist);
+        //    MenuItem miProperties = new()
+        //    {
+        //        Header = "Properties"
+        //    };
 
-            cm.Items.Add(miProperties);
-            btn.ContextMenu = cm;
+        //    cm.Items.Add(miPlay);
+        //    cm.Items.Add(miPlaylists);
+        //    cm.Items.Add(miDeleteFromPlaylist);
 
-            return btn;
-        }
+        //    cm.Items.Add(miProperties);
+        //    btn.ContextMenu = cm;
 
-        public Button CreatePlaylistItemUI(Playlist playlist)
-        {
-            Button btn = new()
-            {
-                Style = Application.Current.FindResource("PlaylistItem") as Style,
-                DataContext = playlist,
-                Tag = playlist.Id
-            };
-            btn.Click += PlaylistItemClick;
-            btn.Name = RegisterAndOrSetName($"PlaylistItem{playlist.Id}", btn);
-
-            return btn;
-        }
+        //    return btn;
+        //}
         #endregion CreateUI
 
         #region CreateUIEvents
@@ -563,15 +559,19 @@ namespace MusicPlayer
         {
             int playlistId = int.Parse((sender as FrameworkElement).Tag.ToString());
 
-            Playlist playlist = Playlists.Find(x => x.Id == playlistId);
+            // ehm maybe not :)
+            Playlist playlist = Playlists.ToList().Find(x => x.Id == playlistId);
             LoadPlaylist(playlist);
         }
 
         private void AlbumSongClick(object sender, RoutedEventArgs e)
         {
-            CurrentSongIndex = int.Parse((sender as FrameworkElement).Name.Replace("Song", ""));
+            int songId = int.Parse((sender as FrameworkElement).Tag.ToString());
+            Song song = SelectedPlaylist.Songs.Where(x => x.Id == songId).First();
+            CurrentSongIndex = SelectedPlaylist.Songs.IndexOf(song);
 
             OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+
             PlayMusic();
         }
 
@@ -654,24 +654,13 @@ namespace MusicPlayer
         #region PlaylistSettings
         private void DeletePlaylistClick(object sender, RoutedEventArgs e)
         {
-            Playlists.Remove(Playlists.Where(x => x.Id == int.Parse((sender as Button).Tag.ToString())).First());
-
-            for (int i = 0; i < spPlaylists.Children.Count; i++)
+            if (MessageBox.Show("Are you sure?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if ((spPlaylists.Children[i] as FrameworkElement).Tag.ToString() == (sender as Button).Tag.ToString())
-                {
-                    if (MessageBox.Show("Are you sure?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        spPlaylists.Children.RemoveAt(i);
+                Playlists.Remove(Playlists.Where(x => x.Id == int.Parse((sender as Button).Tag.ToString())).First());
+                FileHandler.SavePlaylists(Playlists);
 
-                        FileHandler.SavePlaylists(Playlists);
-                    }
-                    
-                    break;
-                }
+                LoadPlaylist(MyMusic);
             }
-
-            LoadPlaylist(MyMusic);
         }
 
         private void tbSearch_TextChanged(object sender, TextChangedEventArgs e)
@@ -679,29 +668,30 @@ namespace MusicPlayer
             tblSearch.Text = (sender as TextBox).Text == "" ? "Search..." : "";
 
             // Check textbox
-            if (!string.IsNullOrWhiteSpace((sender as TextBox).Text))
-            {
-                // Clear playlist
-                spPlaylistSongs.Children.Clear();
+            // ?!? => Need names and stuff, fix later
+            //if (!string.IsNullOrWhiteSpace((sender as TextBox).Text))
+            //{
+            //    // Clear playlist
+            //    spPlaylistSongs.Children.Clear();
 
-                for (int i = 0; i < MyMusic.Songs.Count; i++)
-                {
-                    // Check if song contains them
-                    if (!string.IsNullOrWhiteSpace(MyMusic.Songs[i].Title))
-                        if (MyMusic.Songs[i].Title.ToLower().Contains((sender as TextBox).Text.ToLower()) || 
-                            MyMusic.Songs[i].ContributingArtists.ToLower().Contains((sender as TextBox).Text.ToLower()))
-                            spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
-                }
-            }
-            else
-            {
-                // Clear and fill the search playlist
-                spPlaylistSongs.Children.Clear();
-                for (int i = 0; i < MyMusic.Songs.Count; i++)
-                {
-                    spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
-                }
-            }
+            //    for (int i = 0; i < MyMusic.Songs.Count; i++)
+            //    {
+            //        // Check if song contains them
+            //        if (!string.IsNullOrWhiteSpace(MyMusic.Songs[i].Title))
+            //            if (MyMusic.Songs[i].Title.ToLower().Contains((sender as TextBox).Text.ToLower()) || 
+            //                MyMusic.Songs[i].ContributingArtists.ToLower().Contains((sender as TextBox).Text.ToLower()))
+            //                spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
+            //    }
+            //}
+            //else
+            //{
+            //    // Clear and fill the search playlist
+            //    spPlaylistSongs.Children.Clear();
+            //    for (int i = 0; i < MyMusic.Songs.Count; i++)
+            //    {
+            //        spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
+            //    }
+            //}
         }
         #endregion PlaylistSettings
 
@@ -709,10 +699,9 @@ namespace MusicPlayer
         private void AddPlaylistClick(object sender, RoutedEventArgs e)
         {
             // Create sample template to add a new playlist
-            Playlist playlist = new Playlist(Playlists.Count, new List<Song>(), "New Playlist", "New Playlist");
+            Playlist playlist = new Playlist(Playlists.Count, new ObservableCollection<Song>(), "New Playlist", "New Playlist");
 
             Playlists.Add(playlist);
-            spPlaylists.Children.Add(CreatePlaylistItemUI(playlist));
             LoadPlaylist(playlist);
 
             // Save Playlists

@@ -54,6 +54,21 @@
             </Style.Resources>-->
         </Style>
 
+        <Style TargetType="MenuItem" x:Key="Test">
+
+            <Setter Property="Foreground" Value="Pink"/>
+            <Setter Property="Background" Value="Pink"/>
+
+            <Style.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Foreground" Value="MediumPurple"/>
+                    <Setter Property="Background" Value="MediumPurple"/>
+                    <Setter Property="Header" Value="{Binding Path=Name}" />
+                    <Setter Property="Tag" Value="{Binding Path=Name}" />
+                </Style>
+            </Style.Resources>
+        </Style>
+
         <Style TargetType="RibbonApplicationSplitMenuItem">
             <Setter Property="Background" Value="Green" />
             <Setter Property="BorderBrush" Value="Green" />
@@ -133,7 +148,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border DataContext="{Binding Song}" Background="{TemplateBinding Background}" CornerRadius="4">
+                        <Border  Background="{TemplateBinding Background}" CornerRadius="4"> <!--DataContext="{Binding Song}"-->
                             <DockPanel>
                                 <TextBlock Text="{Binding Id}" TextAlignment="Center" Width="26"/>
                                 <StackPanel VerticalAlignment="Center">

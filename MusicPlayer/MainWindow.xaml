@@ -8,7 +8,7 @@
         
         Title="Jrn Music Player" Width="800" Height="450" WindowState="Maximized" Icon="Images/logo_gold.png"
         Background="#202020"
-        Keyboard.KeyDown="Window_KeyDown"
+        Keyboard.KeyDown="WindowKeyDown" Closing="WindowClosing"
         >
     <Grid>
         <Grid>
@@ -101,7 +101,16 @@
                             <Button Width="{Binding ElementName=sideMenuPlaylists, Path=ActualHeight}" 
                                     Content="+" HorizontalAlignment="Right" Click="AddPlaylistClick"/>
                         </DockPanel>
-                        <StackPanel x:Name="spPlaylists" />
+                        
+                        <!-- Items -->
+                        <ItemsControl ItemsSource="{Binding Playlists}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource PlaylistItem}" Tag="{Binding Id}" Click="PlaylistItemClick" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <!-- Items -->
                     </StackPanel>
                     <!-- /Playlists -->
                 </Grid>
@@ -156,27 +165,29 @@
 
                         <!-- Songs -->
                         <ScrollViewer Style="{StaticResource AlbumScrollbar}" Height="650" x:Name="PlaylistSongs">
-                            <StackPanel x:Name="spPlaylistSongs" Margin="0, 0, 8, 0">
-                                <!-- Sample Border -->
-                                <!--<Border Style="{StaticResource AlbumSong}" MouseDown="AlbumSongMouseDown">
-                                <DockPanel Height="50">
-                                    <TextBlock Text="999" Width="26" TextAlignment="Center"/>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="The Sound" MaxWidth="300" />
-                                        <TextBlock Text="Aero Chord" Foreground="#999999" FontSize="14" />
-                                    </StackPanel>
-
-                                    <DockPanel HorizontalAlignment="Right" Margin="0,0,16,0">
-                                        <TextBlock Text="3:07" Foreground="#999999" />
-                                        <Button Content="- - -" Width="30" Height="20" HorizontalAlignment="Right" Margin="20,0,0,0"/>
-                                    </DockPanel>
-                                </DockPanel>
-                            </Border>-->
-                                <!-- /Sample Border -->
-                                <!--<Button 
-                                    Style="{StaticResource NewAlbumSong}" 
-                                    DataContext="{Binding SelectedPlaylist.Songs[0]}"/>-->
-                            </StackPanel>
+                            <!--<StackPanel x:Name="spPlaylistSongs" Margin="0, 0, 8, 0" />-->
+                            <ItemsControl x:Name="icSongs" ItemsSource="{Binding SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource AlbumSong}" Click="AlbumSongClick" Tag="{Binding Id}">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Play" Click="MiPlayClick" />
+                                                    <MenuItem Header="Add to" ItemsSource="{Binding Playlists}" DisplayMemberPath="Name">
+                                                        <!--<MenuItem.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <MenuItem Header="{Binding Name}" Tag="{Binding Id}" Click="MiAddToPlaylistClick"/>
+                                                            </DataTemplate>
+                                                        </MenuItem.ItemTemplate>-->
+                                                    </MenuItem>
+                                                    <MenuItem Header="Remove" />
+                                                    <MenuItem Header="Properties" />
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </ScrollViewer>
                         <!-- /Songs -->
                     </StackPanel>
@@ -194,7 +205,7 @@
                     <Button Content="== Save To Playlist" />
                 </DockPanel>
                 <DockPanel>
-                    <TextBlock Text="==" />
+                    <TextBlock Text="==" />f
                     <TextBlock Text="Remove from playlist" 
                                FontSize="16" Margin="10,0,0,0"/>
                 </DockPanel>

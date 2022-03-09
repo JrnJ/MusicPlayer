@@ -16,12 +16,12 @@ namespace MusicPlayer.Classes
         /// Gets all the playlists from the playlists.json file
         /// </summary>
         /// <returns></returns>
-        public static List<Playlist> GetPlaylists()
+        public static ObservableCollection<Playlist> GetPlaylists()
         {
             try
             {
                 string json = File.ReadAllText("C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/playlists.json");
-                List<Playlist> playlists = JsonConvert.DeserializeObject<List<Playlist>>(json);
+                ObservableCollection<Playlist> playlists = JsonConvert.DeserializeObject<ObservableCollection<Playlist>>(json);
 
                 if (playlists == null)
                 {
@@ -117,7 +117,7 @@ namespace MusicPlayer.Classes
         /// </summary>
         /// <param name="playlists"></param>
         /// <returns>True if save was succesful</returns>
-        public static bool SavePlaylists(List<Playlist> playlists)
+        public static bool SavePlaylists(ObservableCollection<Playlist> playlists)
         {
             try
             {

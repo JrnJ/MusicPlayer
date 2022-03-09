@@ -1,6 +1,7 @@
 ﻿using MusicPlayer.Classes;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,6 @@ namespace MusicPlayer.Models
     public class SongPlaylists
     {
         public Song Song { get; set; }
-        public List<Playlist> Playlists { get; set; }
+        public ObservableCollection<Playlist> Playlists { get; set; }
     }
 }
