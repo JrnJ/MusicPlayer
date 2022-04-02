@@ -4,22 +4,30 @@
              xmlns:local="clr-namespace:MusicPlayer"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style TargetType="TextBlock">
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/AlbumSongTheme.xaml" />
+                <ResourceDictionary Source="Themes/PlaylistItemTheme.xaml" />
+                <ResourceDictionary Source="Themes/SongTimeSliderTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        
+        <!--<Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="White" />
         </Style>
 
         <Style TargetType="Button">
             <Setter Property="Background" Value="#353535" />
             <Setter Property="Foreground" Value="White" />
-        </Style>
+        </Style>-->
 
-        <Style TargetType="ContextMenu">
+        <!--<Style TargetType="ContextMenu">
             <Setter Property="Background" Value="#222222" />
-            <!--#151515-->
+            --><!--#151515--><!--
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="HasDropShadow" Value="False" />
 
-            <!--<Style.Resources>
+            --><!--<Style.Resources>
                 <Style TargetType="MenuItem">
                     <Setter Property="Template">
                         <Setter.Value>
@@ -51,7 +59,7 @@
                         </Setter.Value>
                     </Setter>
                 </Style>
-            </Style.Resources>-->
+            </Style.Resources>--><!--
         </Style>
 
         <Style TargetType="MenuItem" x:Key="Test">
@@ -79,7 +87,7 @@
             <Setter Property="Foreground" Value="White" />
 
 
-            <!--<Setter Property="Template">
+            --><!--<Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type MenuItem}">
                         <Border Background="{TemplateBinding Background}" >
@@ -87,7 +95,7 @@
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
-            </Setter>-->
+            </Setter>--><!--
 
             <Style.Triggers>
                 <Trigger Property="Role" Value="TopLevelHeader">
@@ -98,132 +106,17 @@
                     <Setter Property="Background" Value="Green" />
                 </Trigger>
 
-                <!--Item with extra Items inside Item-->
+                --><!--Item with extra Items inside Item--><!--
                 <Trigger Property="Role" Value="SubmenuHeader">
                     <Setter Property="Background" Value="Cyan" />
                 </Trigger>
 
-                <!--Every Item-->
+                --><!--Every Item--><!--
                 <Trigger Property="Role" Value="SubmenuItem">
                     <Setter Property="Background" Value="Orange" />
                 </Trigger>
             </Style.Triggers>
-        </Style>
-
-        <!-- PlaylistItem -->
-        <Style TargetType="Button" x:Key="PlaylistItem">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Height" Value="60" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border Background="{TemplateBinding Background}">
-                            <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Name}" FontSize="18"/>
-                                <DockPanel>
-                                    <TextBlock Text="{Binding Songs.Count, StringFormat='{}{0} Songs, '}"/>
-                                    <TextBlock Text="{Binding PlaylistDuration}"/>
-                                </DockPanel>
-                            </StackPanel>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#303030"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <!-- /PlaylistItem -->
-
-        <!-- AlbumSong-->
-        <Style TargetType="Button" x:Key="AlbumSong">
-            <Setter Property="Background" Value="#252525"/>
-            <Setter Property="Height" Value="50" />
-            <Setter Property="Margin" Value="0, 0, 0, 8" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border  Background="{TemplateBinding Background}" CornerRadius="4"> <!--DataContext="{Binding Song}"-->
-                            <DockPanel>
-                                <TextBlock Text="{Binding Id}" TextAlignment="Center" Width="26"/>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding Title}" />
-                                    <TextBlock Text="{Binding ContributingArtists}" Foreground="#999999" FontSize="14"/>
-                                </StackPanel>
-                                <DockPanel HorizontalAlignment="Right" Margin="0, 0, 16, 0">
-                                    <TextBlock Text="{Binding StringTime}" Foreground="#999999" />
-                                </DockPanel>
-                            </DockPanel>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#303030"/>
-                </Trigger>
-            </Style.Triggers>
-
-            <Style.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="White" />
-                    <Setter Property="FontSize" Value="16" />
-
-                    <Setter Property="Margin" Value="16,0,0,0" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                </Style>
-            </Style.Resources>
-        </Style>
-        <!-- /AlbumSong-->
-
-        <!-- SelectedAlbumSong-->
-        <Style TargetType="Button" x:Key="SelectedAlbumSong">
-            <Setter Property="Background" Value="#303030"/>
-            <Setter Property="Height" Value="50" />
-            <Setter Property="Margin" Value="0, 0, 0, 8" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border DataContext="{Binding Song}" Background="{TemplateBinding Background}" CornerRadius="4">
-                            <DockPanel>
-                                <Grid Width="26" Margin="16, 0, 0, 0">
-                                    <Polygon Points="0,18, 10,25, 0,32" Fill="#dba531" HorizontalAlignment="Center">
-                                        <Polygon.Effect>
-                                            <DropShadowEffect ShadowDepth="0" Color="#dba531" Opacity="0.5" BlurRadius="20"/>
-                                        </Polygon.Effect>
-                                    </Polygon>
-                                </Grid>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding Title}" />
-                                    <TextBlock Text="{Binding ContributingArtists}" Foreground="#999999" FontSize="14"/>
-                                </StackPanel>
-                                <DockPanel HorizontalAlignment="Right" Margin="0, 0, 16, 0">
-                                    <TextBlock Text="{Binding StringTime}" Foreground="#999999" />
-                                </DockPanel>
-                            </DockPanel>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-
-            <Style.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="White" />
-                    <Setter Property="FontSize" Value="16" />
-
-                    <Setter Property="Margin" Value="16,0,0,0" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                </Style>
-            </Style.Resources>
-        </Style>
-        <!-- /SelectedAlbumSong-->
+        </Style>-->
 
         <!--<Style x:Key="RepeatButtonTransparent" TargetType="{x:Type RepeatButton}">
             <Setter Property="OverridesDefaultStyle" Value="true"/>
@@ -477,75 +370,13 @@
                 </Trigger>
             </Style.Triggers>
         </Style>-->
-        
-        <!-- SongTimeSlider -->
-        <Style x:Key="SongTime" TargetType="{x:Type Slider}">
-            <Setter Property="IsSelectionRangeEnabled" Value="True" />
-            <Setter Property="SelectionStart" Value="{Binding Minimum, RelativeSource={RelativeSource Self}}" />
-            <Setter Property="SelectionEnd" Value="{Binding Value, RelativeSource={RelativeSource Self}}" />
-            <Setter Property="Foreground" Value="#dba531" />
-            
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Slider}">
-                        <Grid VerticalAlignment="Center">
-                            <Border x:Name="borderBackground" Margin="6,0" Height="6" Background="#303030" CornerRadius="4"/>
-                            <Canvas Margin="0, -6, 0, 0" VerticalAlignment="Center">
-                                <Border x:Name="PART_SelectionRange" 
-                                        HorizontalAlignment="Left" Height="6" Background="{TemplateBinding Foreground}" 
-                                        CornerRadius="4"
-                                        >
-                                    <Border.Effect>
-                                        <DropShadowEffect ShadowDepth="0" Color="#dba531" Opacity="0.5" BlurRadius="20"/>
-                                    </Border.Effect>
-                                </Border>
-                            </Canvas>
-                            <Track x:Name="PART_Track">
-                                <Track.Thumb>
-                                    <Thumb x:Name="TrackThumb" Height="12" Width="12" Visibility="Hidden">
-                                        <Thumb.Style>
-                                            <Style TargetType="{x:Type Thumb}">
-                                                <Style.Setters>
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="{x:Type Thumb}">
-                                                                <Ellipse Fill="#dba531" />
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style.Setters>
-                                            </Style>
-                                        </Thumb.Style>
-                                    </Thumb>
-                                </Track.Thumb>
-                            </Track>
-                        </Grid>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="TrackThumb" Property="Visibility" Value="Visible" />
-                            </Trigger>
-                            <!--<Trigger Property="IsDragging" Value="true">
-                                <Setter Property="Fill" TargetName="grip" Value="{StaticResource SliderThumb.Pressed.Background}"/>
-                                <Setter Property="Stroke" TargetName="grip" Value="{StaticResource SliderThumb.Pressed.Border}"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Fill" TargetName="grip" Value="{StaticResource SliderThumb.Disabled.Background}"/>
-                                <Setter Property="Stroke" TargetName="grip" Value="{StaticResource SliderThumb.Disabled.Border}"/>
-                            </Trigger>-->
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <!-- /SongTimeSlider -->
 
         <!-- AlbumScrollbar -->
-        <Style TargetType="ScrollViewer" x:Key="AlbumScrollbar">
+        <!--<Style TargetType="ScrollViewer" x:Key="AlbumScrollbar">
             <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
             <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
 
-            <!--<Setter Property="Template">
+            --><!--<Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate>
                         <ScrollBar 
@@ -568,8 +399,8 @@
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
-            </Setter>-->
-        </Style>
+            </Setter>--><!--
+        </Style>-->
         <!-- /AlbumScrollbar -->
 
         <!-- Track -->

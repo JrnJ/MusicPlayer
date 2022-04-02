@@ -77,7 +77,7 @@ namespace MusicPlayer
             set { _settings = value; }
         }
 
-        public Button CurrentUISong = new Button();
+        public RadioButton CurrentUISong = new RadioButton();
         public Song CurrentSong;
         public int CurrentSongIndex = 0;
 
@@ -342,13 +342,20 @@ namespace MusicPlayer
             MediaPlayer.SetUriSource(new Uri(song.Path));
 
             // Reset background
-            if (CurrentUISong != null)
-                CurrentUISong.Style = Application.Current.FindResource("AlbumSong") as Style;
+            // Changed it to a radiobutton which eliminates this, until further testing of radiobutton at least
+            //if (CurrentUISong != null)
+            //    CurrentUISong.Style = Application.Current.FindResource("AlbumSong") as Style;
 
+            //UIElement uiElement = (UIElement)icSongs.ItemContainerGenerator.ContainerFromIndex(CurrentSongIndex);
+            //CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as Button;
+
+            //CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
+
+            // Change SelectedRadioButton
+            // Doesnt work, tbh cant be botherd atm so will change this later
             UIElement uiElement = (UIElement)icSongs.ItemContainerGenerator.ContainerFromIndex(CurrentSongIndex);
-            CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as Button;
-
-            CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
+            CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as RadioButton;
+            CurrentUISong.IsChecked.Equals(true);
 
             // Maybe change where this is placed
             tblInfoSongTitle.Text = song.Title;
@@ -744,5 +751,10 @@ namespace MusicPlayer
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
         #endregion Interface Implementations
+
+        private void RadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("UwU");
+        }
     }
 }

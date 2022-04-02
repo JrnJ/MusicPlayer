@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:MusicPlayer"
         mc:Ignorable="d"
         
-        Title="Jrn Music Player" Width="800" Height="450" WindowState="Maximized" Icon="Images/logo_gold.png"
+        Title="Jrn Music Player" Width="1920" Height="1080" WindowState="Maximized" Icon="Images/logo_gold.png"
         Background="#202020"
         Keyboard.KeyDown="WindowKeyDown" Closing="WindowClosing"
         >
@@ -75,6 +75,7 @@
             </Grid>
             <!-- Controls -->
 
+            <!-- PageView -->
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="400" />
@@ -117,15 +118,16 @@
                 <!-- /Sidemenu -->
 
                 <!-- Playlist Viewer -->
-                <Grid Grid.Column="1">
-                    <StackPanel Margin="20" HorizontalAlignment="Left" Width="700">
-                        <!-- Playlist Info -->
-                        <StackPanel Margin="0,0,0,8" VerticalAlignment="Center">
-                            <!--<TextBlock />-->
-                            <!--<TextBlock Text="{Binding CurrentPlaylist.Name}" 
+                <DockPanel Grid.Column="1">
+                    <Grid Grid.Column="1">
+                        <StackPanel Margin="20" HorizontalAlignment="Left" Width="700">
+                            <!-- Playlist Info -->
+                            <StackPanel Margin="0,0,0,8" VerticalAlignment="Center">
+                                <!--<TextBlock />-->
+                                <!--<TextBlock Text="{Binding CurrentPlaylist.Name}" 
                                        FontSize="30" FontWeight="Bold" Foreground="White" 
                                        />-->
-                            <TextBox Text="{Binding SelectedPlaylist.Name, Mode=TwoWay}"
+                                <TextBox Text="{Binding SelectedPlaylist.Name, Mode=TwoWay}"
                                      FontSize="30" FontWeight="Bold" CaretBrush="White"
                                      Foreground="White" Background="Transparent"
                                      BorderThickness="0" TextAlignment="Left" Padding="-2,0,0,0"
@@ -133,67 +135,77 @@
                                      MouseDoubleClick="TextBox_MouseDoubleClick" KeyDown="TextBox_KeyDown"
                                      Cursor="Arrow"
                                      />
-                            <TextBlock Text="{Binding SelectedPlaylist.Description}" 
+                                <TextBlock Text="{Binding SelectedPlaylist.Description}" 
                                        FontSize="16"/>
-                            <TextBlock DataContext="{Binding SelectedPlaylist}" 
+                                <TextBlock DataContext="{Binding SelectedPlaylist}" 
                                        FontSize="12">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} Songs, {1}">
-                                        <Binding Path="Songs.Count" />
-                                        <Binding Path="PlaylistDuration" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                            <DockPanel>
-                                <Button Height="30" Content="Add Song" />
-                                <Button Height="30" Content="Edit Title" />
-                                <Button Height="30" Content="Edit Description" />
-                                <Button Height="30" Content="Delete Playlist" Click="DeletePlaylistClick" Tag="{Binding SelectedPlaylist.Id}"/>
-                            </DockPanel>
-                            <Grid>
-                                <TextBlock x:Name="tblSearch" Text="Search..." FontSize="24"
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} Songs, {1}">
+                                            <Binding Path="Songs.Count" />
+                                            <Binding Path="PlaylistDuration" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <DockPanel>
+                                    <Button Height="30" Content="Add Song" />
+                                    <Button Height="30" Content="Edit Title" />
+                                    <Button Height="30" Content="Edit Description" />
+                                    <Button Height="30" Content="Delete Playlist" Click="DeletePlaylistClick" Tag="{Binding SelectedPlaylist.Id}"/>
+                                </DockPanel>
+                                <Grid>
+                                    <TextBlock x:Name="tblSearch" Text="Search..." FontSize="24"
                                            Foreground="Gray"/>
-                                <TextBox x:Name="tbSearch" FontSize="24"
+                                    <TextBox x:Name="tbSearch" FontSize="24"
                                          Background="Transparent" Foreground="White"
                                          CaretBrush="White"
                                          Padding="-2.35,-1,0,0"
                                          TextChanged="tbSearch_TextChanged"
                                          />
-                            </Grid>
-                        </StackPanel>
-                        <!-- /Playlist Info -->
+                                </Grid>
+                            </StackPanel>
+                            <!-- /Playlist Info -->
 
-                        <!-- Songs -->
-                        <ScrollViewer Style="{StaticResource AlbumScrollbar}" Height="650" x:Name="PlaylistSongs">
-                            <!--<StackPanel x:Name="spPlaylistSongs" Margin="0, 0, 8, 0" />-->
-                            <ItemsControl x:Name="icSongs" ItemsSource="{Binding SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Style="{StaticResource AlbumSong}" Click="AlbumSongClick" Tag="{Binding Id}">
-                                            <Button.ContextMenu>
-                                                <ContextMenu>
-                                                    <MenuItem Header="Play" Click="MiPlayClick" />
-                                                    <MenuItem Header="Add to" ItemsSource="{Binding Playlists}" DisplayMemberPath="Name">
+                            <!-- Songs -->
+                            <ScrollViewer Height="650" x:Name="PlaylistSongs">
+                                <!--="{StaticResource AlbumScrollbar}"-->
+                                <!--<StackPanel x:Name="spPlaylistSongs" Margin="0, 0, 8, 0" />-->
+                                <ItemsControl x:Name="icSongs" ItemsSource="{Binding SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}" Click="AlbumSongClick" Tag="{Binding Id}">
+                                                <RadioButton.ContextMenu>
+                                                    <ContextMenu Tag="{Binding Id}">
+                                                        <MenuItem Header="Play" Click="MiPlayClick" />
+                                                        <!--<MenuItem Header="Add to" ItemsSource="{Binding Playlists}" DisplayMemberPath="Id">
+                                                        -->
                                                         <!--<MenuItem.ItemTemplate>
                                                             <DataTemplate>
                                                                 <MenuItem Header="{Binding Name}" Tag="{Binding Id}" Click="MiAddToPlaylistClick"/>
                                                             </DataTemplate>
                                                         </MenuItem.ItemTemplate>-->
-                                                    </MenuItem>
-                                                    <MenuItem Header="Remove" />
-                                                    <MenuItem Header="Properties" />
-                                                </ContextMenu>
-                                            </Button.ContextMenu>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                        <!-- /Songs -->
-                    </StackPanel>
-                </Grid>
+                                                        <!--
+                                                    </MenuItem>-->
+                                                        <MenuItem Header="{Binding SelectedPlaylist.Id}" />
+                                                        <MenuItem Header="{Binding Id}" />
+                                                        <MenuItem Header="Move Up" />
+                                                        <MenuItem Header="Move Down" />
+                                                        <MenuItem Header="Remove" />
+                                                        <MenuItem Header="Properties" />
+                                                    </ContextMenu>
+                                                </RadioButton.ContextMenu>
+                                            </RadioButton>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            <!-- /Songs -->
+                        </StackPanel>
+                    </Grid>
+                </DockPanel>
+                
                 <!-- /Playlist Viewer -->
             </Grid>
+            <!-- /PageView -->
         </Grid>
 
         <!-- Popups -->
