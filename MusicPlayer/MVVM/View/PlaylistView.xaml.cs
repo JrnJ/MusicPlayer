@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using MusicPlayer.MVVM.ViewModel;
+
 namespace MusicPlayer.MVVM.View
 {
     /// <summary>
@@ -23,6 +25,8 @@ namespace MusicPlayer.MVVM.View
         public PlaylistView()
         {
             InitializeComponent();
+
+            
         }
     }
 }

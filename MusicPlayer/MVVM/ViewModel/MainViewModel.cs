@@ -21,22 +21,30 @@ namespace MusicPlayer.MVVM.ViewModel
         public object CurrentView
         {
             get { return _currentView; }
-            set
-            {
-                _currentView = value;
-                OnPropertyChanged();
-            }
+            set { _currentView = value; OnPropertyChanged(); }
         }
+
+
+        // Stuff
+        private string _hewwo;
+
+        public string Hewwo
+        {
+            get { return _hewwo; }
+            set { _hewwo = value; OnPropertyChanged(); }
+        }
+
 
         // Constructor
         public MainViewModel()
         {
             // Create ViewModels
             HomeVM = new HomeViewModel();
-            PlaylistVM = new PlaylistViewModel();
+            PlaylistVM = new PlaylistViewModel(this);
             
             // Set a default
             CurrentView = HomeVM;
+            Hewwo = "Hewwo";
 
             // Assign Commands
             HomeViewCommand = new RelayCommand(o =>

@@ -104,7 +104,8 @@ namespace MusicPlayer
             ConfigurePlaylists();
             ConfigureSettings();
 
-            DataContext = this;
+            // Enable this if you still want music, will break MVVM
+            //DataContext = this;
         }
 
         #region Configuration

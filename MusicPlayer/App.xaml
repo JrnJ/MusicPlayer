@@ -8,6 +8,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/PageTabTheme.xaml" />
                 <ResourceDictionary Source="Themes/MainTheme.xaml" />
                 <ResourceDictionary Source="Themes/AlbumSongTheme.xaml" />
                 <ResourceDictionary Source="Themes/PlaylistItemTheme.xaml" />
