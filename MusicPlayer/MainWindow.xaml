@@ -4,12 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusicPlayer"
+        xmlns:viewModel="clr-namespace:MusicPlayer.MVVM.ViewModel"
         mc:Ignorable="d"
         
         Title="Jrn Music Player" Width="1920" Height="1080" WindowState="Maximized" Icon="Images/logo_gold.png"
         Background="#202020"
         Keyboard.KeyDown="WindowKeyDown" Closing="WindowClosing"
         >
+
+    <!--<Window.DataContext>
+        <viewModel:MainViewModel />
+    </Window.DataContext>-->
+    
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
@@ -119,7 +125,7 @@
 
                 <!-- Playlist Viewer -->
                 <DockPanel Grid.Column="1">
-                    <Grid Grid.Column="1">
+                    <Grid>
                         <StackPanel Margin="20" HorizontalAlignment="Left" Width="700">
                             <!-- Playlist Info -->
                             <StackPanel Margin="0,0,0,8" VerticalAlignment="Center">
@@ -201,8 +207,13 @@
                             <!-- /Songs -->
                         </StackPanel>
                     </Grid>
+                    <Grid>
+                        <StackPanel>
+                            <ContentControl Content="{Binding CurrentView}"/>
+                            <TextBlock Text="Hello" />
+                        </StackPanel>
+                    </Grid>
                 </DockPanel>
-                
                 <!-- /Playlist Viewer -->
             </Grid>
             <!-- /PageView -->
