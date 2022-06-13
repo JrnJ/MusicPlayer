@@ -13,6 +13,6 @@
     </UserControl.DataContext>
     
     <Grid>
-        
+        <TextBlock Text="PlaylistView" />
     </Grid>
 </UserControl>

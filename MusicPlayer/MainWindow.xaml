@@ -70,7 +70,8 @@
                         <!-- /Controls -->
                         <!-- Volume -->
                         <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
-                            <Slider Width="100" Style="{StaticResource SongTime}" Value="{Binding MediaPlayer.Volume, Mode=TwoWay}"
+                            <Slider Width="100" Style="{StaticResource SongTime}" 
+                                        Value="{Binding AudioPlayer.MediaPlayer.Volume, Mode=TwoWay}"
                                     Minimum="0" Maximum="1"
                                     PreviewMouseLeftButtonUp="VolumeSliderPreviewMouseLeftButtonUp"
                                 />

@@ -13,17 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Media;
-using System.Runtime.InteropServices;
 using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 using System.Collections.ObjectModel;
 using System.Globalization;
 using Windows.Media;
 using MusicPlayer.Classes;
 using MusicPlayer.Models;
+using System.Runtime.CompilerServices;
 
 namespace MusicPlayer
 {
@@ -33,16 +32,14 @@ namespace MusicPlayer
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         // Classes
-        public DispatcherTimer Timer = new DispatcherTimer();
         public SystemMediaTransportControls MediaControls;
-        public Debugger Debugger;
 
-        private Windows.Media.Playback.MediaPlayer _mediaPlayer;
+        private AudioPlayer _audioPlayer;
 
-        public Windows.Media.Playback.MediaPlayer MediaPlayer
+        public AudioPlayer AudioPlayer
         {
-            get { return _mediaPlayer; }
-            set { _mediaPlayer = value; }
+            get { return _audioPlayer; }
+            set { _audioPlayer = value; }
         }
 
         private ObservableCollection<Playlist> _playlists;
@@ -69,89 +66,34 @@ namespace MusicPlayer
             set { _myMusic = value; }
         }
 
-        private Settings _settings;
-
-        public Settings Settings
-        {
-            get { return _settings; }
-            set { _settings = value; }
-        }
-
         public RadioButton CurrentUISong = new RadioButton();
-        public Song CurrentSong;
         public int CurrentSongIndex = 0;
 
         public double SongTotalMs;
-        public bool IsPlaying = false;
 
         public bool LeftMouseDownOnSlider = false;
-
-        // DLL
-        [DllImport("Kernel32")]
-        public static extern void AllocConsole();
-
-        [DllImport("Kernel32")]
-        public static extern void FreeConsole();
 
         public MainWindow()
         {
             InitializeComponent();
-            //AllocConsole();
-            Debugger = new Debugger(this);
-            Debugger.SetActive(false);
 
-            ConfigureMediaPlayer();
+            ConfigureAudioPlayer();
             ConfigurePlaylists();
             ConfigureSettings();
 
             // Enable this if you still want music, will break MVVM
-            //DataContext = this;
+            DataContext = this;
         }
 
         #region Configuration
-        private void ConfigureSettings()
+        private void ConfigureAudioPlayer()
         {
-            // Load Settings
-            Settings = FileHandler.GetSettings();
-            MediaPlayer.Volume = Settings.Volume;
-            MyMusic = new Playlist(0, new ObservableCollection<Song>(), "My Music", "All music from all folders.");
+            // AudioPlayer
+            AudioPlayer = new AudioPlayer();
+            AudioPlayer.MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
 
-            // Create a playlist of all songs
-            for (int i = 0; i < Settings.MusicFolders.Count; i++)
-            {
-                List<Song> songs = FileHandler.GetSongsFromFolder(Settings.MusicFolders[i]);
-
-                if (songs != null)
-                {
-                    //MyMusic.Songs.AddRange(songs);
-                    for (int i2 = 0; i2 < songs.Count; i2++)
-                    {
-                        MyMusic.Songs.Add(songs[i2]);
-                    }
-                }
-            }
-        }
-
-        private void ConfigureMediaPlayer()
-        {
-            // Mediaplayer
-            MediaPlayer = new Windows.Media.Playback.MediaPlayer();
-
-            // Mediaplayer events
-            MediaPlayer.SystemMediaTransportControls.ButtonPressed += MediaPlayerButtonPressed;
-            MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
-            MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
-            MediaPlayer.VolumeChanged += MediaPlayerVolumeChanged;
-            MediaPlayer.CommandManager.IsEnabled = true;
-            MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
-            MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
-
-            // try get next song to work
-            //MediaPlayer.AutoPlay = true;
-
-            // Instantiate Timer
-            Timer.Interval = new TimeSpan(0, 0, 1);
-            Timer.Tick += Timer_Tick;
+            // Timer Tick Event
+            AudioPlayer.Timer.Tick += Timer_Tick;
         }
 
         public void ConfigurePlaylists()
@@ -168,97 +110,91 @@ namespace MusicPlayer
                 LoadPlaylist(Playlists[0]);
             }
         }
+
+        private void ConfigureSettings()
+        {
+            // Load Settings
+            AppSettings.GetSettingsFromFile();
+            AudioPlayer.Volume = AppSettings.Volume;
+            MyMusic = new Playlist(0, new ObservableCollection<Song>(), "My Music", "All music from all folders.");
+
+            // Create a playlist of all songs
+            for (int i = 0; i < AppSettings.MusicFolders.Count; i++)
+            {
+                List<Song> songs = FileHandler.GetSongsFromFolder(AppSettings.MusicFolders[i]);
+
+                if (songs != null)
+                {
+                    //MyMusic.Songs.AddRange(songs);
+                    for (int i2 = 0; i2 < songs.Count; i2++)
+                    {
+                        MyMusic.Songs.Add(songs[i2]);
+                    }
+                }
+            }
+        }
         #endregion Configuration
 
         #region MediaPlayerEvents
 
-        private void MediaPlayerButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
-        {
-            // Call to MainWindow thread
-            Dispatcher.Invoke(() => { ButtonPressed(sender, args); });
-        }
+        //private void MediaPlayerButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
+        //{
+        //    // Call to MainWindow thread
+        //    Dispatcher.Invoke(() => { ButtonPressed(sender, args); });
+        //}
 
         private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
         {
             // Call to MainWindow thread
             Dispatcher.Invoke(() => { MediaEnded(); });
         }
-
-        private void MediaPlayerMediaOpened(Windows.Media.Playback.MediaPlayer sender, object args)
-        {
-            if (CurrentSong != null)
-            {
-                UpdateSMTCDisplay(CurrentSong);
-            }
-        }
-
-        private void MediaPlayerVolumeChanged(Windows.Media.Playback.MediaPlayer sender, object args)
-        {
-            // Apply volume change to settings
-            Settings.Volume = MediaPlayer.Volume;
-        }
         #endregion MediaPlayerEvents
 
         #region MusicThings
-        public void ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
-        {
-            switch (args.Button)
-            {
-                case SystemMediaTransportControlsButton.Previous:
-                    PauseMusic();
-                    if (CurrentSongIndex >= 1)
-                    {
-                        CurrentSongIndex -= 1;
-                        OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-                        PlayMusic();
-                    }
-                    break;
-                case SystemMediaTransportControlsButton.Next:
-                    PauseMusic();
-                    if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
-                    {
-                        CurrentSongIndex += 1;
-                        OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-                        PlayMusic();
-                    }
-                    break;
-            }
-        }
+        //public void ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
+        //{
+        //    switch (args.Button)
+        //    {
+        //        case SystemMediaTransportControlsButton.Previous:
+        //            PauseMusic();
+        //            if (CurrentSongIndex >= 1)
+        //            {
+        //                CurrentSongIndex -= 1;
+        //                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+        //                PlayMusic();
+        //            }
+        //            break;
+        //        case SystemMediaTransportControlsButton.Next:
+        //            PauseMusic();
+        //            if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
+        //            {
+        //                CurrentSongIndex += 1;
+        //                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+        //                PlayMusic();
+        //            }
+        //            break;
+        //    }
+        //}
 
         public void MediaEnded()
         {
-            PauseMusic();
+            AudioPlayer.Pause();
 
             if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
             {
                 CurrentSongIndex += 1;
                 OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-                PlayMusic();
+                AudioPlayer.Play();
             }
-        }
-
-        private void UpdateSMTCDisplay(Song song)
-        {
-            SystemMediaTransportControls smtc = MediaPlayer.SystemMediaTransportControls;
-            smtc.DisplayUpdater.ClearAll();
-            smtc.IsNextEnabled = true;
-            smtc.IsPreviousEnabled = true;
-            smtc.DisplayUpdater.Type = MediaPlaybackType.Video;
-            smtc.DisplayUpdater.VideoProperties.Title = song.Title;
-            smtc.DisplayUpdater.VideoProperties.Subtitle = song.ContributingArtists;
-            smtc.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
-
-            // Update the system media transport controls
-            smtc.DisplayUpdater.Update();
         }
 
         private void UpdateTime()
         {
             // Set Slider Accordingly
-            sliderSongTimePlayed.Value = MediaPlayer.Position.TotalMilliseconds;
+            sliderSongTimePlayed.Value = AudioPlayer.MediaPlayer.Position.TotalMilliseconds;
 
             // Update UI
-            tblCurrentTime.Text = HelperMethods.MsToTime(MediaPlayer.Position.TotalMilliseconds);
+            tblCurrentTime.Text = HelperMethods.MsToTime(AudioPlayer.MediaPlayer.Position.TotalMilliseconds);
         }
         #endregion MusicThings
 
@@ -270,35 +206,35 @@ namespace MusicPlayer
                 #region Reverse
                 // Reverse 10s
                 case Key.J:
-                    SubtractTime(10);
+                    AudioPlayer.SubtractTime(10);
                     break;
                 // Reverse 5
                 case Key.Left:
-                    SubtractTime(5);
+                    AudioPlayer.SubtractTime(5);
                     break;
                 #endregion Reverse
                 #region Forward
                 // Forward 10s
                 case Key.L:
-                    AddTime(10);
+                    AudioPlayer.AddTime(10);
                     break;
                 // Forward 5
                 case Key.Right:
-                    AddTime(5);
+                    AudioPlayer.AddTime(5);
                     break;
                 #endregion Forward
                 #region Playpause
                 case Key.Space:
-                    if (IsPlaying)
-                        PauseMusic();
+                    if (AudioPlayer.IsPlaying)
+                        AudioPlayer.Pause();
                     else
-                        PlayMusic();
+                        AudioPlayer.Play();
                     break;
                 case Key.K:
-                    if (IsPlaying)
-                        PauseMusic();
+                    if (AudioPlayer.IsPlaying)
+                        AudioPlayer.Pause();
                     else
-                        PlayMusic();
+                        AudioPlayer.Play();
                     break;
                 #endregion Playpause
 
@@ -307,10 +243,10 @@ namespace MusicPlayer
                 #region ChangeVolume
                 // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
                 case Key.NumPad8:
-                    Settings.Volume += 0.05;
+                    AppSettings.Volume += 0.05;
                     break;
                 case Key.NumPad2:
-                    Settings.Volume -= 0.05;
+                    AppSettings.Volume -= 0.05;
                     break;
                 #endregion ChangeVolume
                 default:
@@ -334,13 +270,7 @@ namespace MusicPlayer
 
         private void OpenMedia(Song song)
         {
-            // Change this fast lmfao
-            CurrentSong = song;
-
-            MediaPlayer.Pause();
-
-            //MediaPlayer.Open();
-            MediaPlayer.SetUriSource(new Uri(song.Path));
+            AudioPlayer.OpenMedia(song);
 
             // Reset background
             // Changed it to a radiobutton which eliminates this, until further testing of radiobutton at least
@@ -369,46 +299,8 @@ namespace MusicPlayer
             tblFinalTime.Text = HelperMethods.MsToTime(SongTotalMs);
             sliderSongTimePlayed.Maximum = SongTotalMs;
 
-            PlayMusic();
-        }
-
-        private void PlayMusic()
-        {
-            MediaPlayer.Play();
-            IsPlaying = true;
-
-            Timer.Start();
-        }
-
-        /// <summary>
-        /// Pauses the song
-        /// </summary>
-        private void PauseMusic()
-        {
-            MediaPlayer.Pause();
-            IsPlaying = false;
-
-            Timer.Stop();
-        }
-
-        /// <summary>
-        /// Adds an amount of time in seconds to the song
-        /// </summary>
-        /// <param name="amount">Time in seconds</param>
-        private void AddTime(int amount)
-        {
-            MediaPlayer.Position = MediaPlayer.Position.Add(new TimeSpan(0, 0, amount));
-            Timer_Tick(Timer, null);
-        }
-
-        /// <summary>
-        /// Subtracts an amount of time in seconds from the song
-        /// </summary>
-        /// <param name="amount">Time in seconds</param>
-        private void SubtractTime(int amount)
-        {
-            MediaPlayer.Position = MediaPlayer.Position.Subtract(new TimeSpan(0, 0, amount));
-            Timer_Tick(Timer, null);
+            // Remove whenever this mess is fixed
+            AudioPlayer.Play();
         }
 
         private void sliderSongTimePlayed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -419,28 +311,22 @@ namespace MusicPlayer
 
             double value = sliderSongTimePlayed.Maximum / (sliderSongTimePlayed.ActualWidth + 0) * e.GetPosition(sliderSongTimePlayed).X;
             sliderSongTimePlayed.Value = value;
-
-            // Pause timer
-            Timer.Stop();
         }
 
         private void sliderSongTimePlayed_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (LeftMouseDownOnSlider)
             {
-                //Debugger.WriteLine(e.GetPosition(sliderSongTimePlayed).ToString());
                 //sliderSongTimePlayed.Value = 0;
                 // MIN: 0
-                //Debugger.WriteLine(sliderSongTimePlayed.ActualWidth.ToString());
-                Debugger.WriteLine(sliderSongTimePlayed.Value.ToString());
 
                 // Add x amount of time to song
-                int msToAdd = int.Parse(Math.Round(sliderSongTimePlayed.Value - MediaPlayer.Position.TotalMilliseconds, 0).ToString());
-                MediaPlayer.Position = MediaPlayer.Position.Add(new TimeSpan(0, 0, 0, 0, msToAdd));
+                int msToAdd = int.Parse(Math.Round(sliderSongTimePlayed.Value - AudioPlayer.MediaPlayer.Position.TotalMilliseconds, 0).ToString());
+                AudioPlayer.MediaPlayer.Position = AudioPlayer.MediaPlayer.Position.Add(new TimeSpan(0, 0, 0, 0, msToAdd));
 
                 // Start Timer
                 UpdateTime();
-                Timer.Start();
+                AudioPlayer.Timer.Start();
                 LeftMouseDownOnSlider = false;
             }
         }
@@ -448,10 +334,10 @@ namespace MusicPlayer
         #region Controls
         private void PausePlayClick(object sender, RoutedEventArgs e)
         {
-            if (IsPlaying)
-                PauseMusic();
+            if (AudioPlayer.IsPlaying)
+                AudioPlayer.Pause();
             else
-                PlayMusic();
+                AudioPlayer.Play();
         }
 
         private void ShuffleClick(object sender, RoutedEventArgs e)
@@ -579,8 +465,6 @@ namespace MusicPlayer
             CurrentSongIndex = SelectedPlaylist.Songs.IndexOf(song);
 
             OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-
-            PlayMusic();
         }
 
         // ContextMenuEvents
@@ -594,7 +478,6 @@ namespace MusicPlayer
                 {
                     CurrentSongIndex = SelectedPlaylist.Songs[i].Id;
                     OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-                    PlayMusic();
                     break;
                 }
             }
@@ -620,7 +503,7 @@ namespace MusicPlayer
         private void VolumeSliderPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             // Save settings
-            FileHandler.SaveSettings(Settings);
+            AppSettings.SaveSettingsToFile();
         }
         #endregion VolumeSlider
 
@@ -756,6 +639,17 @@ namespace MusicPlayer
         private void RadioButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("UwU");
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string tag = (sender as FrameworkElement).Tag.ToString();
+
+            switch (tag)
+            {
+                case "":
+                    break;
+            }
         }
     }
 }
