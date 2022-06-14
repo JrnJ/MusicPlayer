@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
-    class HomeViewModel
+    internal class HomeViewModel
     {
     }
 }

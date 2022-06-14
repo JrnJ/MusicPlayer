@@ -5,14 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MusicPlayer.MVVM.View" 
              xmlns:viewModel="clr-namespace:MusicPlayer.MVVM.ViewModel"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500">
+             mc:Ignorable="d">
 
     <UserControl.DataContext>
-        <viewModel:MainViewModel />
+        <viewModel:PlaylistViewModel />
     </UserControl.DataContext>
     
     <Grid>
-        <TextBlock Text="PlaylistView" />
+        <!-- Songs -->
+        <ScrollViewer Height="650">
+            <ItemsControl x:Name="icSongs" ItemsSource="{Binding Global.SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Click="AlbumSongClick" -->
+                        <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}" Tag="{Binding Id}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <!-- /Songs -->
     </Grid>
 </UserControl>

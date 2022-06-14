@@ -3,58 +3,51 @@ using MusicPlayer.Core;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
-    class MainViewModel : ObservableObject
+    internal class MainViewModel : ObservableObject
     {
         // Commands
         public RelayCommand HomeViewCommand { get; set; }
 
-        public RelayCommand PlaylistViewCommand { get; set; }
+        public RelayCommand PlaylistsViewCommand { get; set; }
 
         // ViewModels
         public HomeViewModel HomeVM { get; set; }
 
-        public PlaylistViewModel PlaylistVM { get; set; }
+        public PlaylistsViewModel PlaylistsVM { get; set; }
 
-        // Current View
-        private object _currentView;
+        // rather have this here somehow
+        //// Current View
+        //private object _currentView;
 
-        public object CurrentView
-        {
-            get { return _currentView; }
-            set { _currentView = value; OnPropertyChanged(); }
-        }
+        //public object CurrentView
+        //{
+        //    get { return _currentView; }
+        //    set { _currentView = value; OnPropertyChanged(); }
+        //}
 
-
-        // Stuff
-        private string _hewwo;
-
-        public string Hewwo
-        {
-            get { return _hewwo; }
-            set { _hewwo = value; OnPropertyChanged(); }
-        }
-
+        // <GlobalViewModel> //
+        public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
+        // </GlobalViewModel> //
 
         // Constructor
         public MainViewModel()
         {
             // Create ViewModels
-            HomeVM = new HomeViewModel();
-            PlaylistVM = new PlaylistViewModel(this);
+            HomeVM = new();
+            PlaylistsVM = new();
             
             // Set a default
-            CurrentView = HomeVM;
-            Hewwo = "Hewwo";
+            Global.CurrentView = HomeVM;
 
             // Assign Commands
-            HomeViewCommand = new RelayCommand(o =>
+            HomeViewCommand = new(o =>
             {
-                CurrentView = HomeVM;
+                Global.CurrentView = HomeVM;
             });
 
-            PlaylistViewCommand = new RelayCommand(o =>
+            PlaylistsViewCommand = new(o =>
             {
-                CurrentView = PlaylistVM;
+                Global.CurrentView = PlaylistsVM;
             });
         }
     }

@@ -21,7 +21,6 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using Windows.Media;
 using MusicPlayer.Classes;
-using MusicPlayer.Models;
 using System.Runtime.CompilerServices;
 
 namespace MusicPlayer
@@ -82,7 +81,7 @@ namespace MusicPlayer
             ConfigureSettings();
 
             // Enable this if you still want music, will break MVVM
-            DataContext = this;
+            //DataContext = this;
         }
 
         #region Configuration

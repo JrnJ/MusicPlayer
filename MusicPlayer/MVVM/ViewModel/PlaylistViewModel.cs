@@ -2,11 +2,15 @@
 
 namespace MusicPlayer.MVVM.ViewModel
 {
-    class PlaylistViewModel
+    internal class PlaylistViewModel
     {
-        public PlaylistViewModel(MainViewModel mainViewModel)
-        {
+        // <GlobalViewModel> //
+        public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
+        // </GlobalViewModel> //
 
+        public PlaylistViewModel()
+        {
+            
         }
     }
 }

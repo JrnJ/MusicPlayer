@@ -4,20 +4,33 @@
              xmlns:local="clr-namespace:MusicPlayer"
              xmlns:viewModel="clr-namespace:MusicPlayer.MVVM.ViewModel"
              xmlns:view="clr-namespace:MusicPlayer.MVVM.View"
-             StartupUri="MainWindow.xaml">
+             StartupUri="MVVM/View/MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Themes/PageTabTheme.xaml" />
                 <ResourceDictionary Source="Themes/MainTheme.xaml" />
+                
+                <ResourceDictionary Source="Themes/PageTabTheme.xaml" />
+                
                 <ResourceDictionary Source="Themes/AlbumSongTheme.xaml" />
+                
                 <ResourceDictionary Source="Themes/PlaylistItemTheme.xaml" />
+
                 <ResourceDictionary Source="Themes/SongTimeSliderTheme.xaml" />
+
+
+                <ResourceDictionary Source="Themes/PlaylistsItemTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- Navigation -->
             <DataTemplate DataType="{x:Type viewModel:HomeViewModel}">
                 <view:HomeView />
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModel:PlaylistsViewModel}">
+                <view:PlaylistsView />
+            </DataTemplate>
+            <!-- /Navigation -->
 
             <DataTemplate DataType="{x:Type viewModel:PlaylistViewModel}">
                 <view:PlaylistView />

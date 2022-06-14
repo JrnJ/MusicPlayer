@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace MusicPlayer.Core
 {
-    class ObservableObject : INotifyPropertyChanged
+    internal class ObservableObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -12,5 +12,13 @@ namespace MusicPlayer.Core
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
+        // Mine
+        //public event PropertyChangedEventHandler PropertyChanged;
+
+        //private void OnPropertyChanged([CallerMemberName] string name = null)
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        //}
     }
 }

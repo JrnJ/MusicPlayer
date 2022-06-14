@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace MusicPlayer.Core
 {
-    class RelayCommand : ICommand
+    public class RelayCommand : ICommand
     {
         // 
         private Action<object> _execute;
@@ -23,7 +23,10 @@ namespace MusicPlayer.Core
         }
 
         // Commands
-        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+        public bool CanExecute(object parameter)
+        {
+            return _canExecute == null || _canExecute(parameter);
+        }
 
         public void Execute(object parameter)
         {

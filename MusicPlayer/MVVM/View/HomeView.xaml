@@ -21,7 +21,7 @@
             <TextBlock Text="Is" />
             <TextBlock Text="My" />
             <TextBlock Text="Home" />
-            <TextBlock Text="{Binding Hewwo}" />
+            <TextBlock Text="Page" />
         </StackPanel>
     </Grid>
 </UserControl>
