@@ -30,6 +30,10 @@
             <DataTemplate DataType="{x:Type viewModel:PlaylistsViewModel}">
                 <view:PlaylistsView />
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModel:DiscordViewModel}">
+                <view:DiscordView />
+            </DataTemplate>
             <!-- /Navigation -->
 
             <DataTemplate DataType="{x:Type viewModel:PlaylistViewModel}">

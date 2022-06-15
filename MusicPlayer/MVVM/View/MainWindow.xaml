@@ -103,6 +103,8 @@
                                          Content="Home" Style="{StaticResource PageTab}" />
                             <RadioButton GroupName="PageTabs" Command="{Binding PlaylistsViewCommand}"
                                          Content="Playlists" Style="{StaticResource PageTab}" />
+                            <RadioButton GroupName="PageTabs" Command="{Binding DiscordViewCommand}"
+                                         Content="Discord ᴮᴱᵀᴬ" Style="{StaticResource PageTab}" />
                         </StackPanel>
                         <!-- /Selections -->
 

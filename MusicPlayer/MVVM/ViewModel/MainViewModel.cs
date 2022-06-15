@@ -8,12 +8,19 @@ namespace MusicPlayer.MVVM.ViewModel
 {
     internal class MainViewModel : ObservableObject
     {
+        // <GlobalViewModel> //
+        public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
+        // </GlobalViewModel> //
+
         // Commands
         #region Navigation
         public RelayCommand HomeViewCommand { get; set; }
 
         public RelayCommand PlaylistsViewCommand { get; set; }
+
+        public RelayCommand DiscordViewCommand { get; set; }
         #endregion Navigation
+
         public RelayCommand CreatePlaylistCommand { get; set; }
 
         public RelayCommand PausePlayCommand { get; set; }
@@ -23,19 +30,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public PlaylistsViewModel PlaylistsVM { get; set; }
 
-        // rather have this here somehow
-        //// Current View
-        //private object _currentView;
-
-        //public object CurrentView
-        //{
-        //    get { return _currentView; }
-        //    set { _currentView = value; OnPropertyChanged(); }
-        //}
-
-        // <GlobalViewModel> //
-        public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
-        // </GlobalViewModel> //
+        public DiscordViewModel DiscordVM { get; set; }
 
         // Constructor
         public MainViewModel()
@@ -43,6 +38,7 @@ namespace MusicPlayer.MVVM.ViewModel
             // Create ViewModels
             HomeVM = new();
             PlaylistsVM = new();
+            DiscordVM = new();
             
             // Set a default
             Global.CurrentView = HomeVM;
@@ -56,6 +52,11 @@ namespace MusicPlayer.MVVM.ViewModel
             PlaylistsViewCommand = new(o =>
             {
                 Global.CurrentView = PlaylistsVM;
+            });
+
+            DiscordViewCommand = new(o => 
+            {
+                Global.CurrentView = DiscordVM;
             });
 
             CreatePlaylistCommand = new(o =>

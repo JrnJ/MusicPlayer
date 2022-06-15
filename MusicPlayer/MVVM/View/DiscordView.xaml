@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="MusicPlayer.MVVM.View.HomeView"
+﻿<UserControl x:Class="MusicPlayer.MVVM.View.DiscordView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,15 +8,15 @@
              mc:Ignorable="d">
 
     <UserControl.DataContext>
-        <viewmodel:MainViewModel />
+        <viewmodel:DiscordViewModel />
     </UserControl.DataContext>
-
+    
     <Grid>
         <StackPanel VerticalAlignment="Center" >
-            <TextBlock Text="Home View"
+            <TextBlock Text="Discord Intergration"
                    FontSize="36" Foreground="White"
                    HorizontalAlignment="Center" />
-            <TextBlock Text="Welcome"
+            <TextBlock Text="Coming Soon"
                    FontSize="32" Foreground="Gray"
                    HorizontalAlignment="Center" />
         </StackPanel>
