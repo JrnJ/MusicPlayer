@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\NotoSans-Regular.ttf" />
     <None Remove="Images\logo.png" />
     <None Remove="Images\logo_gold.png" />
     <None Remove="Images\next_track.png" />
@@ -17,6 +18,12 @@
     <None Remove="Images\shuffle.png" />
     <None Remove="Images\SongImagePlaceholder.png" />
     <None Remove="MainWindow.xaml.cs~RFaa61997.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Fonts\NotoSans-Regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

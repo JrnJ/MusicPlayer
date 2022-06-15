@@ -7,7 +7,8 @@
         xmlns:viewModel="clr-namespace:MusicPlayer.MVVM.ViewModel"
         mc:Ignorable="d"
         
-        Title="Jrn Music Player" Width="1280" Height="720" WindowState="Maximized" Icon="../../Images/logo_gold.png"
+        Title="Jrn Music Player" WindowState="Maximized" Icon="../../Images/logo_gold.png"
+        Width="1280" Height="720" MinWidth="1140" MinHeight="308"
         Background="#202020"
         
         >
@@ -88,21 +89,16 @@
             <!-- PageView -->
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="400" />
+                    <ColumnDefinition Width="340" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
                 <!-- Sidemenu -->
                 <Grid Grid.Column="0" 
                       Background="#151515">
-                    <Grid Margin="6">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-
+                    <StackPanel>
                         <!-- Selections -->
-                        <StackPanel Grid.Row="0">
+                        <StackPanel Margin="6,6,6,0">
                             <RadioButton GroupName="PageTabs" IsChecked="True" Command="{Binding HomeViewCommand}"
                                          Content="Home" Style="{StaticResource PageTab}" />
                             <RadioButton GroupName="PageTabs" Command="{Binding PlaylistsViewCommand}"
@@ -110,21 +106,23 @@
                         </StackPanel>
                         <!-- /Selections -->
 
+                        <Grid Height="0.25" Background="Gray" Margin="0, 2, 0, 2"/>
+
                         <!-- Playlists -->
-                        <StackPanel Grid.Row="1">
+                        <StackPanel Margin="6">
                             <!-- Controls -->
-                            <DockPanel Height="40">
+                            <!--<DockPanel Height="40">
                                 <Button Content="My Playlists"/>
                                 <Button Width="40" 
                                     Content="+" HorizontalAlignment="Right" Command="{Binding CreatePlaylistCommand}"/>
-                            </DockPanel>
+                            </DockPanel>-->
                             <!-- /Controls -->
 
                             <!-- Items -->
                             <ItemsControl x:Name="PlaylistItems" ItemsSource="{Binding Global.Playlists}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <RadioButton GroupName="PlaylistItems" Style="{StaticResource PlaylistItem}" 
+                                        <RadioButton GroupName="PageTabs" Style="{StaticResource PlaylistItem}" 
                                                      Command="{Binding ElementName=PlaylistItems, Path=DataContext.Global.SelectPlaylistCommand}"
                                                      CommandParameter="{Binding Id}"
                                                      />
@@ -134,7 +132,7 @@
                             <!-- Items -->
                         </StackPanel>
                         <!-- /Playlists -->
-                    </Grid>
+                    </StackPanel>
                 </Grid>
                 <!-- /Sidemenu -->
 
