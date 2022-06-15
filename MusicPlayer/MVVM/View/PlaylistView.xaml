@@ -10,19 +10,41 @@
     <UserControl.DataContext>
         <viewModel:PlaylistViewModel />
     </UserControl.DataContext>
-    
+
     <Grid>
-        <!-- Songs -->
-        <ScrollViewer>
-            <ItemsControl x:Name="icSongs" ItemsSource="{Binding Global.SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <!-- Click="AlbumSongClick" -->
-                        <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}" Tag="{Binding Id}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-        <!-- /Songs -->
+        <StackPanel Margin="16">
+            <!-- Info -->
+            <TextBlock Text="{Binding Global.SelectedPlaylist.Name}" 
+                       FontSize="28" Foreground="White" FontWeight="Bold"
+                       />
+            <TextBlock Text="{Binding Global.SelectedPlaylist.Description}" 
+                       Foreground="LightGray"
+                       />
+            <TextBlock>
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0} Songs, {1}">
+                        <Binding Path="Songs.Count" />
+                        <Binding Path="PlaylistDuration" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <!-- /Info -->
+            
+            <!-- Songs -->
+            <ScrollViewer>
+                <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <!-- Click="AlbumSongClick" -->
+                            <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}" Tag="{Binding Id}" 
+                                         Command="{Binding ElementName=Songs, Path=DataContext.SelectSongCommand}"
+                                         CommandParameter="{Binding Id}"
+                                         />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            <!-- /Songs -->
+        </StackPanel>
     </Grid>
 </UserControl>

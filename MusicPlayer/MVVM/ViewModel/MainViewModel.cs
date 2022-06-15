@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
@@ -66,6 +67,32 @@ namespace MusicPlayer.MVVM.ViewModel
                 // Save Playlists
                 FileHandler.SavePlaylists(Global.Playlists);
             });
+
+            // Configuration
+            ConfigureSettings();
+        }
+
+        private void ConfigureSettings()
+        {
+            // Load Settings
+            AppSettings.GetSettingsFromFile();
+            Global.AudioPlayer.Volume = AppSettings.Volume;
+            Global.MyMusic = new Playlist(0, new ObservableCollection<Song>(), "My Music", "All music from all folders.");
+
+            // Create a playlist of all songs
+            for (int i = 0; i < AppSettings.MusicFolders.Count; i++)
+            {
+                List<Song> songs = FileHandler.GetSongsFromFolder(AppSettings.MusicFolders[i]);
+
+                if (songs != null)
+                {
+                    //MyMusic.Songs.AddRange(songs);
+                    for (int i2 = 0; i2 < songs.Count; i2++)
+                    {
+                        Global.MyMusic.Songs.Add(songs[i2]);
+                    }
+                }
+            }
         }
     }
 }

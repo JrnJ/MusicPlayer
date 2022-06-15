@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MusicPlayer.Core;
+using System;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
@@ -8,7 +9,17 @@ namespace MusicPlayer.MVVM.ViewModel
         public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
         // </GlobalViewModel> //
 
+        public RelayCommand SelectSongCommand { get; set; }
+
         public PlaylistViewModel()
+        {
+            SelectSongCommand = new(o =>
+            {
+                PlaySong((int)o);
+            });
+        }
+
+        public void PlaySong(int id)
         {
             
         }

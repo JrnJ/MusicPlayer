@@ -33,8 +33,8 @@
                             <Image Width="100" Source="../../Images/SongImagePlaceholder.png" />
                             <!-- /Image -->
                             <StackPanel VerticalAlignment="Center" Margin="20,0,0,0">
-                                <TextBlock x:Name="tblInfoSongTitle" Text="Unknown Song" FontSize="24" />
-                                <TextBlock x:Name="tblInfoSongArtist" Text="Unknown Artist" FontSize="24" />
+                                <TextBlock Text="{Binding Global.CurrentSong.Title}" FontSize="24" />
+                                <TextBlock Text="{Binding Global.CurrentSong.ContributingArtists}" FontSize="24" />
                             </StackPanel>
                         </DockPanel>
                         <!-- /Song Info -->
@@ -57,13 +57,15 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Column="0" x:Name="tblCurrentTime" HorizontalAlignment="Left" Foreground="#999999"/>
-                                <Slider Grid.Column="1" x:Name="sliderSongTimePlayed" Style="{StaticResource SongTime}"  Value="{Binding SongMs, Mode=TwoWay}"
-                                    Margin="10, 0, 10, 0" 
-                                    PreviewMouseLeftButtonDown="sliderSongTimePlayed_PreviewMouseLeftButtonDown" 
-                                    PreviewMouseLeftButtonUp="sliderSongTimePlayed_PreviewMouseLeftButtonUp"
+                                <TextBlock Grid.Column="0" Text="{Binding Global.CurrentTime}" HorizontalAlignment="Left" Foreground="#999999"/>
+                                
+                                <Slider Grid.Column="1" x:Name="sliderSongTimePlayed" Style="{StaticResource SongTime}" 
+                                        Value="{Binding SongMs, Mode=TwoWay}" Maximum="{Binding Global.CurrentSong.Length}"
+                                        Margin="10, 0, 10, 0" 
+                                        PreviewMouseLeftButtonDown="sliderSongTimePlayed_PreviewMouseLeftButtonDown" 
+                                        PreviewMouseLeftButtonUp="sliderSongTimePlayed_PreviewMouseLeftButtonUp"
                                 />
-                                <TextBlock Grid.Column="2" x:Name="tblFinalTime" HorizontalAlignment="Right" Foreground="#999999"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>
                             </Grid>
                             <!-- /TrackBar -->
                         </StackPanel>

@@ -31,24 +31,7 @@ namespace MusicPlayer
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         // Classes
-        private AudioPlayer _audioPlayer;
-
-        public AudioPlayer AudioPlayer
-        {
-            get { return _audioPlayer; }
-            set { _audioPlayer = value; }
-        }
-
-        private Playlist _myMusic;
-
-        public Playlist MyMusic
-        {
-            get { return _myMusic; }
-            set { _myMusic = value; }
-        }
-
         public RadioButton CurrentUISong = new RadioButton();
-        public int CurrentSongIndex = 0;
 
         public double SongTotalMs;
 
@@ -57,45 +40,7 @@ namespace MusicPlayer
         public MainWindow()
         {
             InitializeComponent();
-
-            ConfigureAudioPlayer();
-            ConfigureSettings();
         }
-
-        #region Configuration
-        private void ConfigureAudioPlayer()
-        {
-            // AudioPlayer
-            AudioPlayer = new AudioPlayer();
-            AudioPlayer.MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
-
-            // Timer Tick Event
-            AudioPlayer.Timer.Tick += Timer_Tick;
-        }
-
-        private void ConfigureSettings()
-        {
-            // Load Settings
-            AppSettings.GetSettingsFromFile();
-            AudioPlayer.Volume = AppSettings.Volume;
-            MyMusic = new Playlist(0, new ObservableCollection<Song>(), "My Music", "All music from all folders.");
-
-            // Create a playlist of all songs
-            for (int i = 0; i < AppSettings.MusicFolders.Count; i++)
-            {
-                List<Song> songs = FileHandler.GetSongsFromFolder(AppSettings.MusicFolders[i]);
-
-                if (songs != null)
-                {
-                    //MyMusic.Songs.AddRange(songs);
-                    for (int i2 = 0; i2 < songs.Count; i2++)
-                    {
-                        MyMusic.Songs.Add(songs[i2]);
-                    }
-                }
-            }
-        }
-        #endregion Configuration
 
         #region MediaPlayerEvents
 
@@ -104,12 +49,6 @@ namespace MusicPlayer
         //    // Call to MainWindow thread
         //    Dispatcher.Invoke(() => { ButtonPressed(sender, args); });
         //}
-
-        private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
-        {
-            // Call to MainWindow thread
-            Dispatcher.Invoke(() => { MediaEnded(); });
-        }
         #endregion MediaPlayerEvents
 
         #region MusicThings
@@ -137,20 +76,6 @@ namespace MusicPlayer
         //            break;
         //    }
         //}
-
-        public void MediaEnded()
-        {
-            // this might get difficult later on
-            // maybe put audioplayer in global or something
-            AudioPlayer.Pause();
-
-            //if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
-            //{
-            //    CurrentSongIndex += 1;
-            //    OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-            //    AudioPlayer.Play();
-            //}
-        }
 
         private void UpdateTime()
         {
@@ -230,42 +155,6 @@ namespace MusicPlayer
         private void Timer_Tick(object sender, EventArgs e)
         {
             UpdateTime();
-        }
-
-        private void OpenMedia(Song song)
-        {
-            AudioPlayer.OpenMedia(song);
-
-            // Reset background
-            // Changed it to a radiobutton which eliminates this, until further testing of radiobutton at least
-            //if (CurrentUISong != null)
-            //    CurrentUISong.Style = Application.Current.FindResource("AlbumSong") as Style;
-
-            //UIElement uiElement = (UIElement)icSongs.ItemContainerGenerator.ContainerFromIndex(CurrentSongIndex);
-            //CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as Button;
-
-            //CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
-
-            // Change SelectedRadioButton
-            // Doesnt work, tbh cant be botherd atm so will change this later
-            // this code is very questionable anyways, lets rework this some day, thanos snapping it atm
-            //UIElement uiElement = (UIElement)icSongs.ItemContainerGenerator.ContainerFromIndex(CurrentSongIndex);
-            //CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as RadioButton;
-            //CurrentUISong.IsChecked.Equals(true);
-
-            // Maybe change where this is placed
-            tblInfoSongTitle.Text = song.Title;
-            tblInfoSongArtist.Text = song.ContributingArtists;
-            sliderSongTimePlayed.Value = 0;
-            tblCurrentTime.Text = "0:00";
-
-            // Update UI
-            SongTotalMs = song.Length;
-            tblFinalTime.Text = HelperMethods.MsToTime(SongTotalMs);
-            sliderSongTimePlayed.Maximum = SongTotalMs;
-
-            // Remove whenever this mess is fixed
-            AudioPlayer.Play();
         }
 
         private void sliderSongTimePlayed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
