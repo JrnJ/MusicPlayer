@@ -13,12 +13,14 @@
     
     <Grid>
         <StackPanel>
-            <!--<Button Content="{Binding Global.SelectedPlaylist.Name}" Command="{Binding PlaylistViewCommand}"/>-->
-
-            <ItemsControl ItemsSource="{Binding Global.Playlists}" Margin="0, 0, 8, 0">
+            <ItemsControl x:Name="MyItems" ItemsSource="{Binding Global.Playlists}" Margin="0, 0, 8, 0"
+                          IsEnabled="True"
+                          >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Style="{StaticResource PlaylistsItem}" Command="{Binding Path=DataContext.PlaylistViewCommand}"/>
+                        <Button Style="{StaticResource PlaylistsItem}" 
+                                Command="{Binding ElementName=MyItems, Path=DataContext.PlaylistViewCommand}"
+                                CommandParameter="{Binding Id}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

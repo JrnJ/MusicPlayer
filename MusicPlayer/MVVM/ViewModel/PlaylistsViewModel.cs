@@ -13,9 +13,17 @@ namespace MusicPlayer.MVVM.ViewModel
         public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
         // </GlobalViewModel> //
 
+        // Commands???
+        public RelayCommand PlaylistViewCommand { get; set; }
+
         public PlaylistsViewModel()
         {
-            
+            // Assign Commands
+            PlaylistViewCommand = new(o =>
+            {
+                Global.SelectedPlaylist = Global.Playlists[int.Parse(o.ToString())];
+                Global.CurrentView = Global.PlaylistVM;
+            });
         }
     }
 }

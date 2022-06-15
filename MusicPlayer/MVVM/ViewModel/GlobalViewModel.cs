@@ -25,14 +25,14 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         // ViewModels
-        public PlaylistsViewModel PlaylistVM { get; set; }
+        public PlaylistViewModel PlaylistVM { get; set; }
 
 
         private ObservableCollection<Playlist> _playlists;
 
         public ObservableCollection<Playlist> Playlists
         {
-            get { return _playlists; }
+            get => _playlists;
             set { _playlists = value; OnPropertyChanged(); }
         }
 
@@ -40,12 +40,9 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public Playlist SelectedPlaylist
         {
-            get { return _selectedPlaylist; }
+            get => _selectedPlaylist;
             set { _selectedPlaylist = value; OnPropertyChanged(); }
         }
-
-        // Commands???
-        public RelayCommand PlaylistViewCommand { get; set; }
 
         public GlobalViewModel()
         {
@@ -54,13 +51,6 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Load Playlists
             Playlists = FileHandler.GetPlaylists();
-
-            // Assign Commands
-            PlaylistViewCommand = new(o =>
-            {
-                SelectedPlaylist = Playlists[1];
-                CurrentView = PlaylistVM;
-            });
         }
     }
 }
