@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MusicPlayer.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ using Windows.Media;
 
 namespace MusicPlayer.Classes
 {
-    public class AudioPlayer
+    internal class AudioPlayer : ObservableObject
     {
         // Unsure about accesibility here
         public SystemMediaTransportControls MediaControls { get; set; }
@@ -16,7 +17,13 @@ namespace MusicPlayer.Classes
         public Windows.Media.Playback.MediaPlayer MediaPlayer { get; set; }
 
         // Stoopid props
-        public Song CurrentSong { get; private set; }
+        private Song _currentSong;
+
+        public Song CurrentSong
+        {
+            get { return _currentSong; }
+            set { _currentSong = value; OnPropertyChanged(); }
+        }
 
         public bool IsPlaying { get; private set; }
 

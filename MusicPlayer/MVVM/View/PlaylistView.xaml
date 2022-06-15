@@ -20,11 +20,11 @@
             <TextBlock Text="{Binding Global.SelectedPlaylist.Description}" 
                        Foreground="LightGray"
                        />
-            <TextBlock>
+            <TextBlock Foreground="LightGray" Margin="0, 0, 0, 16">
                 <TextBlock.Text>
                     <MultiBinding StringFormat="{}{0} Songs, {1}">
-                        <Binding Path="Songs.Count" />
-                        <Binding Path="PlaylistDuration" />
+                        <Binding Path="Global.SelectedPlaylist.Songs.Count" />
+                        <Binding Path="Global.SelectedPlaylist.PlaylistDuration" />
                     </MultiBinding>
                 </TextBlock.Text>
             </TextBlock>

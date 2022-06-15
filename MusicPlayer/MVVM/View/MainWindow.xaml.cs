@@ -33,8 +33,6 @@ namespace MusicPlayer
         // Classes
         public RadioButton CurrentUISong = new RadioButton();
 
-        public double SongTotalMs;
-
         public bool LeftMouseDownOnSlider = false;
 
         public MainWindow()
@@ -76,86 +74,64 @@ namespace MusicPlayer
         //            break;
         //    }
         //}
-
-        private void UpdateTime()
-        {
-            // Set Slider Accordingly
-            sliderSongTimePlayed.Value = AudioPlayer.MediaPlayer.Position.TotalMilliseconds;
-
-            // Update UI
-            tblCurrentTime.Text = HelperMethods.MsToTime(AudioPlayer.MediaPlayer.Position.TotalMilliseconds);
-        }
         #endregion MusicThings
 
         #region WindowEvents
-        private void WindowKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                #region Reverse
-                // Reverse 10s
-                case Key.J:
-                    AudioPlayer.SubtractTime(10);
-                    break;
-                // Reverse 5
-                case Key.Left:
-                    AudioPlayer.SubtractTime(5);
-                    break;
-                #endregion Reverse
-                #region Forward
-                // Forward 10s
-                case Key.L:
-                    AudioPlayer.AddTime(10);
-                    break;
-                // Forward 5
-                case Key.Right:
-                    AudioPlayer.AddTime(5);
-                    break;
-                #endregion Forward
-                #region Playpause
-                case Key.Space:
-                    if (AudioPlayer.IsPlaying)
-                        AudioPlayer.Pause();
-                    else
-                        AudioPlayer.Play();
-                    break;
-                case Key.K:
-                    if (AudioPlayer.IsPlaying)
-                        AudioPlayer.Pause();
-                    else
-                        AudioPlayer.Play();
-                    break;
-                #endregion Playpause
+        //private void WindowKeyDown(object sender, KeyEventArgs e)
+        //{
+        //    switch (e.Key)
+        //    {
+        //        #region Reverse
+        //        // Reverse 10s
+        //        case Key.J:
+        //            AudioPlayer.SubtractTime(10);
+        //            break;
+        //        // Reverse 5
+        //        case Key.Left:
+        //            AudioPlayer.SubtractTime(5);
+        //            break;
+        //        #endregion Reverse
+        //        #region Forward
+        //        // Forward 10s
+        //        case Key.L:
+        //            AudioPlayer.AddTime(10);
+        //            break;
+        //        // Forward 5
+        //        case Key.Right:
+        //            AudioPlayer.AddTime(5);
+        //            break;
+        //        #endregion Forward
+        //        #region Playpause
+        //        case Key.Space:
+        //            if (AudioPlayer.IsPlaying)
+        //                AudioPlayer.Pause();
+        //            else
+        //                AudioPlayer.Play();
+        //            break;
+        //        case Key.K:
+        //            if (AudioPlayer.IsPlaying)
+        //                AudioPlayer.Pause();
+        //            else
+        //                AudioPlayer.Play();
+        //            break;
+        //        #endregion Playpause
 
-                // Do this
-                // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
-                #region ChangeVolume
-                // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
-                case Key.NumPad8:
-                    AppSettings.Volume += 0.05;
-                    break;
-                case Key.NumPad2:
-                    AppSettings.Volume -= 0.05;
-                    break;
-                #endregion ChangeVolume
-                default:
-                    break;
-            }
-        }
-
-        private void WindowClosing(object sender, CancelEventArgs e)
-        {
-            // Minimize window
-            //WindowState = WindowState.Minimized;
-
-            //e.Cancel = true;
-        }
+        //        // Do this
+        //        // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
+        //        #region ChangeVolume
+        //        // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
+        //        case Key.NumPad8:
+        //            AppSettings.Volume += 0.05;
+        //            break;
+        //        case Key.NumPad2:
+        //            AppSettings.Volume -= 0.05;
+        //            break;
+        //        #endregion ChangeVolume
+        //        default:
+        //            break;
+        //    }
+        //}
         #endregion WindowEvents
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            UpdateTime();
-        }
 
         private void sliderSongTimePlayed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -169,31 +145,23 @@ namespace MusicPlayer
 
         private void sliderSongTimePlayed_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (LeftMouseDownOnSlider)
-            {
-                //sliderSongTimePlayed.Value = 0;
-                // MIN: 0
+            //if (LeftMouseDownOnSlider)
+            //{
+            //    //sliderSongTimePlayed.Value = 0;
+            //    // MIN: 0
 
-                // Add x amount of time to song
-                int msToAdd = int.Parse(Math.Round(sliderSongTimePlayed.Value - AudioPlayer.MediaPlayer.Position.TotalMilliseconds, 0).ToString());
-                AudioPlayer.MediaPlayer.Position = AudioPlayer.MediaPlayer.Position.Add(new TimeSpan(0, 0, 0, 0, msToAdd));
+            //    // Add x amount of time to song
+            //    int msToAdd = int.Parse(Math.Round(sliderSongTimePlayed.Value - AudioPlayer.MediaPlayer.Position.TotalMilliseconds, 0).ToString());
+            //    AudioPlayer.MediaPlayer.Position = AudioPlayer.MediaPlayer.Position.Add(new TimeSpan(0, 0, 0, 0, msToAdd));
 
-                // Start Timer
-                UpdateTime();
-                AudioPlayer.Timer.Start();
-                LeftMouseDownOnSlider = false;
-            }
+            //    // Start Timer
+            //    UpdateTime();
+            //    AudioPlayer.Timer.Start();
+            //    LeftMouseDownOnSlider = false;
+            //}
         }
 
         #region Controls
-        private void PausePlayClick(object sender, RoutedEventArgs e)
-        {
-            if (AudioPlayer.IsPlaying)
-                AudioPlayer.Pause();
-            else
-                AudioPlayer.Play();
-        }
-
         private void ShuffleClick(object sender, RoutedEventArgs e)
         {
 

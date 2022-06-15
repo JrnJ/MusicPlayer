@@ -34,7 +34,7 @@ namespace MusicPlayer.MVVM.ViewModel
         public AudioPlayer AudioPlayer
         {
             get { return _audioPlayer; }
-            set { _audioPlayer = value; }
+            set { _audioPlayer = value; OnPropertyChanged(); }
         }
 
         private ObservableCollection<Playlist> _playlists;
@@ -61,13 +61,13 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _myMusic = value; OnPropertyChanged(); }
         }
 
-        private Song _currentSong;
+        //private Song _currentSong;
 
-        public Song CurrentSong
-        {
-            get { return _currentSong; }
-            set { _currentSong = value; OnPropertyChanged(); }
-        }
+        //public Song CurrentSong
+        //{
+        //    get { return _currentSong; }
+        //    set { _currentSong = value; OnPropertyChanged(); }
+        //}
 
         private string _finalTime;
 
@@ -84,6 +84,15 @@ namespace MusicPlayer.MVVM.ViewModel
             get { return _currentTime; }
             set { _currentTime = value; OnPropertyChanged(); }
         }
+
+        private double _sliderValue;
+
+        public double SliderValue
+        {
+            get { return _sliderValue; }
+            set { _sliderValue = value; OnPropertyChanged(); }
+        }
+
 
         public int CurrentSongIndex { get; set; }
 
@@ -122,21 +131,22 @@ namespace MusicPlayer.MVVM.ViewModel
         private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
         {
             // Call to MainWindow thread
-            Dispatcher.Invoke(() =>
-            {
-                AudioPlayer.Pause();
+            //Dispatcher.Invoke(() =>
+            //{
+                
+            //});
 
-                if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
-                {
-                    CurrentSongIndex += 1;
-                    CurrentSong = SelectedPlaylist.Songs[CurrentSongIndex];
-                    OpenMedia(CurrentSong);
-                    AudioPlayer.Play();
-                }
-            });
+            AudioPlayer.Pause();
+
+            if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
+            {
+                CurrentSongIndex += 1;
+                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+                AudioPlayer.Play();
+            }
         }
 
-        private void OpenMedia(Song song)
+        public void OpenMedia(Song song)
         {
             AudioPlayer.OpenMedia(song);
 
@@ -158,15 +168,29 @@ namespace MusicPlayer.MVVM.ViewModel
             //CurrentUISong.IsChecked.Equals(true);
 
             // Maybe change where this is placed
-            sliderSongTimePlayed.Value = 0;
-
+            
 
             // Update UI
             CurrentTime = "0:00";
+            SliderValue = 0.0;
             FinalTime = HelperMethods.MsToTime(song.Length);
 
             // Remove whenever this mess is fixed
             AudioPlayer.Play();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            UpdateTime();
+        }
+
+        private void UpdateTime()
+        {
+            // Set Slider Accordingly
+            SliderValue = AudioPlayer.MediaPlayer.Position.TotalMilliseconds;
+
+            // Update UI
+            CurrentTime = HelperMethods.MsToTime(AudioPlayer.MediaPlayer.Position.TotalMilliseconds);
         }
         #endregion Configuration
 

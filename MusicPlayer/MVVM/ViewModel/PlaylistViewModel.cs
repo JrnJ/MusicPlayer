@@ -21,7 +21,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public void PlaySong(int id)
         {
-            
+            Global.OpenMedia(Global.SelectedPlaylist.Songs[id]);
         }
     }
 }

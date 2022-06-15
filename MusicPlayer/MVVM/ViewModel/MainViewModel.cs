@@ -16,6 +16,8 @@ namespace MusicPlayer.MVVM.ViewModel
         #endregion Navigation
         public RelayCommand CreatePlaylistCommand { get; set; }
 
+        public RelayCommand PausePlayCommand { get; set; }
+
         // ViewModels
         public HomeViewModel HomeVM { get; set; }
 
@@ -66,6 +68,14 @@ namespace MusicPlayer.MVVM.ViewModel
 
                 // Save Playlists
                 FileHandler.SavePlaylists(Global.Playlists);
+            });
+
+            PausePlayCommand = new(o =>
+            {
+                if (Global.AudioPlayer.IsPlaying)
+                    Global.AudioPlayer.Pause();
+                else
+                    Global.AudioPlayer.Play();
             });
 
             // Configuration
