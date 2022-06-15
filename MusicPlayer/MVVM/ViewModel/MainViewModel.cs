@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using MusicPlayer.Classes;
 using MusicPlayer.Core;
 
 namespace MusicPlayer.MVVM.ViewModel
@@ -6,9 +8,12 @@ namespace MusicPlayer.MVVM.ViewModel
     internal class MainViewModel : ObservableObject
     {
         // Commands
+        #region Navigation
         public RelayCommand HomeViewCommand { get; set; }
 
         public RelayCommand PlaylistsViewCommand { get; set; }
+        #endregion Navigation
+        public RelayCommand CreatePlaylistCommand { get; set; }
 
         // ViewModels
         public HomeViewModel HomeVM { get; set; }
@@ -48,6 +53,18 @@ namespace MusicPlayer.MVVM.ViewModel
             PlaylistsViewCommand = new(o =>
             {
                 Global.CurrentView = PlaylistsVM;
+            });
+
+            CreatePlaylistCommand = new(o =>
+            {
+                // Create sample template to add a new playlist
+                Playlist playlist = new Playlist(Global.Playlists.Count, new ObservableCollection<Song>(), "New Playlist", "New Playlist");
+
+                Global.Playlists.Add(playlist);
+                Global.ShowPlaylist(playlist.Id);
+
+                // Save Playlists
+                FileHandler.SavePlaylists(Global.Playlists);
             });
         }
     }

@@ -27,7 +27,6 @@ namespace MusicPlayer.MVVM.ViewModel
         // ViewModels
         public PlaylistViewModel PlaylistVM { get; set; }
 
-
         private ObservableCollection<Playlist> _playlists;
 
         public ObservableCollection<Playlist> Playlists
@@ -44,6 +43,9 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _selectedPlaylist = value; OnPropertyChanged(); }
         }
 
+        // Commands
+        public RelayCommand SelectPlaylistCommand { get; set; }
+
         public GlobalViewModel()
         {
             // Create ViewModels
@@ -51,6 +53,28 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Load Playlists
             Playlists = FileHandler.GetPlaylists();
+
+            // Assign Commands
+            SelectPlaylistCommand = new(o =>
+            {
+                ShowPlaylist((int)o);
+            });
+        }
+
+        public void ShowPlaylist(int id)
+        {
+            SelectedPlaylist = Playlists[id];
+
+            // Maybe do this whenever SelectedPlaylist is changed, might f up if a different view is made though
+            CurrentView = PlaylistVM;
+        }
+
+        public void DeletePlaylist(int id)
+        {
+            Playlists.Remove(Playlists.Where(x => x.Id == id).First());
+            FileHandler.SavePlaylists(Playlists);
+
+            // load home view if playloist view with id x is active
         }
     }
 }

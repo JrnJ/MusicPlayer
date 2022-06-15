@@ -31,30 +31,12 @@ namespace MusicPlayer
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         // Classes
-        public SystemMediaTransportControls MediaControls;
-
         private AudioPlayer _audioPlayer;
 
         public AudioPlayer AudioPlayer
         {
             get { return _audioPlayer; }
             set { _audioPlayer = value; }
-        }
-
-        private ObservableCollection<Playlist> _playlists;
-
-        public ObservableCollection<Playlist> Playlists
-        {
-            get { return _playlists; }
-            set { _playlists = value; OnPropertyChanged(); }
-        }
-
-        private Playlist _selectedPlaylist;
-
-        public Playlist SelectedPlaylist
-        {
-            get { return _selectedPlaylist; }
-            set { _selectedPlaylist = value; OnPropertyChanged(); }
         }
 
         private Playlist _myMusic;
@@ -77,11 +59,7 @@ namespace MusicPlayer
             InitializeComponent();
 
             ConfigureAudioPlayer();
-            ConfigurePlaylists();
             ConfigureSettings();
-
-            // Enable this if you still want music, will break MVVM
-            //DataContext = this;
         }
 
         #region Configuration
@@ -93,21 +71,6 @@ namespace MusicPlayer
 
             // Timer Tick Event
             AudioPlayer.Timer.Tick += Timer_Tick;
-        }
-
-        public void ConfigurePlaylists()
-        {
-            // Load Playlist
-            Playlists = FileHandler.GetPlaylists();
-
-            if (Playlists == null)
-            {
-                MessageBox.Show("No playlists found!");
-            }
-            else
-            {
-                LoadPlaylist(Playlists[0]);
-            }
         }
 
         private void ConfigureSettings()
@@ -177,14 +140,16 @@ namespace MusicPlayer
 
         public void MediaEnded()
         {
+            // this might get difficult later on
+            // maybe put audioplayer in global or something
             AudioPlayer.Pause();
 
-            if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
-            {
-                CurrentSongIndex += 1;
-                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-                AudioPlayer.Play();
-            }
+            //if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
+            //{
+            //    CurrentSongIndex += 1;
+            //    OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+            //    AudioPlayer.Play();
+            //}
         }
 
         private void UpdateTime()
@@ -283,9 +248,10 @@ namespace MusicPlayer
 
             // Change SelectedRadioButton
             // Doesnt work, tbh cant be botherd atm so will change this later
-            UIElement uiElement = (UIElement)icSongs.ItemContainerGenerator.ContainerFromIndex(CurrentSongIndex);
-            CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as RadioButton;
-            CurrentUISong.IsChecked.Equals(true);
+            // this code is very questionable anyways, lets rework this some day, thanos snapping it atm
+            //UIElement uiElement = (UIElement)icSongs.ItemContainerGenerator.ContainerFromIndex(CurrentSongIndex);
+            //CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as RadioButton;
+            //CurrentUISong.IsChecked.Equals(true);
 
             // Maybe change where this is placed
             tblInfoSongTitle.Text = song.Title;
@@ -360,145 +326,25 @@ namespace MusicPlayer
         }
         #endregion Controls
 
-        public void LoadPlaylist(Playlist playlist)
-        {
-            SelectedPlaylist = playlist;
-
-            // Loop thru all songs
-            // ?!? => CurrentSongUi, I dont think this even has to be done
-            //for (int i = 0; i < playlist.Songs.Count; i++)
-            //{
-            //    spPlaylistSongs.Children.Add(CreateSongUI(playlist.Songs[i], i));
-
-            //    // Add song to screen
-            //    if (playlist.Songs[i] == CurrentSong)
-            //    {
-            //        CurrentSongIndex = i;
-
-            //        // Change new background
-            //        CurrentUISong = FindName($"Song{CurrentSongIndex}") as Button;
-            //        CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
-            //    }
-            //}
-        }
-
-        #region CreateUI
-        //public Button CreateSongUI(Song song, int index)
+        //private void PlaylistItemClick(object sender, RoutedEventArgs e)
         //{
-        //    SongPlaylists songPlaylists = new()
-        //    {
-        //        Song = song,
-        //        Playlists = Playlists
-        //    };
+        //    int playlistId = int.Parse((sender as FrameworkElement).Tag.ToString());
 
-        //    // Create UI Element
-        //    Button btn = new()
-        //    {
-        //        Style = Application.Current.FindResource("AlbumSong") as Style,
-        //        DataContext = songPlaylists,
-        //        Tag = song.Id
-        //    };
-        //    btn.Click += AlbumSongClick;
-        //    btn.Name = RegisterAndOrSetName($"Song{index}", btn);
-
-        //    ContextMenu cm = new()
-        //    {
-        //        Tag = songPlaylists.Song.Id
-        //    };
-
-        //    MenuItem miPlay = new()
-        //    {
-        //        Header = "Play"
-        //    };
-        //    miPlay.Click += MiPlayClick;
-
-        //    MenuItem miPlaylists = new()
-        //    {
-        //        Style = Application.Current.FindResource("Test") as Style,
-
-        //        Header = "Add to",
-        //        ItemsSource = songPlaylists.Playlists,
-        //        //DisplayMemberPath = "Name",
-        //        //Tag = "{Binding Path=Id}"
-        //    };
-        //    Binding binding = new Binding("Name");
-        //    binding.Source = miPlaylists;
-        //    miPlaylists.SetBinding(TagProperty, binding);
-        //    miPlaylists.Click += MiAddToPlaylistClick;
-
-        //    MenuItem miDeleteFromPlaylist = new()
-        //    {
-        //        Header = "Remove"
-        //    };
-
-        //    MenuItem miProperties = new()
-        //    {
-        //        Header = "Properties"
-        //    };
-
-        //    cm.Items.Add(miPlay);
-        //    cm.Items.Add(miPlaylists);
-        //    cm.Items.Add(miDeleteFromPlaylist);
-
-        //    cm.Items.Add(miProperties);
-        //    btn.ContextMenu = cm;
-
-        //    return btn;
+        //    // ehm maybe not :)
+        //    Playlist playlist = Playlists.ToList().Find(x => x.Id == playlistId);
+        //    LoadPlaylist(playlist);
         //}
-        #endregion CreateUI
 
-        #region CreateUIEvents
-        private void PlaylistItemClick(object sender, RoutedEventArgs e)
-        {
-            int playlistId = int.Parse((sender as FrameworkElement).Tag.ToString());
+        //private void AlbumSongClick(object sender, RoutedEventArgs e)
+        //{
+        //    int songId = int.Parse((sender as FrameworkElement).Tag.ToString());
+        //    Song song = SelectedPlaylist.Songs.Where(x => x.Id == songId).First();
+        //    CurrentSongIndex = SelectedPlaylist.Songs.IndexOf(song);
 
-            // ehm maybe not :)
-            Playlist playlist = Playlists.ToList().Find(x => x.Id == playlistId);
-            LoadPlaylist(playlist);
-        }
-
-        private void AlbumSongClick(object sender, RoutedEventArgs e)
-        {
-            int songId = int.Parse((sender as FrameworkElement).Tag.ToString());
-            Song song = SelectedPlaylist.Songs.Where(x => x.Id == songId).First();
-            CurrentSongIndex = SelectedPlaylist.Songs.IndexOf(song);
-
-            OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-        }
-
-        // ContextMenuEvents
-        private void MiPlayClick(object sender, RoutedEventArgs e)
-        {
-            int songId = int.Parse(((sender as FrameworkElement).Parent as FrameworkElement).Tag.ToString());
-
-            for (int i = 0; i < SelectedPlaylist.Songs.Count; i++)
-            {
-                if (SelectedPlaylist.Songs[i].Id == songId)
-                {
-                    CurrentSongIndex = SelectedPlaylist.Songs[i].Id;
-                    OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-                    break;
-                }
-            }
-        }
-
-        private void MiAddToPlaylistClick(object sender, RoutedEventArgs e)
-        {
-            // Add item to playlist
-            int songId = int.Parse(((sender as FrameworkElement).Parent as FrameworkElement).Tag.ToString());
-            string playlistId = (sender as FrameworkElement).Tag.ToString();
-            FrameworkElement parent = sender as FrameworkElement;
-
-            MessageBox.Show(songId.ToString() + " | " + playlistId.ToString());
-        }
-        #endregion CreateUIEvents
+        //    OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+        //}
 
         #region VolumeSlider
-        private void MyMusicClick(object sender, RoutedEventArgs e)
-        {
-            LoadPlaylist(MyMusic);
-        }
-
         private void VolumeSliderPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             // Save settings
@@ -541,91 +387,6 @@ namespace MusicPlayer
             }
         }
 
-        #region PlaylistSettings
-        private void DeletePlaylistClick(object sender, RoutedEventArgs e)
-        {
-            if (MessageBox.Show("Are you sure?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            {
-                Playlists.Remove(Playlists.Where(x => x.Id == int.Parse((sender as Button).Tag.ToString())).First());
-                FileHandler.SavePlaylists(Playlists);
-
-                LoadPlaylist(MyMusic);
-            }
-        }
-
-        private void tbSearch_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            tblSearch.Text = (sender as TextBox).Text == "" ? "Search..." : "";
-
-            // Check textbox
-            // ?!? => Need names and stuff, fix later
-            //if (!string.IsNullOrWhiteSpace((sender as TextBox).Text))
-            //{
-            //    // Clear playlist
-            //    spPlaylistSongs.Children.Clear();
-
-            //    for (int i = 0; i < MyMusic.Songs.Count; i++)
-            //    {
-            //        // Check if song contains them
-            //        if (!string.IsNullOrWhiteSpace(MyMusic.Songs[i].Title))
-            //            if (MyMusic.Songs[i].Title.ToLower().Contains((sender as TextBox).Text.ToLower()) || 
-            //                MyMusic.Songs[i].ContributingArtists.ToLower().Contains((sender as TextBox).Text.ToLower()))
-            //                spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
-            //    }
-            //}
-            //else
-            //{
-            //    // Clear and fill the search playlist
-            //    spPlaylistSongs.Children.Clear();
-            //    for (int i = 0; i < MyMusic.Songs.Count; i++)
-            //    {
-            //        spPlaylistSongs.Children.Add(CreateSongUI(MyMusic.Songs[i], i));
-            //    }
-            //}
-        }
-        #endregion PlaylistSettings
-
-        #region PlaylistItemsMenu
-        private void AddPlaylistClick(object sender, RoutedEventArgs e)
-        {
-            // Create sample template to add a new playlist
-            Playlist playlist = new Playlist(Playlists.Count, new ObservableCollection<Song>(), "New Playlist", "New Playlist");
-
-            Playlists.Add(playlist);
-            LoadPlaylist(playlist);
-
-            // Save Playlists
-            FileHandler.SavePlaylists(Playlists);
-        }
-        #endregion PlaylistsTab
-
-        // Keep at bottom
-        #region HelperMethods
-
-        // < ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! > //
-        //
-        // Place in HelperMethods.cs if possible
-        //
-        // < ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! > //
-
-        /// <summary>
-        /// Registers an object with a name
-        /// Unregisters if object already exists
-        /// </summary>
-        /// <param name="name">Object's x:Name</param>
-        /// <param name="obj">Object</param>
-        /// <returns></returns>
-        private string RegisterAndOrSetName(string name, object obj)
-        {
-            if (FindName(name) != null)
-                UnregisterName(name);
-
-            RegisterName(name, obj);
-
-            return name;
-        }
-        #endregion HelperMethods
-
         #region Interface Implementations
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -634,21 +395,5 @@ namespace MusicPlayer
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
         #endregion Interface Implementations
-
-        private void RadioButton_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("UwU");
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            string tag = (sender as FrameworkElement).Tag.ToString();
-
-            switch (tag)
-            {
-                case "":
-                    break;
-            }
-        }
     }
 }

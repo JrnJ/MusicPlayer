@@ -13,18 +13,16 @@
     
     <Grid>
         <!-- Songs -->
-        <!--<ScrollViewer Height="650">
-            
-        </ScrollViewer>-->
-
-        <ItemsControl x:Name="icSongs" ItemsSource="{Binding Global.SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <!-- Click="AlbumSongClick" -->
-                    <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}" Tag="{Binding Id}" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <ScrollViewer>
+            <ItemsControl x:Name="icSongs" ItemsSource="{Binding Global.SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Click="AlbumSongClick" -->
+                        <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}" Tag="{Binding Id}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
         <!-- /Songs -->
     </Grid>
 </UserControl>
