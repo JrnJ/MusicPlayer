@@ -4,17 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MusicPlayer.MVVM.View" 
-             xmlns:viewModel="clr-namespace:MusicPlayer.MVVM.ViewModel"
+             xmlns:viewmodel="clr-namespace:MusicPlayer.MVVM.ViewModel"
+             xmlns:converters="clr-namespace:MusicPlayer.Classes"
              mc:Ignorable="d">
 
     <UserControl.DataContext>
-        <viewModel:PlaylistViewModel />
+        <viewmodel:PlaylistViewModel />
     </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <converters:AddConverter x:Key="AddConverter" />
+    </UserControl.Resources>
 
     <Grid>
         <StackPanel Margin="16">
             <!-- Info -->
-            <TextBlock Text="{Binding Global.SelectedPlaylist.Name}" 
+            <TextBlock Text="{Binding Global.SelectedPlaylist.Name}"
                        FontSize="28" Foreground="White" FontWeight="SemiBold"
                        />
             <TextBlock Text="{Binding Global.SelectedPlaylist.Description}" 
@@ -36,10 +41,34 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <!-- Click="AlbumSongClick" -->
-                            <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}" Tag="{Binding Id}" 
+                            <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
                                          Command="{Binding ElementName=Songs, Path=DataContext.SelectSongCommand}"
                                          CommandParameter="{Binding Id}"
-                                         />
+                                         Tag="{Binding ElementName=Songs, Path=DataContext}">
+                                <RadioButton.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Play" 
+                                                  Command="{Binding PlacementTarget.Tag.SelectSongCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding Id}"/>
+                                        <MenuItem Header="Add to" ItemsSource="{Binding PlacementTarget.Tag.Global.Playlists, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                            <MenuItem.ItemTemplate>
+                                                <DataTemplate>
+                                                    <MenuItem Header="{Binding Name}"
+                                                              Command="{Binding PlacementTarget.Tag.AddSongToPlaylist, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              >
+                                                        <MenuItem.CommandParameter>
+                                                            <MultiBinding Converter="{StaticResource AddConverter}">
+                                                                <Binding Path="Id" />
+                                                                <Binding Path="PlacementTarget.CommandParameter" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                                                            </MultiBinding>
+                                                        </MenuItem.CommandParameter>
+                                                    </MenuItem>
+                                                </DataTemplate>
+                                            </MenuItem.ItemTemplate>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </RadioButton.ContextMenu>
+                            </RadioButton>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

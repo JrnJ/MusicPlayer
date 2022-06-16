@@ -11,11 +11,19 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand SelectSongCommand { get; set; }
 
+        public RelayCommand AddSongToPlaylist { get; set; }
+
         public PlaylistViewModel()
         {
             SelectSongCommand = new(o =>
             {
                 PlaySong((int)o);
+            });
+
+            AddSongToPlaylist = new(o =>
+            {
+                string[] ids = o.ToString().Split(","); // 0 = playlistId, 1 = songId
+                Global.Playlists[int.Parse(ids[0])].Songs.Add(Global.SelectedPlaylist.Songs[int.Parse(ids[1])]);
             });
         }
 
