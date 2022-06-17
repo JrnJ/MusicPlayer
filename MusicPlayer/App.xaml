@@ -9,11 +9,12 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/MainTheme.xaml" />
-                
+                <ResourceDictionary Source="Themes/ContextMenuTheme.xaml" />
+
                 <ResourceDictionary Source="Themes/PageTabTheme.xaml" />
-                
+
                 <ResourceDictionary Source="Themes/AlbumSongTheme.xaml" />
-                
+
                 <ResourceDictionary Source="Themes/PlaylistItemTheme.xaml" />
 
                 <ResourceDictionary Source="Themes/SongTimeSliderTheme.xaml" />

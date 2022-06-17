@@ -40,7 +40,6 @@
                 <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <!-- Click="AlbumSongClick" -->
                             <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
                                          Command="{Binding ElementName=Songs, Path=DataContext.SelectSongCommand}"
                                          CommandParameter="{Binding Id}"
@@ -49,7 +48,10 @@
                                     <ContextMenu>
                                         <MenuItem Header="Play" 
                                                   Command="{Binding PlacementTarget.Tag.SelectSongCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                  CommandParameter="{Binding Id}"/>
+                                                  CommandParameter="{Binding Id}" />
+                                        <MenuItem Header="Remove" 
+                                                  Command="{Binding PlacementTarget.Tag.RemoveSongCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding Id}" />
                                         <MenuItem Header="Add to" ItemsSource="{Binding PlacementTarget.Tag.Global.Playlists, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                             <MenuItem.ItemTemplate>
                                                 <DataTemplate>

@@ -49,8 +49,18 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public Playlist SelectedPlaylist
         {
-            get => _selectedPlaylist;
-            set { _selectedPlaylist = value; OnPropertyChanged(); }
+            get => Playlists.FirstOrDefault(x => x.Id == _selectedPlaylist.Id);
+            set
+            {
+                Playlist playlist = Playlists.FirstOrDefault(x => x.Id == value.Id);
+
+                if (playlist != null)
+                {
+                    _selectedPlaylist = value;
+                    Playlists[Playlists.IndexOf(playlist)] = playlist;
+                    OnPropertyChanged();
+                }
+            }
         }
 
         private Playlist _myMusic;
@@ -208,6 +218,24 @@ namespace MusicPlayer.MVVM.ViewModel
             FileHandler.SavePlaylists(Playlists);
 
             // load home view if playloist view with id x is active
+        }
+
+        public void AddSongToPlaylist(Song song, Playlist playlist)
+        {
+            // Add Song to Playlist
+            Playlists[Playlists.IndexOf(playlist)].Songs.Add(song);
+
+            // Save Playlists
+            FileHandler.SavePlaylists(Playlists);
+        }
+
+        public void RemoveSongFromPlaylist(Song song, Playlist playlist)
+        {
+            // Remove song from Playlist
+            Playlists[Playlists.IndexOf(playlist)].Songs.Remove(song);
+
+            // Save Playlists
+            FileHandler.SavePlaylists(Playlists);
         }
     }
 }

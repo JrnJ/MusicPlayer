@@ -1,5 +1,7 @@
-﻿using MusicPlayer.Core;
+﻿using MusicPlayer.Classes;
+using MusicPlayer.Core;
 using System;
+using System.Linq;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
@@ -13,23 +15,30 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand AddSongToPlaylist { get; set; }
 
+        public RelayCommand RemoveSongCommand { get; set; }
+
         public PlaylistViewModel()
         {
             SelectSongCommand = new(o =>
             {
-                PlaySong((int)o);
+                Global.OpenMedia(Global.SelectedPlaylist.Songs[(int)o]);
             });
 
             AddSongToPlaylist = new(o =>
             {
                 string[] ids = o.ToString().Split(","); // 0 = playlistId, 1 = songId
-                Global.Playlists[int.Parse(ids[0])].Songs.Add(Global.SelectedPlaylist.Songs[int.Parse(ids[1])]);
-            });
-        }
+                Song song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == int.Parse(ids[1]));
+                Playlist playlist = Global.Playlists.FirstOrDefault(x => x.Id == int.Parse(ids[0]));
 
-        public void PlaySong(int id)
-        {
-            Global.OpenMedia(Global.SelectedPlaylist.Songs[id]);
+                Global.AddSongToPlaylist(song, playlist);
+            });
+
+            RemoveSongCommand = new(o =>
+            {
+                Song song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);
+
+                Global.RemoveSongFromPlaylist(song, Global.SelectedPlaylist);
+            });
         }
     }
 }
