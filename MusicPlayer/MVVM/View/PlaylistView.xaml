@@ -17,65 +17,76 @@
     </UserControl.Resources>
 
     <Grid>
-        <StackPanel Margin="16">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
             <!-- Info -->
-            <TextBlock Text="{Binding Global.SelectedPlaylist.Name}"
+            <Grid Grid.Row="0" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="{Binding Global.SelectedPlaylist.Name}"
                        FontSize="28" Foreground="White" FontWeight="SemiBold"
                        />
-            <TextBlock Text="{Binding Global.SelectedPlaylist.Description}" 
+                    <TextBlock Text="{Binding Global.SelectedPlaylist.Description}" 
                        Foreground="LightGray"
                        />
-            <TextBlock Foreground="LightGray" Margin="0, 0, 0, 16">
-                <TextBlock.Text>
-                    <MultiBinding StringFormat="{}{0} Songs, {1}">
-                        <Binding Path="Global.SelectedPlaylist.Songs.Count" />
-                        <Binding Path="Global.SelectedPlaylist.PlaylistDuration" />
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
+                    <TextBlock Foreground="LightGray" Margin="0, 0, 0, 16">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} Songs, {1}">
+                                <Binding Path="Global.SelectedPlaylist.Songs.Count" />
+                                <Binding Path="Global.SelectedPlaylist.PlaylistDuration" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
             <!-- /Info -->
-            
+
             <!-- Songs -->
-            <ScrollViewer>
-                <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
+            <Grid Grid.Row="1">
+                <ScrollViewer>
+                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
                                          Command="{Binding ElementName=Songs, Path=DataContext.SelectSongCommand}"
                                          CommandParameter="{Binding Id}"
                                          Tag="{Binding ElementName=Songs, Path=DataContext}">
-                                <RadioButton.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="Play" 
+                                    <RadioButton.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Play" 
                                                   Command="{Binding PlacementTarget.Tag.SelectSongCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                   CommandParameter="{Binding Id}" />
-                                        <MenuItem Header="Remove" 
+                                            <MenuItem Header="Remove" 
                                                   Command="{Binding PlacementTarget.Tag.RemoveSongCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                   CommandParameter="{Binding Id}" />
-                                        <MenuItem Header="Add to" ItemsSource="{Binding PlacementTarget.Tag.Global.Playlists, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                            <MenuItem.ItemTemplate>
-                                                <DataTemplate>
-                                                    <MenuItem Header="{Binding Name}"
-                                                              Command="{Binding PlacementTarget.Tag.AddSongToPlaylist, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                            <MenuItem Header="Add to" ItemsSource="{Binding PlacementTarget.Tag.Global.Playlists, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                <MenuItem.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <MenuItem Header="{Binding Name}"
+                                                              Command="{Binding PlacementTarget.Tag.AddSongToPlaylistCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                               >
-                                                        <MenuItem.CommandParameter>
-                                                            <MultiBinding Converter="{StaticResource AddConverter}">
-                                                                <Binding Path="Id" />
-                                                                <Binding Path="PlacementTarget.CommandParameter" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
-                                                            </MultiBinding>
-                                                        </MenuItem.CommandParameter>
-                                                    </MenuItem>
-                                                </DataTemplate>
-                                            </MenuItem.ItemTemplate>
-                                        </MenuItem>
-                                    </ContextMenu>
-                                </RadioButton.ContextMenu>
-                            </RadioButton>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                                                            <MenuItem.CommandParameter>
+                                                                <MultiBinding Converter="{StaticResource AddConverter}">
+                                                                    <Binding Path="Id" />
+                                                                    <Binding Path="PlacementTarget.CommandParameter" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                                                                </MultiBinding>
+                                                            </MenuItem.CommandParameter>
+                                                        </MenuItem>
+                                                    </DataTemplate>
+                                                </MenuItem.ItemTemplate>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </RadioButton.ContextMenu>
+                                </RadioButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
             <!-- /Songs -->
-        </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

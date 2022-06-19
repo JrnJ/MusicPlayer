@@ -32,11 +32,21 @@
                         <!-- Song Info -->
                         <DockPanel>
                             <!-- Image -->
-                            <Image Width="100" Source="../../Images/SongImagePlaceholder.png" />
+                            <Grid Width="80" Height="80" Margin="10,0,0,0">
+                                <Border Background="DarkCyan" CornerRadius="4"/>
+                                <Border CornerRadius="4">
+                                    <Border.Background>
+                                        <ImageBrush Stretch="Fill" ImageSource="{Binding Global.AudioPlayer.CurrentSong.Image}" 
+                                                    RenderOptions.BitmapScalingMode="Linear"
+                                                    />
+                                    </Border.Background>
+                                </Border>
+                            </Grid>
                             <!-- /Image -->
                             <StackPanel VerticalAlignment="Center" Margin="20,0,0,0">
                                 <TextBlock Text="{Binding Global.AudioPlayer.CurrentSong.Title}" FontSize="24" />
-                                <TextBlock Text="{Binding Global.AudioPlayer.CurrentSong.ContributingArtists}" FontSize="24" />
+                                <TextBlock Text="{Binding Global.AudioPlayer.CurrentSong.ContributingArtists}" 
+                                           FontSize="20" Foreground="#999999" />
                             </StackPanel>
                         </DockPanel>
                         <!-- /Song Info -->
@@ -91,6 +101,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="340" />
                     <ColumnDefinition />
+                    <ColumnDefinition Width="340" />
                 </Grid.ColumnDefinitions>
 
                 <!-- Sidemenu -->
@@ -139,7 +150,7 @@
                 <!-- /Sidemenu -->
 
                 <!-- Current View -->
-                <Grid Grid.Column="2">
+                <Grid Grid.Column="1">
                     <ContentControl Content="{Binding Global.CurrentView}"/>
                 </Grid>
                 <!-- /Current View -->

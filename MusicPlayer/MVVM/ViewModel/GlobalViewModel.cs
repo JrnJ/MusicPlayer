@@ -71,14 +71,6 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _myMusic = value; OnPropertyChanged(); }
         }
 
-        //private Song _currentSong;
-
-        //public Song CurrentSong
-        //{
-        //    get { return _currentSong; }
-        //    set { _currentSong = value; OnPropertyChanged(); }
-        //}
-
         private string _finalTime;
 
         public string FinalTime
@@ -102,7 +94,6 @@ namespace MusicPlayer.MVVM.ViewModel
             get { return _sliderValue; }
             set { _sliderValue = value; OnPropertyChanged(); }
         }
-
 
         public int CurrentSongIndex { get; set; }
 
@@ -224,6 +215,7 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             // Add Song to Playlist
             Playlists[Playlists.IndexOf(playlist)].Songs.Add(song);
+            FixPlaylistSongIds(playlist);
 
             // Save Playlists
             FileHandler.SavePlaylists(Playlists);
@@ -233,9 +225,20 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             // Remove song from Playlist
             Playlists[Playlists.IndexOf(playlist)].Songs.Remove(song);
+            FixPlaylistSongIds(playlist);
 
             // Save Playlists
             FileHandler.SavePlaylists(Playlists);
+        }
+
+        private void FixPlaylistSongIds(Playlist playlist)
+        {
+            Playlist temp = Playlists[Playlists.IndexOf(playlist)];
+
+            for (int i = 0; i < temp.Songs.Count; i++)
+            {
+                Playlists[Playlists.IndexOf(playlist)].Songs[i].SetId(i);
+            }
         }
     }
 }

@@ -100,7 +100,10 @@ namespace MusicPlayer.MVVM.ViewModel
                     //MyMusic.Songs.AddRange(songs);
                     for (int i2 = 0; i2 < songs.Count; i2++)
                     {
-                        Global.MyMusic.Songs.Add(songs[i2]);
+                        Song song = songs[i2];
+                        song.SetId(Global.MyMusic.Songs.Count);
+
+                        Global.MyMusic.Songs.Add(song);
                     }
                 }
             }

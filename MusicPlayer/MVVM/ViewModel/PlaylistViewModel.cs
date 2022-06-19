@@ -13,7 +13,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand SelectSongCommand { get; set; }
 
-        public RelayCommand AddSongToPlaylist { get; set; }
+        public RelayCommand AddSongToPlaylistCommand { get; set; }
 
         public RelayCommand RemoveSongCommand { get; set; }
 
@@ -24,7 +24,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 Global.OpenMedia(Global.SelectedPlaylist.Songs[(int)o]);
             });
 
-            AddSongToPlaylist = new(o =>
+            AddSongToPlaylistCommand = new(o =>
             {
                 string[] ids = o.ToString().Split(","); // 0 = playlistId, 1 = songId
                 Song song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == int.Parse(ids[1]));

@@ -43,7 +43,7 @@ namespace MusicPlayer.Classes
 
             // Timer
             Timer = new();
-            Timer.Interval = new TimeSpan(0, 0, 1);
+            Timer.Interval = new TimeSpan(0, 0, 0, 0, 250);
         }
 
         #region Private

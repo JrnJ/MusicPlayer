@@ -21,6 +21,8 @@
 
 
                 <ResourceDictionary Source="Themes/PlaylistsItemTheme.xaml" />
+                
+                <ResourceDictionary Source="Themes/TestTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Navigation -->

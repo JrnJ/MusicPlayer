@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using Newtonsoft.Json;
 
 namespace MusicPlayer.Classes
@@ -46,7 +48,7 @@ namespace MusicPlayer.Classes
         public string Genre { get; private set; } = "Unknown Genre";
 
         [JsonIgnore]
-        public TagLib.Picture Picture { get; private set; }
+        public BitmapImage Image { get; private set; }
 
         /// <summary>
         /// Length of Media in Milliseconds
@@ -70,6 +72,11 @@ namespace MusicPlayer.Classes
             AddSongInfo();
         }
 
+        public void SetId(int id)
+        {
+            Id = id;
+        }
+
         public bool AddSongInfo()
         {
             if (Path != null)
@@ -77,13 +84,24 @@ namespace MusicPlayer.Classes
                 // Get file
                 TagLib.File tFile = TagLib.File.Create(Path);
 
-                TagLib.Picture pic = new TagLib.Picture("../../../Images/SongImagePlaceholder.png");
-                //TagLib.Picture pic = null;
+                if (tFile.Tag.Pictures.Length > 0)
+                {
+                    TagLib.IPicture picture = tFile.Tag.Pictures[0];
+                    MemoryStream ms = new(picture.Data.Data);
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    BitmapImage bitmap = new();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = ms;
+                    bitmap.EndInit();
+
+                    Image = bitmap;
+                }
 
                 //
-                if (tFile.Tag.Title == "")
+                if (string.IsNullOrEmpty(tFile.Tag.Title) || string.IsNullOrWhiteSpace(tFile.Tag.Title))
                 {
-                    Title = Path.ToString().Split("/")[Path.ToString().Split("/").Length - 1];
+                    Title = Path.Split("\\")[^1];
                 }
                 else
                 {
@@ -97,11 +115,6 @@ namespace MusicPlayer.Classes
                 Album = tFile.Tag.Album;
                 Year = tFile.Tag.Year;
                 Genre = tFile.Tag.FirstGenre;
-
-                if (pic != null)
-                    Picture = pic;
-                else
-                    Picture = new TagLib.Picture("../../../Images/SongImagePlaceholder.png");
 
                 Length = tFile.Properties.Duration.TotalMilliseconds;
 
