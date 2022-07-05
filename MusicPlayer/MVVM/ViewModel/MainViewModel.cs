@@ -23,7 +23,16 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand CreatePlaylistCommand { get; set; }
 
+        // Control Commands
         public RelayCommand PausePlayCommand { get; set; }
+
+        public RelayCommand PreviousSongCommand { get; set; }
+
+        public RelayCommand NextSongCommand { get; set; }
+
+        public RelayCommand ShuffleCommand { get; set; }
+
+        public RelayCommand RepeatCommand { get; set; }
 
         // ViewModels
         public HomeViewModel HomeVM { get; set; }
@@ -71,13 +80,39 @@ namespace MusicPlayer.MVVM.ViewModel
                 FileHandler.SavePlaylists(Global.Playlists);
             });
 
+            #region ManagerCommands
             PausePlayCommand = new(o =>
             {
                 if (Global.AudioPlayer.IsPlaying)
+                {
                     Global.AudioPlayer.Pause();
+                }
                 else
+                {
                     Global.AudioPlayer.Play();
+                }
             });
+
+            PreviousSongCommand = new(o =>
+            {
+                
+            });
+
+            NextSongCommand = new(o =>
+            {
+                
+            });
+
+            ShuffleCommand = new(o =>
+            {
+
+            });
+
+            RepeatCommand = new(o =>
+            {
+
+            });
+            #endregion ManagerCommands
 
             // Configuration
             ConfigureSettings();

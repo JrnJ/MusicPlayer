@@ -9,7 +9,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/MainTheme.xaml" />
-                <ResourceDictionary Source="Themes/ContextMenuTheme.xaml" />
+                <ResourceDictionary Source="Themes/CTTestTheme.xaml" />
 
                 <ResourceDictionary Source="Themes/PageTabTheme.xaml" />
 
@@ -18,10 +18,13 @@
                 <ResourceDictionary Source="Themes/PlaylistItemTheme.xaml" />
 
                 <ResourceDictionary Source="Themes/SongTimeSliderTheme.xaml" />
+                <ResourceDictionary Source="Themes/ScrollbarTheme.xaml" />
+
+                <ResourceDictionary Source="Themes/ImageButtonTheme.xaml" />
 
 
                 <ResourceDictionary Source="Themes/PlaylistsItemTheme.xaml" />
-                
+
                 <ResourceDictionary Source="Themes/TestTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
@@ -43,7 +46,6 @@
                 <view:PlaylistView />
             </DataTemplate>
         </ResourceDictionary>
-
         <!--<Style TargetType="ContextMenu">
             <Setter Property="Background" Value="#222222" />
             --><!--#151515--><!--

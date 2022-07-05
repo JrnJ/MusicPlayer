@@ -14,12 +14,14 @@
                     <Grid VerticalAlignment="Center">
                         <Border x:Name="borderBackground" Margin="6,0" Height="6" Background="#303030" CornerRadius="4"/>
                         <Canvas Margin="0, -6, 0, 0" VerticalAlignment="Center">
-                            <Border x:Name="PART_SelectionRange" 
+                            <Border x:Name="PART_SelectionRange"
                                         HorizontalAlignment="Left" Height="6" Background="{TemplateBinding Foreground}" 
                                         CornerRadius="4"
                                         >
                                 <Border.Effect>
-                                    <DropShadowEffect ShadowDepth="0" Color="#dba531" Opacity="0.5" BlurRadius="20"/>
+                                    <DropShadowEffect ShadowDepth="0"
+                                                      Color="#dba531"
+                                                      Opacity="0.5" BlurRadius="20" />
                                 </Border.Effect>
                             </Border>
                         </Canvas>

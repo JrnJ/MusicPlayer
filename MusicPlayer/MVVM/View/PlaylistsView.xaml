@@ -20,29 +20,41 @@
 
             <!-- Info -->
             <Grid Grid.Row="0" Margin="0,0,0,16">
-                <TextBlock Text="Playlists"
-                       FontSize="28" Foreground="White" FontWeight="SemiBold"
-                       />
+                <StackPanel>
+                    <TextBlock Text="Playlists"
+                       FontSize="28" Foreground="White" FontWeight="SemiBold" />
+
+                    <Button 
+                        Content="New Playlist"
+                        Width="180" Height="35"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Left"
+                        Command="{Binding NewPlaylistCommand}"
+                        />
+                </StackPanel>
             </Grid>
             <!-- /Info -->
             
             <!-- Songs -->
             <Grid Grid.Row="1">
-                <ItemsControl x:Name="Playlists" ItemsSource="{Binding Global.Playlists}" Margin="0, 0, 8, 0"
-                          IsEnabled="True">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="2" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button Style="{StaticResource PlaylistsItem}" 
+                <ScrollViewer>
+                    <ItemsControl x:Name="Playlists" ItemsSource="{Binding Global.Playlists}" 
+                              IsEnabled="True"
+                              HorizontalAlignment="Left">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="7" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource PlaylistsItem}" 
                                 Command="{Binding ElementName=Playlists, Path=DataContext.Global.SelectPlaylistCommand}"
                                 CommandParameter="{Binding Id}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
             </Grid>
             <!-- /Songs -->
         </Grid>

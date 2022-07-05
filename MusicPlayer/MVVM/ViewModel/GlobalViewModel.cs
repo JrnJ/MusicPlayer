@@ -100,6 +100,8 @@ namespace MusicPlayer.MVVM.ViewModel
         // Commands
         public RelayCommand SelectPlaylistCommand { get; set; }
 
+        public RelayCommand DeletePlaylistCommand { get; set; }
+
         public GlobalViewModel()
         {
             // Create ViewModels
@@ -112,6 +114,11 @@ namespace MusicPlayer.MVVM.ViewModel
             SelectPlaylistCommand = new(o =>
             {
                 ShowPlaylist((int)o);
+            });
+
+            DeletePlaylistCommand = new(o =>
+            {
+                DeletePlaylist((int)o);
             });
 
             // Configuration
@@ -194,6 +201,17 @@ namespace MusicPlayer.MVVM.ViewModel
             CurrentTime = HelperMethods.MsToTime(AudioPlayer.MediaPlayer.Position.TotalMilliseconds);
         }
         #endregion Configuration
+
+        public void CreatePlaylist()
+        {
+            int playlistId = Playlists.Count;
+            while (Playlists.Where(x => x.Id == playlistId).FirstOrDefault() != null)
+                playlistId++;
+
+            Playlist playlist = new(playlistId, new(), "New Playlist", "None");
+            Playlists.Add(playlist);
+            FileHandler.SavePlaylists(Playlists);
+        }
 
         public void ShowPlaylist(int id)
         {
