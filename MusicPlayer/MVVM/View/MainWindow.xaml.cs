@@ -23,6 +23,11 @@ using Windows.Media;
 using MusicPlayer.Classes;
 using System.Runtime.CompilerServices;
 
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
+using System.Runtime.InteropServices;
+using MusicPlayer.Core;
+
 namespace MusicPlayer
 {
     /// <summary>
@@ -35,9 +40,55 @@ namespace MusicPlayer
 
         public bool LeftMouseDownOnSlider = false;
 
+        public static AppWindow AppWindow;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            // Gets the AppWindow using the windowing interop methods (see WindowingInterop.cs for details)
+            AppWindow = AppWindowExtensions.GetAppWindowFromWPFWindow(this);
+
+            if (AppWindow != null)
+            {
+                if (AppWindowTitleBar.IsCustomizationSupported())
+                {
+                    CustomizeTitleBar();
+                }
+                else
+                {
+                    //AppTitleBar.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        public void CustomizeTitleBar()
+        {
+            // AppWindowTitleBar
+            AppWindowTitleBar titleBar = AppWindow.TitleBar;
+            titleBar.ExtendsContentIntoTitleBar = true;
+
+            // Icon
+            //titleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
+
+            // Title
+
+
+            // Bar
+            titleBar.BackgroundColor = Windows.UI.Color.FromArgb(255, 32, 32, 32);
+            titleBar.ForegroundColor = Windows.UI.Color.FromArgb(255, 255, 255, 255);
+            /// Inactive
+            titleBar.InactiveBackgroundColor = Windows.UI.Color.FromArgb(255, 32, 32, 32);
+            titleBar.InactiveForegroundColor = Windows.UI.Color.FromArgb(255, 255, 255, 255);
+
+            // Buttons
+            titleBar.ButtonBackgroundColor = Windows.UI.Color.FromArgb(255, 32, 32, 32);
+            titleBar.ButtonForegroundColor = Windows.UI.Color.FromArgb(255, 255, 255, 255);
+            titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(255, 37, 37, 37);
+            titleBar.ButtonPressedBackgroundColor = Windows.UI.Color.FromArgb(255, 41, 41, 41);
+            /// Inactive
+            titleBar.ButtonInactiveBackgroundColor = Windows.UI.Color.FromArgb(255, 32, 32, 32);
+            titleBar.ButtonInactiveForegroundColor = Windows.UI.Color.FromArgb(255, 255, 255, 255);
         }
 
         #region MediaPlayerEvents

@@ -1,29 +1,34 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
+		<Platforms>x64</Platforms>
+		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Remove="Images\Icons\next_icon.png" />
+	  <Content Remove="Images\Icons\pause_icon.png" />
+	  <Content Remove="Images\Icons\previous_icon.png" />
+	  <Content Remove="Images\Icons\repeat_icon.png" />
+	  <Content Remove="Images\Icons\shuffle_icon.png" />
+	  <Content Remove="Images\logo.png" />
+	  <Content Remove="Images\logo_gold.png" />
+	  <Content Remove="Images\next_track.png" />
+	  <Content Remove="Images\pause.png" />
+	  <Content Remove="Images\play.png" />
+	  <Content Remove="Images\previous_track.png" />
+	  <Content Remove="Images\repeat.png" />
+	  <Content Remove="Images\shuffle.png" />
+	  <Content Remove="Images\SongImagePlaceholder.png" />
+	  <Content Remove="Images\Triangle_Filled.png" />
+	</ItemGroup>
 
   <ItemGroup>
     <None Remove="Fonts\NotoSans-Regular.ttf" />
-    <None Remove="Images\Icons\next_icon.png" />
-    <None Remove="Images\Icons\pause_icon.png" />
-    <None Remove="Images\Icons\previous_icon.png" />
-    <None Remove="Images\Icons\repeat_icon.png" />
-    <None Remove="Images\Icons\shuffle_icon.png" />
-    <None Remove="Images\logo.png" />
-    <None Remove="Images\logo_gold.png" />
-    <None Remove="Images\next_track.png" />
-    <None Remove="Images\pause.png" />
-    <None Remove="Images\play.png" />
-    <None Remove="Images\previous_track.png" />
-    <None Remove="Images\repeat.png" />
-    <None Remove="Images\shuffle.png" />
-    <None Remove="Images\SongImagePlaceholder.png" />
-    <None Remove="Images\Triangle_Filled.png" />
-    <None Remove="Images\Triangle_Filled.svg" />
     <None Remove="MainWindow.xaml.cs~RFaa61997.TMP" />
   </ItemGroup>
 
@@ -31,14 +36,6 @@
     <Resource Include="Fonts\NotoSans-Regular.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Resource Include="Images\Icons\next_icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -84,6 +81,13 @@
     <Resource Include="Images\Triangle_Filled.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25151-preview" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
   </ItemGroup>
 
 </Project>
