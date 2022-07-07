@@ -27,6 +27,7 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using System.Runtime.InteropServices;
 using MusicPlayer.Core;
+using Microsoft.Windows.ApplicationModel.DynamicDependency;
 
 namespace MusicPlayer
 {
@@ -46,19 +47,28 @@ namespace MusicPlayer
         {
             InitializeComponent();
 
-            // Gets the AppWindow using the windowing interop methods (see WindowingInterop.cs for details)
-            AppWindow = AppWindowExtensions.GetAppWindowFromWPFWindow(this);
-
-            if (AppWindow != null)
+            try
             {
-                if (AppWindowTitleBar.IsCustomizationSupported())
+                AppWindow = AppWindowExtensions.GetAppWindowFromWPFWindow(this);
+
+                if (AppWindow != null)
                 {
-                    CustomizeTitleBar();
+                    if (AppWindowTitleBar.IsCustomizationSupported())
+                    {
+                        CustomizeTitleBar();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Titlebar customization not supported on this device!", "Error");
+                    }
                 }
-                else
-                {
-                    //AppTitleBar.Visibility = Visibility.Collapsed;
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex);
+#if !DEBUG
+                MessageBox.Show("Could not load custom window!", "Error");
+#endif
             }
         }
 
@@ -69,7 +79,8 @@ namespace MusicPlayer
             titleBar.ExtendsContentIntoTitleBar = true;
 
             // Icon
-            //titleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
+            //titleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;)
+            AppWindow.SetIcon("/Images/LockScreenLogo.scale-200.png");
 
             // Title
 
@@ -91,16 +102,16 @@ namespace MusicPlayer
             titleBar.ButtonInactiveForegroundColor = Windows.UI.Color.FromArgb(255, 255, 255, 255);
         }
 
-        #region MediaPlayerEvents
+#region MediaPlayerEvents
 
         //private void MediaPlayerButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
         //{
         //    // Call to MainWindow thread
         //    Dispatcher.Invoke(() => { ButtonPressed(sender, args); });
         //}
-        #endregion MediaPlayerEvents
+#endregion MediaPlayerEvents
 
-        #region MusicThings
+#region MusicThings
         //public void ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
         //{
         //    switch (args.Button)
@@ -125,9 +136,9 @@ namespace MusicPlayer
         //            break;
         //    }
         //}
-        #endregion MusicThings
+#endregion MusicThings
 
-        #region WindowEvents
+#region WindowEvents
         //private void WindowKeyDown(object sender, KeyEventArgs e)
         //{
         //    switch (e.Key)
@@ -182,7 +193,7 @@ namespace MusicPlayer
         //            break;
         //    }
         //}
-        #endregion WindowEvents
+#endregion WindowEvents
 
         private void sliderSongTimePlayed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -212,7 +223,7 @@ namespace MusicPlayer
             //}
         }
 
-        #region Controls
+#region Controls
         private void ShuffleClick(object sender, RoutedEventArgs e)
         {
 
@@ -232,7 +243,7 @@ namespace MusicPlayer
         {
 
         }
-        #endregion Controls
+#endregion Controls
 
         //private void PlaylistItemClick(object sender, RoutedEventArgs e)
         //{
@@ -252,13 +263,13 @@ namespace MusicPlayer
         //    OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
         //}
 
-        #region VolumeSlider
+#region VolumeSlider
         private void VolumeSliderPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             // Save settings
             AppSettings.SaveSettingsToFile();
         }
-        #endregion VolumeSlider
+#endregion VolumeSlider
 
         private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -295,13 +306,13 @@ namespace MusicPlayer
             }
         }
 
-        #region Interface Implementations
+#region Interface Implementations
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
-        #endregion Interface Implementations
+#endregion Interface Implementations
     }
 }

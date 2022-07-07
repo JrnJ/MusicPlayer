@@ -39,12 +39,13 @@
 	
   <PropertyGroup>
     <ProjectGuid>73497daa-3d58-448c-ad11-6d150faa1e8d</ProjectGuid>
-    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.22000.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.22000.0</TargetPlatformMinVersion>
     <AssetTargetFallback>net6.0-windows$(TargetPlatformVersion);$(AssetTargetFallback)</AssetTargetFallback>
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
-    <!--<NoWarn>$(NoWarn);NU1702</NoWarn>-->
+    <NoWarn>$(NoWarn);NU1702</NoWarn>
+	<EntryPointProjectUniqueName>..\MusicPlayer\MusicPlayer.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
 	
   <ItemGroup>
@@ -63,21 +64,15 @@
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\MusicPlayer\MusicPlayer.csproj">
-			<SkipGetTargetFrameworkProperties>True</SkipGetTargetFrameworkProperties>
-		</ProjectReference>
-	</ItemGroup>
-
-	<ItemGroup>
+	<Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
+	
+  <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25151-preview" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25151-preview" />
   </ItemGroup>
 
-	<PropertyGroup>
-		<EntryPointProjectUniqueName>..\MusicPlayer\MusicPlayer.csproj</EntryPointProjectUniqueName>
-	</PropertyGroup>
-
-	<Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
+	<ItemGroup>
+		<ProjectReference Include="..\MusicPlayer\MusicPlayer.csproj" />
+	</ItemGroup>
 	
 </Project>
