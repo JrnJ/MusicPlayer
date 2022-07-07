@@ -19,7 +19,7 @@
                                     TextAlignment="Center" Width="26"/>
                                 <Polygon x:Name="polygonPlay" Visibility="Collapsed"
                                          Points="0,18, 10,25, 0,32" Fill="#dba531" 
-                                         HorizontalAlignment="Center" Margin="26, 0, 6, 0" >
+                                         HorizontalAlignment="Center" Margin="26, 0, 6, 0">
                                     <Polygon.Effect>
                                         <DropShadowEffect ShadowDepth="0" Color="#dba531" Opacity="0.5" BlurRadius="20"/>
                                     </Polygon.Effect>

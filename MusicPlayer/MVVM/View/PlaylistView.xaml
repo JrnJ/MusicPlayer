@@ -40,6 +40,21 @@
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
+
+                    <DockPanel>
+                        <Button 
+                            Content="Edit"
+                            Width="100" Height="35"
+                            HorizontalAlignment="Left"
+                            Command="{Binding EditPlaylistCommand}" />
+                        <Button 
+                            Content="Delete"
+                            Width="100" Height="35"
+                            HorizontalAlignment="Left"
+                            Margin="18,0,0,0"
+                            Background="#ff4040"
+                            Command="{Binding DeletePlaylistCommand}" />
+                    </DockPanel>
                 </StackPanel>
             </Grid>
             <!-- /Info -->

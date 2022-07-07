@@ -37,8 +37,6 @@ namespace MusicPlayer.MVVM.ViewModel
         // ViewModels
         public HomeViewModel HomeVM { get; set; }
 
-        public PlaylistsViewModel PlaylistsVM { get; set; }
-
         public DiscordViewModel DiscordVM { get; set; }
 
         // Constructor
@@ -46,7 +44,6 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             // Create ViewModels
             HomeVM = new();
-            PlaylistsVM = new();
             DiscordVM = new();
             
             // Set a default
@@ -60,7 +57,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             PlaylistsViewCommand = new(o =>
             {
-                Global.CurrentView = PlaylistsVM;
+                Global.CurrentView = Global.PlaylistsVM;
             });
 
             DiscordViewCommand = new(o => 
@@ -71,7 +68,7 @@ namespace MusicPlayer.MVVM.ViewModel
             CreatePlaylistCommand = new(o =>
             {
                 // Create sample template to add a new playlist
-                Playlist playlist = new Playlist(Global.Playlists.Count, new ObservableCollection<Song>(), "New Playlist", "New Playlist");
+                Playlist playlist = new(Global.Playlists.Count, new ObservableCollection<Song>(), "New Playlist", "New Playlist");
 
                 Global.Playlists.Add(playlist);
                 Global.ShowPlaylist(playlist.Id);

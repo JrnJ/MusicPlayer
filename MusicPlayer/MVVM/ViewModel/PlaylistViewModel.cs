@@ -17,6 +17,11 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand RemoveSongCommand { get; set; }
 
+        public RelayCommand EditPlaylistCommand { get; set; }
+
+        public RelayCommand DeletePlaylistCommand { get; set; }
+
+
         public PlaylistViewModel()
         {
             SelectSongCommand = new(o =>
@@ -38,6 +43,24 @@ namespace MusicPlayer.MVVM.ViewModel
                 Song song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);
 
                 Global.RemoveSongFromPlaylist(song, Global.SelectedPlaylist);
+            });
+
+            EditPlaylistCommand = new(o =>
+            {
+                
+            });
+
+            DeletePlaylistCommand = new(o =>
+            {
+                // Promt users first!
+                
+
+                // Delete Playlist from list
+                int playlistId = Global.SelectedPlaylist.Id;
+                Global.DeletePlaylist(playlistId);
+
+                // Change View to Playlists View
+                Global.CurrentView = Global.PlaylistsVM;
             });
         }
     }

@@ -66,9 +66,9 @@ namespace MusicPlayer
             catch (Exception ex)
             {
                 Console.WriteLine("ERROR: " + ex);
-#if !DEBUG
-                MessageBox.Show("Could not load custom window!", "Error");
-#endif
+
+                //MessageBox.Show("Could not load custom window!", "Error");
+                this.Title = "Custom Window Not Supported";
             }
         }
 

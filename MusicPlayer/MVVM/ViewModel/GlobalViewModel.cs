@@ -97,7 +97,10 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public int CurrentSongIndex { get; set; }
 
-        // Commands
+        // ViewModels
+        public PlaylistsViewModel PlaylistsVM { get; set; }
+
+        // Commands ?
         public RelayCommand SelectPlaylistCommand { get; set; }
 
         public RelayCommand DeletePlaylistCommand { get; set; }
@@ -105,6 +108,7 @@ namespace MusicPlayer.MVVM.ViewModel
         public GlobalViewModel()
         {
             // Create ViewModels
+            PlaylistsVM = new();
             PlaylistVM = new();
 
             // Load Playlists
@@ -114,11 +118,6 @@ namespace MusicPlayer.MVVM.ViewModel
             SelectPlaylistCommand = new(o =>
             {
                 ShowPlaylist((int)o);
-            });
-
-            DeletePlaylistCommand = new(o =>
-            {
-                DeletePlaylist((int)o);
             });
 
             // Configuration
@@ -213,20 +212,18 @@ namespace MusicPlayer.MVVM.ViewModel
             FileHandler.SavePlaylists(Playlists);
         }
 
-        public void ShowPlaylist(int id)
+        public void ShowPlaylist(int playlistId)
         {
-            SelectedPlaylist = Playlists[id];
+            SelectedPlaylist = Playlists.Where(x => x.Id == playlistId).FirstOrDefault();
 
             // Maybe do this whenever SelectedPlaylist is changed, might f up if a different view is made though
             CurrentView = PlaylistVM;
         }
 
-        public void DeletePlaylist(int id)
+        public void DeletePlaylist(int playlistId)
         {
-            Playlists.Remove(Playlists.Where(x => x.Id == id).First());
+            Playlists.Remove(Playlists.Where(x => x.Id == playlistId).FirstOrDefault());
             FileHandler.SavePlaylists(Playlists);
-
-            // load home view if playloist view with id x is active
         }
 
         public void AddSongToPlaylist(Song song, Playlist playlist)
