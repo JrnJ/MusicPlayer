@@ -1,11 +1,13 @@
 ﻿using MusicPlayer.Classes;
 using MusicPlayer.Core;
+using MusicPlayer.MVVM.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace MusicPlayer.MVVM.ViewModel
@@ -95,6 +97,24 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _sliderValue = value; OnPropertyChanged(); }
         }
 
+        // Popups
+        private Visibility _popupVisiblity;
+
+        public Visibility PopupVisibility
+        {
+            get { return _popupVisiblity; }
+            set { _popupVisiblity = value; OnPropertyChanged(); }
+        }
+
+        private MessageBoxModel _confirmBox;
+
+        public MessageBoxModel ConfirmBox
+        {
+            get { return _confirmBox; }
+            set { _confirmBox = value; OnPropertyChanged(); }
+        }
+
+
         public int CurrentSongIndex { get; set; }
 
         // ViewModels
@@ -122,6 +142,8 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Configuration
             ConfigureAudioPlayer();
+            PopupVisibility = Visibility.Collapsed;
+            ConfirmBox = new();
         }
 
         #region Configuration

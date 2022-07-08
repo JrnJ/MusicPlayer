@@ -52,15 +52,36 @@ namespace MusicPlayer.MVVM.ViewModel
 
             DeletePlaylistCommand = new(o =>
             {
-                // Promt users first!
-                
+                // Create ConfirmBox
+                Global.ConfirmBox = new()
+                {
+                    Title = "Delete Playlist?",
+                    Description = $"Are you sure you want to delete {Global.SelectedPlaylist.Name}?",
+                    ConfirmText = "Cancel",
+                    CancelText = "Delete",
+                    Visibility = System.Windows.Visibility.Visible,
 
-                // Delete Playlist from list
-                int playlistId = Global.SelectedPlaylist.Id;
-                Global.DeletePlaylist(playlistId);
+                    ConfirmCommand = new(o =>
+                    {
+                        Global.PopupVisibility = System.Windows.Visibility.Collapsed;
+                        Global.ConfirmBox.Visibility = System.Windows.Visibility.Collapsed;
+                    }),
+                    CancelCommand = new(o =>
+                    {
+                        Global.PopupVisibility = System.Windows.Visibility.Collapsed;
+                        Global.ConfirmBox.Visibility = System.Windows.Visibility.Collapsed;
 
-                // Change View to Playlists View
-                Global.CurrentView = Global.PlaylistsVM;
+                        // Delete Playlist
+                        int playlistId = Global.SelectedPlaylist.Id;
+                        Global.DeletePlaylist(playlistId);
+
+                        // Change View to Playlists View
+                        Global.CurrentView = Global.PlaylistsVM;
+                    })
+                };
+
+                // Show ConfirmBox
+                Global.PopupVisibility = System.Windows.Visibility.Visible;
             });
         }
     }
