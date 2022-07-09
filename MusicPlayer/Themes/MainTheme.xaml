@@ -5,6 +5,7 @@
         <Setter Property="Foreground" Value="White" />
     </Style>
 
+    <!-- Button -->
     <Style TargetType="{x:Type Button}">
         <Setter Property="Background" Value="#292929" />
         <Setter Property="Foreground" Value="White" />
@@ -35,4 +36,46 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <!-- /Button -->
+
+    <!-- TextBox -->
+    <Style TargetType="{x:Type TextBox}" x:Key="TextBox">
+        <Setter Property="Background" Value="#191919" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="#353535" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <Grid>
+                            <TextBlock Text="{TemplateBinding Tag}" 
+                                       Visibility="Visible"
+                                       Padding="6,4,4,4" 
+                                       Foreground="#707070"
+                                       FontSize="{TemplateBinding FontSize}" />
+                            <TextBox Padding="4" 
+                                     FontSize="{TemplateBinding FontSize}"
+                                     Background="Transparent" 
+                                     BorderThickness="0"
+                                     CaretBrush="{TemplateBinding Foreground}"
+                                     Foreground="{TemplateBinding Foreground}" 
+                                     Text="{TemplateBinding Text}" />
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="Red" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- /TextBox -->
 </ResourceDictionary>

@@ -8,17 +8,8 @@ using System.Windows;
 
 namespace MusicPlayer.MVVM.Model
 {
-    internal class MessageBoxModel : ObservableObject
+    internal class MessageBoxModel : BoxModel
     {
-        // Visiblity
-        private Visibility _visibility;
-
-        public Visibility Visibility
-        {
-            get => _visibility;
-            set { _visibility = value; OnPropertyChanged(); }
-        }
-
         // Properties
         private string _title;
 

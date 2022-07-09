@@ -47,7 +47,27 @@ namespace MusicPlayer.MVVM.ViewModel
 
             EditPlaylistCommand = new(o =>
             {
-                
+                Global.EditPlaylistBox = new()
+                {
+                    Playlist = Global.SelectedPlaylist,
+
+                    ConfirmCommand = new(o =>
+                    {
+                        Global.PopupVisibility = System.Windows.Visibility.Collapsed;
+                        Global.EditPlaylistBox.Visibility = System.Windows.Visibility.Collapsed;
+
+                        // Save Playlist
+                        Global.UpdatePlaylist(Global.EditPlaylistBox.Playlist.Id, Global.EditPlaylistBox.Playlist);
+                    }),
+                    CancelCommand = new(o =>
+                    {
+                        Global.PopupVisibility = System.Windows.Visibility.Collapsed;
+                        Global.EditPlaylistBox.Visibility = System.Windows.Visibility.Collapsed;
+                    })
+                };
+
+                // Show ConfirmBox
+                Global.PopupVisibility = System.Windows.Visibility.Visible;
             });
 
             DeletePlaylistCommand = new(o =>

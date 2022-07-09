@@ -114,6 +114,13 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _confirmBox = value; OnPropertyChanged(); }
         }
 
+        private EditBoxModel _editPlaylistBox;
+
+        public EditBoxModel EditPlaylistBox
+        {
+            get { return _editPlaylistBox; }
+            set { _editPlaylistBox = value; OnPropertyChanged(); }
+        }
 
         public int CurrentSongIndex { get; set; }
 
@@ -143,7 +150,10 @@ namespace MusicPlayer.MVVM.ViewModel
             // Configuration
             ConfigureAudioPlayer();
             PopupVisibility = Visibility.Collapsed;
+
+            // Set BoxModels
             ConfirmBox = new();
+            EditPlaylistBox = new();
         }
 
         #region Configuration
@@ -245,6 +255,14 @@ namespace MusicPlayer.MVVM.ViewModel
         public void DeletePlaylist(int playlistId)
         {
             Playlists.Remove(Playlists.Where(x => x.Id == playlistId).FirstOrDefault());
+            FileHandler.SavePlaylists(Playlists);
+        }
+
+        public void UpdatePlaylist(int playlistId, Playlist playlist)
+        {
+            Playlists[Playlists.IndexOf(Playlists.Where(x => x.Id == playlistId).FirstOrDefault())].Name = playlist.Name;
+            Playlists[Playlists.IndexOf(Playlists.Where(x => x.Id == playlistId).FirstOrDefault())].Description = playlist.Description;
+
             FileHandler.SavePlaylists(Playlists);
         }
 
