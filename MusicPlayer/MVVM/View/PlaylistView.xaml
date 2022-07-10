@@ -93,6 +93,12 @@
                                                     </DataTemplate>
                                                 </MenuItem.ItemTemplate>
                                             </MenuItem>
+                                            <MenuItem Header="Move Up" 
+                                                  Command="{Binding PlacementTarget.Tag.MoveSongUpCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding Id}" />
+                                            <MenuItem Header="Move Down" 
+                                                  Command="{Binding PlacementTarget.Tag.MoveSongDownCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding Id}" />
                                         </ContextMenu>
                                     </RadioButton.ContextMenu>
                                 </RadioButton>

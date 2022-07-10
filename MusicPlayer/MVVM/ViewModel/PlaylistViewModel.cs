@@ -1,6 +1,7 @@
 ﻿using MusicPlayer.Classes;
 using MusicPlayer.Core;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MusicPlayer.MVVM.ViewModel
@@ -11,12 +12,18 @@ namespace MusicPlayer.MVVM.ViewModel
         public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
         // </GlobalViewModel> //
 
+        // Song Commands
         public RelayCommand SelectSongCommand { get; set; }
-
-        public RelayCommand AddSongToPlaylistCommand { get; set; }
 
         public RelayCommand RemoveSongCommand { get; set; }
 
+        public RelayCommand AddSongToPlaylistCommand { get; set; }
+
+        public RelayCommand MoveSongUpCommand { get; set; }
+
+        public RelayCommand MoveSongDownCommand { get; set; }
+
+        // View Commands
         public RelayCommand EditPlaylistCommand { get; set; }
 
         public RelayCommand DeletePlaylistCommand { get; set; }
@@ -29,6 +36,14 @@ namespace MusicPlayer.MVVM.ViewModel
                 Global.OpenMedia(Global.SelectedPlaylist.Songs[(int)o]);
             });
 
+
+            RemoveSongCommand = new(o =>
+            {
+                Song song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);
+
+                Global.RemoveSongFromPlaylist(song, Global.SelectedPlaylist);
+            });
+
             AddSongToPlaylistCommand = new(o =>
             {
                 string[] ids = o.ToString().Split(","); // 0 = playlistId, 1 = songId
@@ -38,11 +53,28 @@ namespace MusicPlayer.MVVM.ViewModel
                 Global.AddSongToPlaylist(song, playlist);
             });
 
-            RemoveSongCommand = new(o =>
+            MoveSongUpCommand = new(o =>
             {
-                Song song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);
+                int songId = (int)o;
+                int songIndex = Global.SelectedPlaylist.Songs.IndexOf(Global.SelectedPlaylist.Songs.Where(x => x.Id == songId).FirstOrDefault());
 
-                Global.RemoveSongFromPlaylist(song, Global.SelectedPlaylist);
+                if (songIndex != 0)
+                {
+                    Global.SelectedPlaylist.Songs.Move(songIndex, songIndex - 1);
+                    FileHandler.SavePlaylists(Global.Playlists);
+                }
+            });
+
+            MoveSongDownCommand = new(o =>
+            {
+                int songId = (int)o;
+                int songIndex = Global.SelectedPlaylist.Songs.IndexOf(Global.SelectedPlaylist.Songs.Where(x => x.Id == songId).FirstOrDefault());
+
+                if (songIndex != Global.SelectedPlaylist.Songs.Count - 1)
+                {
+                    Global.SelectedPlaylist.Songs.Move(songIndex, songIndex + 1);
+                    FileHandler.SavePlaylists(Global.Playlists);
+                }
             });
 
             EditPlaylistCommand = new(o =>
@@ -53,11 +85,12 @@ namespace MusicPlayer.MVVM.ViewModel
 
                     ConfirmCommand = new(o =>
                     {
+                        // Save Playlist
+                        // This wank af tbh, fix this crap
+                        Global.UpdatePlaylist(Global.SelectedPlaylist.Id, Global.EditPlaylistBox.Playlist);
+
                         Global.PopupVisibility = System.Windows.Visibility.Collapsed;
                         Global.EditPlaylistBox.Visibility = System.Windows.Visibility.Collapsed;
-
-                        // Save Playlist
-                        Global.UpdatePlaylist(Global.EditPlaylistBox.Playlist.Id, Global.EditPlaylistBox.Playlist);
                     }),
                     CancelCommand = new(o =>
                     {

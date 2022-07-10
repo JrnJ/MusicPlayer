@@ -260,9 +260,12 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public void UpdatePlaylist(int playlistId, Playlist playlist)
         {
-            Playlists[Playlists.IndexOf(Playlists.Where(x => x.Id == playlistId).FirstOrDefault())].Name = playlist.Name;
-            Playlists[Playlists.IndexOf(Playlists.Where(x => x.Id == playlistId).FirstOrDefault())].Description = playlist.Description;
-
+            Playlists[Playlists.IndexOf(Playlists.Where(x => x.Id == playlistId).FirstOrDefault())] = new(
+                playlistId, 
+                playlist.Songs, 
+                playlist.Name, 
+                playlist.Description
+            );
             FileHandler.SavePlaylists(Playlists);
         }
 
@@ -286,7 +289,7 @@ namespace MusicPlayer.MVVM.ViewModel
             FileHandler.SavePlaylists(Playlists);
         }
 
-        private void FixPlaylistSongIds(Playlist playlist)
+        public void FixPlaylistSongIds(Playlist playlist)
         {
             Playlist temp = Playlists[Playlists.IndexOf(playlist)];
 

@@ -292,11 +292,11 @@
                             <TextBox Margin="0,10,0,0" 
                                      Style="{StaticResource TextBox}"
                                      Width="300" 
-                                     Text="{Binding Playlist.Name}"
+                                     Text="{Binding Playlist.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      Tag="Title..." />
                             <TextBox Margin="0,10,0,0" 
                                      Style="{StaticResource TextBox}"
-                                     Text="{Binding Playlist.Description}"
+                                     Text="{Binding Playlist.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      Tag="Description..." />
                         </StackPanel>
                     </Border>
