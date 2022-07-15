@@ -12,6 +12,7 @@
                 <ResourceDictionary Source="Themes/CTTestTheme.xaml" />
 
                 <ResourceDictionary Source="Themes/PageTabTheme.xaml" />
+                <ResourceDictionary Source="Themes/PageTitleTheme.xaml" />
 
                 <ResourceDictionary Source="Themes/AlbumSongTheme.xaml" />
 
@@ -39,6 +40,10 @@
 
             <DataTemplate DataType="{x:Type viewModel:DiscordViewModel}">
                 <view:DiscordView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModel:SettingsViewModel}">
+                <view:SettingsView />
             </DataTemplate>
             <!-- /Navigation -->
 

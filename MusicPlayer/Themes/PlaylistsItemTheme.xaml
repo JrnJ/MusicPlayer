@@ -16,10 +16,10 @@
                                    Width="{TemplateBinding Width}" Height="{TemplateBinding Width}" />
 
                             <TextBlock Text="{Binding Name}" FontSize="18"
-                                       HorizontalAlignment="Center"/>
+                                       HorizontalAlignment="Center" />
                             <TextBlock Text="{Binding Songs.Count, StringFormat='{}{0} Songs'}" 
                                        Foreground="LightGray"
-                                       HorizontalAlignment="Center"/>
+                                       HorizontalAlignment="Center" />
                             <TextBlock Text="{Binding PlaylistDuration}" 
                                        Foreground="LightGray"
                                        HorizontalAlignment="Center"/>

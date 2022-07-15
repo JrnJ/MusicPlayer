@@ -154,6 +154,11 @@ namespace MusicPlayer.MVVM.ViewModel
             // Set BoxModels
             ConfirmBox = new();
             EditPlaylistBox = new();
+
+            //AudioPlayer.MediaPlayer.AudioCategory
+            //AudioPlayer.MediaPlayer.AudioStateMonitor
+            //AudioPlayer.MediaPlayer.PlaybackMediaMarkers
+            //AudioPlayer.MediaPlayer.PlaybackSession
         }
 
         #region Configuration

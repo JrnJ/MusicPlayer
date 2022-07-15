@@ -26,9 +26,7 @@
             <!-- Info -->
             <Grid Grid.Row="0" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="{Binding Global.SelectedPlaylist.Name}"
-                       FontSize="28" Foreground="White" FontWeight="SemiBold"
-                       />
+                    <TextBlock Text="{Binding Global.SelectedPlaylist.Name}" Style="{StaticResource PageTitle}" />
                     <TextBlock Text="{Binding Global.SelectedPlaylist.Description}" 
                        Foreground="LightGray"
                        />

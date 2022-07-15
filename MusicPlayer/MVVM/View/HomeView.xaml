@@ -24,9 +24,7 @@
             </Grid.RowDefinitions>
             
             <Grid Grid.Row="0" Margin="0,0,0,16">
-                <TextBlock Text="Home"
-                       FontSize="28" Foreground="White" FontWeight="SemiBold"
-                       />
+                <TextBlock Text="Home" Style="{StaticResource PageTitle}" />
             </Grid>
             <Grid Grid.Row="1">
                 <!-- Songs -->

@@ -18,5 +18,10 @@ namespace MusicPlayer.MVVM.Model
             get => _visibility;
             set { _visibility = value; OnPropertyChanged(); }
         }
+
+        public BoxModel()
+        {
+            Visibility = Visibility.Collapsed;
+        }
     }
 }

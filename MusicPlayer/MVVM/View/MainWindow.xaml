@@ -13,7 +13,6 @@
         Background="#202020"
         
         >
-    <!--Keyboard.KeyDown="WindowKeyDown"-->
 
     <Window.DataContext>
         <viewModel:MainViewModel />
@@ -61,8 +60,9 @@
                     <Grid Margin="0,32,0,0">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <!-- Navigation -->
@@ -99,6 +99,14 @@
                                 </ScrollViewer>
                             </Grid>
                             <!-- /Playlists -->
+
+                            <!-- Settings -->
+                            <Grid Grid.Row="2" Margin="6" VerticalAlignment="Bottom">
+                                <RadioButton GroupName="PageTabs" Command="{Binding SettingsViewCommand}"
+                                             Content="Settings" Style="{StaticResource PageTab}" 
+                                             extensions:CustomProperty.ImageSource="/Images/logo_gold.png" />
+                            </Grid>
+                            <!-- /Settings -->
                         </Grid>
                     </Grid>
                 </Grid>
@@ -213,7 +221,7 @@
         <!-- Popups -->
         <Grid Background="#25000000" Visibility="{Binding Global.PopupVisibility}">
         <!--<Grid Background="#25000000" Visibility="Visible">-->
-                <!-- Confirm -->
+            <!-- Confirm -->
             <Border DataContext="{Binding Global.ConfirmBox}"
                 Visibility="{Binding Visibility}"
                 VerticalAlignment="Center" HorizontalAlignment="Center" 

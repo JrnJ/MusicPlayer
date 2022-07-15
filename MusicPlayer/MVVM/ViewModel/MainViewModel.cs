@@ -19,6 +19,8 @@ namespace MusicPlayer.MVVM.ViewModel
         public RelayCommand PlaylistsViewCommand { get; set; }
 
         public RelayCommand DiscordViewCommand { get; set; }
+
+        public RelayCommand SettingsViewCommand { get; set; }
         #endregion Navigation
 
         public RelayCommand CreatePlaylistCommand { get; set; }
@@ -39,12 +41,15 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public DiscordViewModel DiscordVM { get; set; }
 
+        public SettingsViewModel SettingsVM { get; set; }
+
         // Constructor
         public MainViewModel()
         {
             // Create ViewModels
             HomeVM = new();
             DiscordVM = new();
+            SettingsVM = new();
             
             // Set a default
             Global.CurrentView = HomeVM;
@@ -63,6 +68,11 @@ namespace MusicPlayer.MVVM.ViewModel
             DiscordViewCommand = new(o => 
             {
                 Global.CurrentView = DiscordVM;
+            });
+
+            SettingsViewCommand = new(o =>
+            {
+                Global.CurrentView = SettingsVM;
             });
 
             CreatePlaylistCommand = new(o =>

@@ -21,8 +21,7 @@
             <!-- Info -->
             <Grid Grid.Row="0" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Playlists"
-                       FontSize="28" Foreground="White" FontWeight="SemiBold" />
+                    <TextBlock Text="Playlists" Style="{StaticResource PageTitle}" FontSize="28" Foreground="White" FontWeight="SemiBold" />
 
                     <Button 
                         Content="New Playlist"

@@ -79,9 +79,11 @@ namespace MusicPlayer.MVVM.ViewModel
 
             EditPlaylistCommand = new(o =>
             {
+                // Create EditPlaylistBox
                 Global.EditPlaylistBox = new()
                 {
                     Playlist = Global.SelectedPlaylist,
+                    Visibility = System.Windows.Visibility.Visible,
 
                     ConfirmCommand = new(o =>
                     {

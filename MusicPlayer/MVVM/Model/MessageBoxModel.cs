@@ -45,8 +45,6 @@ namespace MusicPlayer.MVVM.Model
 
         public MessageBoxModel()
         {
-            Visibility = Visibility.Collapsed;
-
             Title = "Title";
             Description = "Description";
             ConfirmText = "Yes";
