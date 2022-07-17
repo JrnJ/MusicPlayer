@@ -1,21 +1,13 @@
-﻿using MusicPlayer.Classes;
-using MusicPlayer.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows;
+﻿using MusicPlayer.Core;
 
 namespace MusicPlayer.MVVM.Model
 {
     internal class EditBoxModel : BoxModel
     {
         // Properties
-        private Playlist _playlist;
+        private PlaylistModel _playlist;
 
-        public Playlist Playlist
+        public PlaylistModel Playlist
         {
             get { return _playlist; }
             set { _playlist = value; OnPropertyChanged(); }

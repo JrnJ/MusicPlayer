@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
+using MusicPlayer.MVVM.Model;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
@@ -78,7 +79,7 @@ namespace MusicPlayer.MVVM.ViewModel
             CreatePlaylistCommand = new(o =>
             {
                 // Create sample template to add a new playlist
-                Playlist playlist = new(Global.Playlists.Count, new ObservableCollection<Song>(), "New Playlist", "New Playlist");
+                PlaylistModel playlist = new(Global.Playlists.Count, new ObservableCollection<AlbumSongModel>(), "New Playlist", "New Playlist");
 
                 Global.Playlists.Add(playlist);
                 Global.ShowPlaylist(playlist.Id);
@@ -130,19 +131,19 @@ namespace MusicPlayer.MVVM.ViewModel
             // Load Settings
             AppSettings.GetSettingsFromFile();
             Global.AudioPlayer.Volume = AppSettings.Volume;
-            Global.MyMusic = new Playlist(0, new ObservableCollection<Song>(), "My Music", "All music from all folders.");
+            Global.MyMusic = new PlaylistModel(0, new ObservableCollection<AlbumSongModel>(), "My Music", "All music from all folders.");
 
             // Create a playlist of all songs
             for (int i = 0; i < AppSettings.MusicFolders.Count; i++)
             {
-                List<Song> songs = FileHandler.GetSongsFromFolder(AppSettings.MusicFolders[i]);
+                List<AlbumSongModel> songs = FileHandler.GetSongsFromFolder(AppSettings.MusicFolders[i]);
 
                 if (songs != null)
                 {
                     //MyMusic.Songs.AddRange(songs);
                     for (int i2 = 0; i2 < songs.Count; i2++)
                     {
-                        Song song = songs[i2];
+                        AlbumSongModel song = songs[i2];
                         song.SetId(Global.MyMusic.Songs.Count);
 
                         Global.MyMusic.Songs.Add(song);

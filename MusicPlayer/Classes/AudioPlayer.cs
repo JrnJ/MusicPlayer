@@ -1,4 +1,5 @@
 ﻿using MusicPlayer.Core;
+using MusicPlayer.MVVM.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,9 @@ namespace MusicPlayer.Classes
         public Windows.Media.Playback.MediaPlayer MediaPlayer { get; set; }
 
         // Stoopid props
-        private Song _currentSong;
+        private AlbumSongModel _currentSong;
 
-        public Song CurrentSong
+        public AlbumSongModel CurrentSong
         {
             get { return _currentSong; }
             set { _currentSong = value; OnPropertyChanged(); }
@@ -107,7 +108,7 @@ namespace MusicPlayer.Classes
 
         #endregion Private
 
-        public void OpenMedia(Song song)
+        public void OpenMedia(AlbumSongModel song)
         {
             CurrentSong = song;
             Pause();

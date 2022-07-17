@@ -1,5 +1,6 @@
 ﻿using MusicPlayer.Classes;
 using MusicPlayer.Core;
+using MusicPlayer.MVVM.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             RemoveSongCommand = new(o =>
             {
-                Song song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);
+                AlbumSongModel song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);
 
                 Global.RemoveSongFromPlaylist(song, Global.SelectedPlaylist);
             });
@@ -47,8 +48,8 @@ namespace MusicPlayer.MVVM.ViewModel
             AddSongToPlaylistCommand = new(o =>
             {
                 string[] ids = o.ToString().Split(","); // 0 = playlistId, 1 = songId
-                Song song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == int.Parse(ids[1]));
-                Playlist playlist = Global.Playlists.FirstOrDefault(x => x.Id == int.Parse(ids[0]));
+                AlbumSongModel song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == int.Parse(ids[1]));
+                PlaylistModel playlist = Global.Playlists.FirstOrDefault(x => x.Id == int.Parse(ids[0]));
 
                 Global.AddSongToPlaylist(song, playlist);
             });

@@ -39,22 +39,22 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _audioPlayer = value; OnPropertyChanged(); }
         }
 
-        private ObservableCollection<Playlist> _playlists;
+        private ObservableCollection<PlaylistModel> _playlists;
 
-        public ObservableCollection<Playlist> Playlists
+        public ObservableCollection<PlaylistModel> Playlists
         {
             get => _playlists;
             set { _playlists = value; OnPropertyChanged(); }
         }
 
-        private Playlist _selectedPlaylist;
+        private PlaylistModel _selectedPlaylist;
 
-        public Playlist SelectedPlaylist
+        public PlaylistModel SelectedPlaylist
         {
             get => Playlists.FirstOrDefault(x => x.Id == _selectedPlaylist.Id);
             set
             {
-                Playlist playlist = Playlists.FirstOrDefault(x => x.Id == value.Id);
+                PlaylistModel playlist = Playlists.FirstOrDefault(x => x.Id == value.Id);
 
                 if (playlist != null)
                 {
@@ -65,9 +65,9 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        private Playlist _myMusic;
+        private PlaylistModel _myMusic;
 
-        public Playlist MyMusic
+        public PlaylistModel MyMusic
         {
             get { return _myMusic; }
             set { _myMusic = value; OnPropertyChanged(); }
@@ -190,7 +190,7 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        public void OpenMedia(Song song)
+        public void OpenMedia(AlbumSongModel song)
         {
             AudioPlayer.OpenMedia(song);
 
@@ -244,7 +244,7 @@ namespace MusicPlayer.MVVM.ViewModel
             while (Playlists.Where(x => x.Id == playlistId).FirstOrDefault() != null)
                 playlistId++;
 
-            Playlist playlist = new(playlistId, new(), "New Playlist", "None");
+            PlaylistModel playlist = new(playlistId, new(), "New Playlist", "None");
             Playlists.Add(playlist);
             FileHandler.SavePlaylists(Playlists);
         }
@@ -263,7 +263,7 @@ namespace MusicPlayer.MVVM.ViewModel
             FileHandler.SavePlaylists(Playlists);
         }
 
-        public void UpdatePlaylist(int playlistId, Playlist playlist)
+        public void UpdatePlaylist(int playlistId, PlaylistModel playlist)
         {
             Playlists[Playlists.IndexOf(Playlists.Where(x => x.Id == playlistId).FirstOrDefault())] = new(
                 playlistId, 
@@ -274,7 +274,7 @@ namespace MusicPlayer.MVVM.ViewModel
             FileHandler.SavePlaylists(Playlists);
         }
 
-        public void AddSongToPlaylist(Song song, Playlist playlist)
+        public void AddSongToPlaylist(AlbumSongModel song, PlaylistModel playlist)
         {
             // Add Song to Playlist
             Playlists[Playlists.IndexOf(playlist)].Songs.Add(song);
@@ -284,7 +284,7 @@ namespace MusicPlayer.MVVM.ViewModel
             FileHandler.SavePlaylists(Playlists);
         }
 
-        public void RemoveSongFromPlaylist(Song song, Playlist playlist)
+        public void RemoveSongFromPlaylist(AlbumSongModel song, PlaylistModel playlist)
         {
             // Remove song from Playlist
             Playlists[Playlists.IndexOf(playlist)].Songs.Remove(song);
@@ -294,9 +294,9 @@ namespace MusicPlayer.MVVM.ViewModel
             FileHandler.SavePlaylists(Playlists);
         }
 
-        public void FixPlaylistSongIds(Playlist playlist)
+        public void FixPlaylistSongIds(PlaylistModel playlist)
         {
-            Playlist temp = Playlists[Playlists.IndexOf(playlist)];
+            PlaylistModel temp = Playlists[Playlists.IndexOf(playlist)];
 
             for (int i = 0; i < temp.Songs.Count; i++)
             {

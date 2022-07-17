@@ -6,22 +6,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
+using MusicPlayer.MVVM.Model;
 
 namespace MusicPlayer.Classes
 {
-    public static class FileHandler
+    internal static class FileHandler
     {
         #region READ
         /// <summary>
         /// Gets all the playlists from the playlists.json file
         /// </summary>
         /// <returns></returns>
-        public static ObservableCollection<Playlist> GetPlaylists()
+        public static ObservableCollection<PlaylistModel> GetPlaylists()
         {
             try
             {
                 string json = File.ReadAllText("C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/playlists.json");
-                ObservableCollection<Playlist> playlists = JsonConvert.DeserializeObject<ObservableCollection<Playlist>>(json);
+                ObservableCollection<PlaylistModel> playlists = JsonConvert.DeserializeObject<ObservableCollection<PlaylistModel>>(json);
 
                 if (playlists == null)
                 {
@@ -67,11 +68,11 @@ namespace MusicPlayer.Classes
             }
         }
 
-        public static List<Song> GetSongsFromFolder(string path)
+        public static List<AlbumSongModel> GetSongsFromFolder(string path)
         {
             try
             {
-                List<Song> songs = new List<Song>();
+                List<AlbumSongModel> songs = new();
 
                 string[] filePaths = Directory.GetFiles(path);
 
@@ -79,7 +80,7 @@ namespace MusicPlayer.Classes
                 {
                     if (IsMusic(filePaths[i]))
                     {
-                        songs.Add(new Song(filePaths[i], i));
+                        songs.Add(new AlbumSongModel(filePaths[i], i));
                     }
                 }
 
@@ -117,7 +118,7 @@ namespace MusicPlayer.Classes
         /// </summary>
         /// <param name="playlists"></param>
         /// <returns>True if save was succesful</returns>
-        public static bool SavePlaylists(ObservableCollection<Playlist> playlists)
+        public static bool SavePlaylists(ObservableCollection<PlaylistModel> playlists)
         {
             try
             {
