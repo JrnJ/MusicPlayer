@@ -43,8 +43,10 @@ namespace MusicPlayer.Classes
             ConfigureMediaPlayer();
 
             // Timer
-            Timer = new();
-            Timer.Interval = new TimeSpan(0, 0, 0, 0, 250);
+            Timer = new()
+            {
+                Interval = new TimeSpan(0, 0, 0, 0, 250)
+            };
         }
 
         #region Private
@@ -61,8 +63,12 @@ namespace MusicPlayer.Classes
 
             // Properties
             MediaPlayer.CommandManager.IsEnabled = true;
+
+            // SMTC
+            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Type = MediaPlaybackType.Video;
             MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
-            MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
+            MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true; 
+            // https://github.com/microsoft/Windows-universal-samples/blob/dev/Samples/SystemMediaTransportControls/cs/Scenario1.xaml.cs
         }
 
         private void MediaPlayerVolumeChanged(Windows.Media.Playback.MediaPlayer sender, object args)
@@ -89,16 +95,22 @@ namespace MusicPlayer.Classes
             if (CurrentSong != null)
             {
                 SystemMediaTransportControls smtc = MediaPlayer.SystemMediaTransportControls;
-                smtc.DisplayUpdater.ClearAll();
-                smtc.IsNextEnabled = true;
-                smtc.IsPreviousEnabled = true;
+                //smtc.DisplayUpdater.ClearAll();
+                //smtc.IsNextEnabled = true;
+                //smtc.IsPreviousEnabled = true;
                 smtc.DisplayUpdater.Type = MediaPlaybackType.Video;
                 smtc.DisplayUpdater.VideoProperties.Title = CurrentSong.Title;
                 smtc.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.ContributingArtists;
                 smtc.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
+                smtc.IsNextEnabled = true;
+                smtc.IsPreviousEnabled = true;
 
                 // Update the system media transport controls
                 smtc.DisplayUpdater.Update();
+
+                // LateUpdate??
+                //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
+                //MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
             }
             else
             {

@@ -37,6 +37,9 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand RepeatCommand { get; set; }
 
+        // Other Commands
+        public RelayCommand ShowSongCommand { get; set; }
+
         // ViewModels
         public HomeViewModel HomeVM { get; set; }
 
@@ -103,12 +106,12 @@ namespace MusicPlayer.MVVM.ViewModel
 
             PreviousSongCommand = new(o =>
             {
-                
+                Global.PreviousSong();
             });
 
             NextSongCommand = new(o =>
             {
-                
+                Global.NextSong();
             });
 
             ShuffleCommand = new(o =>
@@ -119,6 +122,18 @@ namespace MusicPlayer.MVVM.ViewModel
             RepeatCommand = new(o =>
             {
 
+            });
+
+            ShowSongCommand = new(o =>
+            {
+                if (Global.SingleSongVisibility == System.Windows.Visibility.Collapsed)
+                {
+                    Global.SingleSongVisibility = System.Windows.Visibility.Visible;
+                }
+                else
+                {
+                    Global.SingleSongVisibility = System.Windows.Visibility.Collapsed;
+                }
             });
             #endregion ManagerCommands
 

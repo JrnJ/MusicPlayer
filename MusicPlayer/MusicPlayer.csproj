@@ -10,13 +10,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Remove="Images\Icons\External\Discord-Logo-White.png" />
+	  <Content Remove="Images\Icons\logo_gold.png" />
 	  <Content Remove="Images\Icons\next_icon.png" />
 	  <Content Remove="Images\Icons\pause_icon.png" />
 	  <Content Remove="Images\Icons\previous_icon.png" />
 	  <Content Remove="Images\Icons\repeat_icon.png" />
 	  <Content Remove="Images\Icons\shuffle_icon.png" />
-	  <Content Remove="Images\logo.png" />
-	  <Content Remove="Images\logo_gold.png" />
 	  <Content Remove="Images\next_track.png" />
 	  <Content Remove="Images\pause.png" />
 	  <Content Remove="Images\play.png" />
@@ -36,6 +36,12 @@
     <Resource Include="Fonts\NotoSans-Regular.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Images\Icons\External\Discord-Logo-White.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Icons\logo_gold.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\Icons\next_icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -49,12 +55,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\Icons\shuffle_icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Images\logo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Images\logo_gold.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\next_track.png">

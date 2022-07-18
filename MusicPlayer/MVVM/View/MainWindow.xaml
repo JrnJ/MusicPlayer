@@ -8,7 +8,7 @@
         xmlns:extensions="clr-namespace:MusicPlayer.Core"
         mc:Ignorable="d"
         
-        Title="Jrn Music Player" WindowState="Maximized" Icon="../../Images/logo_gold.png"
+        Title="Jrn Music Player" WindowState="Maximized" Icon="/Images/Icons/logo_gold.png"
         Width="1280" Height="720" MinWidth="1140" MinHeight="308"
         Background="#202020"
         
@@ -26,15 +26,15 @@
                     <ThumbButtonInfo
                         DismissWhenClicked="False"
                         Description="Previous"
-                        ImageSource="../../Images/previous_track.png" />
+                        ImageSource="/Images/Icons/previous_icon.png" />
                     <ThumbButtonInfo
                         DismissWhenClicked="False"
                         Description="Play"
-                        ImageSource="../../Images/play.png" />
+                        ImageSource="/Images/Icons/pause_icon.png" />
                     <ThumbButtonInfo
                         DismissWhenClicked="False"
                         Description="Next"
-                        ImageSource="../../Images/next_track.png"
+                        ImageSource="/Images/Icons/next_icon.png"
                         />
                 </ThumbButtonInfoCollection>
             </TaskbarItemInfo.ThumbButtonInfos>
@@ -45,7 +45,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />
-                <RowDefinition Height="100" />
+                <RowDefinition Height="110" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
@@ -70,13 +70,13 @@
                                 <StackPanel Margin="6,6,6,0">
                                     <RadioButton GroupName="PageTabs" IsChecked="True" Command="{Binding HomeViewCommand}"
                                              Content="Home" Style="{StaticResource PageTab}" 
-                                             extensions:CustomProperty.ImageSource="/Images/logo_gold.png" />
+                                             extensions:CustomProperty.ImageSource="/Images/Icons/logo_gold.png" />
                                     <RadioButton GroupName="PageTabs" Command="{Binding PlaylistsViewCommand}"
                                              Content="Playlists" Style="{StaticResource PageTab}" 
-                                             extensions:CustomProperty.ImageSource="/Images/logo_gold.png" />
+                                             extensions:CustomProperty.ImageSource="/Images/Icons/logo_gold.png" />
                                     <RadioButton GroupName="PageTabs" Command="{Binding DiscordViewCommand}"
                                              Content="Discord ᴮᴱᵀᴬ" Style="{StaticResource PageTab}" 
-                                             extensions:CustomProperty.ImageSource="/Images/Triangle_Filled.png" />
+                                             extensions:CustomProperty.ImageSource="/Images/Icons/External/Discord-logo-White.png" />
 
                                     <Grid Height="0.25" Background="Gray" Margin="0, 2, 0, 2"/>
                                 </StackPanel>
@@ -104,7 +104,7 @@
                             <Grid Grid.Row="2" Margin="6" VerticalAlignment="Bottom">
                                 <RadioButton GroupName="PageTabs" Command="{Binding SettingsViewCommand}"
                                              Content="Settings" Style="{StaticResource PageTab}" 
-                                             extensions:CustomProperty.ImageSource="/Images/logo_gold.png" />
+                                             extensions:CustomProperty.ImageSource="/Images/Icons/logo_gold.png" />
                             </Grid>
                             <!-- /Settings -->
                         </Grid>
@@ -114,106 +114,102 @@
 
                 <!-- Current View -->
                 <Grid Grid.Column="1" Background="#202020">
-                    <Grid Margin="0,32,0,0">
+                    <Grid Margin="32,32,0,0">
                         <ContentControl Content="{Binding Global.CurrentView}"/>
                     </Grid>
                 </Grid>
                 <!-- /Current View -->
             </Grid>
 
-            <!-- Controls -->
-            <Grid Grid.Row="1" Background="#252525">
-                <DockPanel>
-                    <Grid>
-                        <!-- Song Info -->
-                        <DockPanel>
-                            <!-- Image -->
-                            <Grid Width="80" Height="80" Margin="10,0,0,0">
-                                <Border Background="#191919" CornerRadius="4" 
-                                        BorderThickness="1" BorderBrush="#353535"/>
-                                <Border CornerRadius="4">
-                                    <Border.Background>
-                                        <ImageBrush Stretch="Fill" ImageSource="{Binding Global.AudioPlayer.CurrentSong.Image}" 
-                                                        RenderOptions.BitmapScalingMode="Linear"
-                                                        />
-                                    </Border.Background>
-                                </Border>
-                            </Grid>
-                            <!-- /Image -->
-                            <StackPanel VerticalAlignment="Center" Margin="20,0,0,0">
-                                <TextBlock Text="{Binding Global.AudioPlayer.CurrentSong.Title}" FontSize="24" />
-                                <TextBlock Text="{Binding Global.AudioPlayer.CurrentSong.ContributingArtists}" 
-                                               FontSize="20" Foreground="#999999" />
-                            </StackPanel>
-                        </DockPanel>
-                        <!-- /Song Info -->
+            <!-- Single Song View? -->
+            <Grid Grid.Row="0" Background="#151515" Visibility="{Binding Global.SingleSongVisibility}">
+                
+            </Grid>
+            <!-- /Single Song View? -->
 
-                        <!-- Controls -->
-                        <StackPanel>
-                            <!-- AudioButtons -->
-                            <DockPanel Margin="0,15,0,0" HorizontalAlignment="Center">
-                                <Button Command="{Binding ShuffleCommand}"
+            <!-- Controls -->
+            <Grid Grid.Row="1" Background="#242424">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Song Info -->
+                    <Grid Grid.Column="0" HorizontalAlignment="Left">
+                        <Button Style="{StaticResource SongInfo}"
+                                Command="{Binding ShowSongCommand}"
+                                />
+                    </Grid>
+                    <!-- /Song Info -->
+
+                    <!-- Controls -->
+                    <StackPanel Grid.Column="1">
+                        <!-- AudioButtons -->
+                        <DockPanel Margin="0,15,0,0" HorizontalAlignment="Center">
+                            <Button Command="{Binding ShuffleCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/shuffle_icon.png"
                                             Height="40" Width="40" />
-                                <Button Command="{Binding PreviousSongCommand}"
+                            <Button Command="{Binding PreviousSongCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             Height="40" Width="40" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/previous_icon.png"
                                             Margin="10,0,10,0" />
-                                <Button Command="{Binding PausePlayCommand}"
+                            <Button Command="{Binding PausePlayCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/pause_icon.png"
                                             Height="40" Width="40" />
-                                <Button Command="{Binding NextSongCommand}"
+                            <Button Command="{Binding NextSongCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/next_icon.png"
                                             Height="40" Width="40" 
                                             Margin="10,0,10,0" />
-                                <Button Command="{Binding RepeatCommand}"
+                            <Button Command="{Binding RepeatCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/repeat_icon.png"
                                             Height="40" Width="40" />
-                            </DockPanel>
-                            <!-- /AudioButtons -->
+                        </DockPanel>
+                        <!-- /AudioButtons -->
 
-                            <!-- TrackBar -->
-                            <Grid HorizontalAlignment="Center" Width="500" Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                        <!-- TrackBar -->
+                        <Grid HorizontalAlignment="Center" Width="500" Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Column="0" Text="{Binding Global.CurrentTime}" HorizontalAlignment="Left" Foreground="#999999"/>
+                            <TextBlock Grid.Column="0" Text="{Binding Global.CurrentTime}" HorizontalAlignment="Left" Foreground="#999999"/>
 
-                                <Slider Grid.Column="1" x:Name="sliderSongTimePlayed" Style="{StaticResource SongTime}"
+                            <Slider Grid.Column="1" x:Name="sliderSongTimePlayed" Style="{StaticResource SongTime}"
                                             Value="{Binding Global.SliderValue, Mode=TwoWay}" Maximum="{Binding Global.AudioPlayer.CurrentSong.Length}"
                                             Margin="10, 0, 10, 0" 
                                             PreviewMouseLeftButtonDown="sliderSongTimePlayed_PreviewMouseLeftButtonDown" 
                                             PreviewMouseLeftButtonUp="sliderSongTimePlayed_PreviewMouseLeftButtonUp"
                                     />
-                                <TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>
-                            </Grid>
-                            <!-- /TrackBar -->
-                        </StackPanel>
-                        <!-- /Controls -->
+                            <TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>
+                        </Grid>
+                        <!-- /TrackBar -->
+                    </StackPanel>
+                    <!-- /Controls -->
 
-                        <!-- Volume -->
-                        <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
-                            <Slider x:Name="volumeSlider"
+                    <!-- Volume -->
+                    <DockPanel Grid.Column="2"
+                        HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
+                        <Slider x:Name="volumeSlider"
                                     Width="100" Style="{StaticResource SongTime}" 
                                         Value="{Binding Global.AudioPlayer.MediaPlayer.Volume, Mode=TwoWay}"
                                         Minimum="0" Maximum="1"
                                         PreviewMouseLeftButtonUp="VolumeSliderPreviewMouseLeftButtonUp"
                                     />
-                            <TextBlock Text="{Binding ElementName=volumeSlider, Path=Value, StringFormat=N2}"
+                        <TextBlock Text="{Binding ElementName=volumeSlider, Path=Value, StringFormat=N2}"
                                        
                                            />
-                        </DockPanel>
-                        <!-- /Volume -->
-                    </Grid>
-                </DockPanel>
+                    </DockPanel>
+                    <!-- /Volume -->
+                </Grid>
             </Grid>
             <!-- /Controls -->
         </Grid>

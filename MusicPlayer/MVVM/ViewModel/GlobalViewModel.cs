@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Windows.Media;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
@@ -122,6 +123,16 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _editPlaylistBox = value; OnPropertyChanged(); }
         }
 
+        // Single View Stuff
+        private Visibility _singleSongVisibility;
+
+        public Visibility SingleSongVisibility
+        {
+            get { return _singleSongVisibility; }
+            set { _singleSongVisibility = value; OnPropertyChanged(); }
+        }
+
+
         public int CurrentSongIndex { get; set; }
 
         // ViewModels
@@ -150,8 +161,9 @@ namespace MusicPlayer.MVVM.ViewModel
             // Configuration
             ConfigureAudioPlayer();
             PopupVisibility = Visibility.Collapsed;
+            SingleSongVisibility = Visibility.Collapsed;
 
-            // Set BoxModels
+            // Set BoxModels :: This isnt mandatory btw
             ConfirmBox = new();
             EditPlaylistBox = new();
 
@@ -168,27 +180,32 @@ namespace MusicPlayer.MVVM.ViewModel
             AudioPlayer = new AudioPlayer();
             AudioPlayer.MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
 
+            // SMTC
+            AudioPlayer.MediaPlayer.SystemMediaTransportControls.ButtonPressed += SystemMediaTransportControlsButtonPressed;
+
             // Timer Tick Event
             AudioPlayer.Timer.Tick += Timer_Tick;
         }
 
-        private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
+        #region MediaPlayerEvents
+        private void SystemMediaTransportControlsButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
         {
-            // Call to MainWindow thread
-            //Dispatcher.Invoke(() =>
-            //{
-                
-            //});
-
-            AudioPlayer.Pause();
-
-            if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
+            if (args.Button == SystemMediaTransportControlsButton.Previous)
             {
-                CurrentSongIndex += 1;
-                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-                AudioPlayer.Play();
+                PreviousSong();
+            }
+
+            if (args.Button == SystemMediaTransportControlsButton.Next)
+            {
+                NextSong();
             }
         }
+
+        private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
+        {
+            NextSong();
+        }
+        #endregion MediaPlayerEvents
 
         public void OpenMedia(AlbumSongModel song)
         {
@@ -237,6 +254,29 @@ namespace MusicPlayer.MVVM.ViewModel
             CurrentTime = HelperMethods.MsToTime(AudioPlayer.MediaPlayer.Position.TotalMilliseconds);
         }
         #endregion Configuration
+
+
+        public void PreviousSong()
+        {
+            AudioPlayer.Pause();
+
+            if (CurrentSongIndex > 0)
+            {
+                CurrentSongIndex -= 1;
+                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+            }
+        }
+
+        public void NextSong()
+        {
+            AudioPlayer.Pause();
+
+            if (CurrentSongIndex < SelectedPlaylist.Songs.Count - 1)
+            {
+                CurrentSongIndex += 1;
+                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+            }
+        }
 
         public void CreatePlaylist()
         {

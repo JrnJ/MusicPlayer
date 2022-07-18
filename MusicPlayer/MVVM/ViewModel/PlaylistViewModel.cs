@@ -34,7 +34,8 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             SelectSongCommand = new(o =>
             {
-                Global.OpenMedia(Global.SelectedPlaylist.Songs[(int)o]);
+                AlbumSongModel song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);
+                Global.OpenMedia(song);
             });
 
 

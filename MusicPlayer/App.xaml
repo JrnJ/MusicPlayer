@@ -19,6 +19,7 @@
                 <ResourceDictionary Source="Themes/PlaylistItemTheme.xaml" />
 
                 <ResourceDictionary Source="Themes/SongTimeSliderTheme.xaml" />
+                <ResourceDictionary Source="Themes/SongInfoTheme.xaml" />
                 <ResourceDictionary Source="Themes/ScrollbarTheme.xaml" />
 
                 <ResourceDictionary Source="Themes/ImageButtonTheme.xaml" />

@@ -34,14 +34,14 @@ namespace MusicPlayer
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Window
     {
         // Classes
         public RadioButton CurrentUISong = new RadioButton();
 
         public bool LeftMouseDownOnSlider = false;
 
-        public static AppWindow AppWindow;
+        public static AppWindow AppWindow { get; private set; }
 
         public MainWindow()
         {
@@ -223,46 +223,6 @@ namespace MusicPlayer
             //}
         }
 
-#region Controls
-        private void ShuffleClick(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void RepeatClick(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void PreviousSongClick(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void NextSongClick(object sender, RoutedEventArgs e)
-        {
-
-        }
-#endregion Controls
-
-        //private void PlaylistItemClick(object sender, RoutedEventArgs e)
-        //{
-        //    int playlistId = int.Parse((sender as FrameworkElement).Tag.ToString());
-
-        //    // ehm maybe not :)
-        //    Playlist playlist = Playlists.ToList().Find(x => x.Id == playlistId);
-        //    LoadPlaylist(playlist);
-        //}
-
-        //private void AlbumSongClick(object sender, RoutedEventArgs e)
-        //{
-        //    int songId = int.Parse((sender as FrameworkElement).Tag.ToString());
-        //    Song song = SelectedPlaylist.Songs.Where(x => x.Id == songId).First();
-        //    CurrentSongIndex = SelectedPlaylist.Songs.IndexOf(song);
-
-        //    OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-        //}
-
 #region VolumeSlider
         private void VolumeSliderPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -270,49 +230,5 @@ namespace MusicPlayer
             AppSettings.SaveSettingsToFile();
         }
 #endregion VolumeSlider
-
-        private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            (sender as TextBox).IsReadOnly = !(sender as TextBox).IsReadOnly;
-
-            if ((sender as TextBox).IsReadOnly)
-            {
-                (sender as TextBox).Cursor = Cursors.Arrow;
-            }
-            else
-            {
-                (sender as TextBox).Cursor = Cursors.IBeam;
-            }
-        }
-
-        private void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            if ((sender as TextBox).IsReadOnly)
-            {
-                e.Handled.Equals(true);
-                if ((sender as TextBox).SelectionLength != 0)
-                    (sender as TextBox).SelectionLength = 0;
-            }
-        }
-
-        private void TextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key.Equals(Key.Enter))
-            {
-                TextBox_MouseDoubleClick(sender, null);
-                //Playlists.First(x => x.Id == CurrentPlaylist.Id).Name = (sender as TextBox).Text;
-
-                //FileHandler.SavePlaylistsLocation(Playlists);
-            }
-        }
-
-#region Interface Implementations
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-#endregion Interface Implementations
     }
 }
