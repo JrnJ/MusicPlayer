@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MusicPlayer.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,28 @@ namespace MusicPlayer.MVVM.ViewModel
         public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
         // </GlobalViewModel> //
 
+        public RelayCommand StartServerCommand { get; set; }
+
+        public RelayCommand ConnectCommand { get; set; }
+
+        public RelayCommand DisconnectCommand { get; set; }
+
         public DiscordViewModel()
         {
+            StartServerCommand = new(o =>
+            {
+                Global.AudioPlayer.StartServer();
+            });
 
+            ConnectCommand = new(o =>
+            {
+                Global.AudioPlayer.AudioServer.Connect();
+            });
+
+            DisconnectCommand = new(o =>
+            {
+                Global.AudioPlayer.AudioServer.Disconnect();
+            });
         }
     }
 }

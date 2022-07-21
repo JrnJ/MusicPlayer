@@ -12,13 +12,30 @@
     </UserControl.DataContext>
     
     <Grid>
-        <StackPanel VerticalAlignment="Center" >
-            <TextBlock Text="Discord Intergration"
-                   FontSize="36" Foreground="White"
-                   HorizontalAlignment="Center" />
-            <TextBlock Text="Coming Soon"
-                   FontSize="32" Foreground="Gray"
-                   HorizontalAlignment="Center" />
-        </StackPanel>
+        <Grid Margin="0,0,16,16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock Text="Home" Style="{StaticResource PageTitle}" />
+            </Grid>
+            <Grid Grid.Row="1">
+                <StackPanel>
+                    <Button Content="Start Server" 
+                            Height="30" Margin="0,0,0,10"
+                            Command="{Binding StartServerCommand}" />
+                    <Button Content="Connect" 
+                            Height="30" Margin="0,0,0,10"
+                            Command="{Binding ConnectCommand}" />
+                    <Button Content="Disconnect" 
+                            Height="30" Margin="0,0,0,10"
+                            Command="{Binding DisconnectCommand}" />
+
+                    <TextBlock Text="{Binding Global.AudioPlayer.AudioServer.Client.Connected}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

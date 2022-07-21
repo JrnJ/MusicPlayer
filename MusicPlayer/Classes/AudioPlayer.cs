@@ -34,6 +34,15 @@ namespace MusicPlayer.Classes
             set => MediaPlayer.Volume = value;
         }
 
+        // Discord Integration
+        private AudioServer _audioServer;
+
+        public AudioServer AudioServer
+        {
+            get { return _audioServer; }
+            set { _audioServer = value; OnPropertyChanged(); }
+        }
+
         public DispatcherTimer Timer { get; private set; }
 
         // Constructor
@@ -71,6 +80,11 @@ namespace MusicPlayer.Classes
             // https://github.com/microsoft/Windows-universal-samples/blob/dev/Samples/SystemMediaTransportControls/cs/Scenario1.xaml.cs
         }
 
+        private void ConfigureAudioServer()
+        {
+            AudioServer = new AudioServer();
+        }
+
         private void MediaPlayerVolumeChanged(Windows.Media.Playback.MediaPlayer sender, object args)
         {
             // Apply volume change to settings
@@ -90,6 +104,7 @@ namespace MusicPlayer.Classes
         }
         #endregion MediaPlayerEvents
 
+        // This is a joke and doesnt even work
         private void UpdateSMTCDisplay()
         {
             if (CurrentSong != null)
@@ -129,6 +144,20 @@ namespace MusicPlayer.Classes
 
             // Play Song
             //Play();
+
+            // Notify Server
+            if (AudioServer != null)
+            {
+                AudioServer.Play(song);
+            }
+        }
+
+        /// <summary>
+        /// Starts the AudioServer for the Discord
+        /// </summary>
+        public void StartServer()
+        {
+            ConfigureAudioServer();
         }
 
         // Maybe resume instead
@@ -141,6 +170,12 @@ namespace MusicPlayer.Classes
             IsPlaying = true;
 
             Timer.Start();
+
+            // Notify Server
+            if (AudioServer != null)
+            {
+                AudioServer.Resume();
+            }
         }
 
         /// <summary>
@@ -152,6 +187,13 @@ namespace MusicPlayer.Classes
             IsPlaying = false;
 
             Timer.Stop();
+
+            // Notify Server
+            // Notify Server
+            if (AudioServer != null)
+            {
+                AudioServer.Pause();
+            }
         }
 
         /// <summary>
