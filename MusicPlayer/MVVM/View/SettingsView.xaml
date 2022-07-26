@@ -32,9 +32,49 @@
                 </Grid.RowDefinitions>
 
                 <!-- Music Folders -->
-                <Grid>
+                <Grid Grid.Row="0">
                     <TextBlock Text="Libraries"
                        FontSize="24" Foreground="White" FontWeight="SemiBold" />
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <!-- Music Folders -->
+                    <ScrollViewer>
+                        <ItemsControl x:Name="musicFolders" ItemsSource="{Binding Global.AppSettinggs.MusicFolders}" Margin="0, 0, 8, 0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource MusicFolderItem}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid Grid.Column="0">
+                                                <TextBlock Text="{Binding Path}" />
+                                            </Grid>
+
+                                            <Grid Grid.Column="1" 
+                                                  HorizontalAlignment="Right" Margin="0,0,7,0">
+                                                <DockPanel>
+                                                    <Button Content="X"
+                                                            Width="40" Height="26" 
+                                                            Command="{Binding ElementName=musicFolders, Path=DataContext.RemoveFolderCommand}"
+                                                            CommandParameter="{Binding Id}"
+                                                            />
+                                                </DockPanel>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <!-- /Music Folders -->
+
+                    <!-- Add Folder -->
+                    <Button Height="30" Content="+ Add Folder" Command="{Binding AddFolderCommand}" />
+                    <!-- /Add Folder -->
                 </Grid>
                 <!-- /Music Folders -->
             </Grid>

@@ -8,26 +8,38 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Themes/MainTheme.xaml" />
+                <!-- To be grouped -->
                 <ResourceDictionary Source="Themes/CTTestTheme.xaml" />
 
                 <ResourceDictionary Source="Themes/PageTabTheme.xaml" />
                 <ResourceDictionary Source="Themes/PageTitleTheme.xaml" />
-
-                <ResourceDictionary Source="Themes/AlbumSongTheme.xaml" />
-
-                <ResourceDictionary Source="Themes/PlaylistItemTheme.xaml" />
-
-                <ResourceDictionary Source="Themes/SongTimeSliderTheme.xaml" />
+                
                 <ResourceDictionary Source="Themes/SongInfoTheme.xaml" />
-                <ResourceDictionary Source="Themes/ScrollbarTheme.xaml" />
-
+                
                 <ResourceDictionary Source="Themes/ImageButtonTheme.xaml" />
 
-
-                <ResourceDictionary Source="Themes/PlaylistsItemTheme.xaml" />
-
                 <ResourceDictionary Source="Themes/TestTheme.xaml" />
+                <!-- /To be grouped -->
+
+                <!-- General -->
+                <ResourceDictionary Source="Themes/MainTheme.xaml" />
+                <ResourceDictionary Source="Themes/ScrollbarTheme.xaml" />
+                <ResourceDictionary Source="Themes/SongTimeSliderTheme.xaml" />
+                <!-- /General -->
+
+                <!-- Navigation -->
+                <ResourceDictionary Source="Themes/PlaylistItemTheme.xaml" />
+                <!-- /Navigation -->
+
+                <!-- Playlist -->
+                <ResourceDictionary Source="Themes/PlaylistsItemTheme.xaml" />
+                
+                <ResourceDictionary Source="Themes/AlbumSongTheme.xaml" />
+                <!-- /Playlist -->
+                
+                <!-- Settings -->
+                <ResourceDictionary Source="Themes/MusicFolderItemTheme.xaml" />
+                <!-- /Settings -->
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Navigation -->

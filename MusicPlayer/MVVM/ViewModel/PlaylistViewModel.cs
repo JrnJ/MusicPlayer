@@ -63,7 +63,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 if (songIndex != 0)
                 {
                     Global.SelectedPlaylist.Songs.Move(songIndex, songIndex - 1);
-                    FileHandler.SavePlaylists(Global.Playlists);
+                    Global.SavePlaylists();
                 }
             });
 
@@ -75,7 +75,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 if (songIndex != Global.SelectedPlaylist.Songs.Count - 1)
                 {
                     Global.SelectedPlaylist.Songs.Move(songIndex, songIndex + 1);
-                    FileHandler.SavePlaylists(Global.Playlists);
+                    Global.SavePlaylists();
                 }
             });
 

@@ -68,8 +68,6 @@ namespace MusicPlayer.Classes
             MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
             MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
 
-            MediaPlayer.VolumeChanged += MediaPlayerVolumeChanged;
-
             // Properties
             MediaPlayer.CommandManager.IsEnabled = true;
 
@@ -83,12 +81,6 @@ namespace MusicPlayer.Classes
         private void ConfigureAudioServer()
         {
             AudioServer = new AudioServer();
-        }
-
-        private void MediaPlayerVolumeChanged(Windows.Media.Playback.MediaPlayer sender, object args)
-        {
-            // Apply volume change to settings
-            AppSettings.Volume = sender.Volume;
         }
 
         #region MediaPlayerEvents
@@ -114,8 +106,8 @@ namespace MusicPlayer.Classes
                 //smtc.IsNextEnabled = true;
                 //smtc.IsPreviousEnabled = true;
                 smtc.DisplayUpdater.Type = MediaPlaybackType.Video;
-                smtc.DisplayUpdater.VideoProperties.Title = CurrentSong.Title;
-                smtc.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.ContributingArtists;
+                smtc.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
+                smtc.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
                 smtc.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
                 smtc.IsNextEnabled = true;
                 smtc.IsPreviousEnabled = true;

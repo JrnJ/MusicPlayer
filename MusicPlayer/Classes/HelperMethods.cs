@@ -22,6 +22,16 @@ namespace MusicPlayer.Classes
             return (hours > 0 ? hours + ":" : "") + minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
         }
 
+        public static bool IsMusicFile(string path)
+        {
+            if (path.Contains(".mp3"))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
         public static Rect GetAbsolutePlacement(this FrameworkElement element, bool relativeToScreen = false)
         {
             var absolutePos = element.PointToScreen(new System.Windows.Point(0, 0));

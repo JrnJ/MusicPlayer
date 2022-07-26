@@ -20,7 +20,7 @@
 
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo x:Name="taskBarItemInfo"
-                         Description="{Binding Global.AudioPlayer.CurrentSong.Title, StringFormat='{}Playing: {0}'}">
+                         Description="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Title, StringFormat='{}Playing: {0}'}">
             <TaskbarItemInfo.ThumbButtonInfos>
                 <ThumbButtonInfoCollection>
                     <ThumbButtonInfo
@@ -184,7 +184,7 @@
                             <TextBlock Grid.Column="0" Text="{Binding Global.CurrentTime}" HorizontalAlignment="Left" Foreground="#999999"/>
 
                             <Slider Grid.Column="1" x:Name="sliderSongTimePlayed" Style="{StaticResource SongTime}"
-                                            Value="{Binding Global.SliderValue, Mode=TwoWay}" Maximum="{Binding Global.AudioPlayer.CurrentSong.Length}"
+                                            Value="{Binding Global.SliderValue, Mode=TwoWay}" Maximum="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Duration.TotalMilliseconds}"
                                             Margin="10, 0, 10, 0" 
                                             PreviewMouseLeftButtonDown="sliderSongTimePlayed_PreviewMouseLeftButtonDown" 
                                             PreviewMouseLeftButtonUp="sliderSongTimePlayed_PreviewMouseLeftButtonUp"
@@ -199,14 +199,11 @@
                     <DockPanel Grid.Column="2"
                         HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
                         <Slider x:Name="volumeSlider"
-                                    Width="100" Style="{StaticResource SongTime}" 
-                                        Value="{Binding Global.AudioPlayer.MediaPlayer.Volume, Mode=TwoWay}"
-                                        Minimum="0" Maximum="1"
-                                        PreviewMouseLeftButtonUp="VolumeSliderPreviewMouseLeftButtonUp"
-                                    />
-                        <TextBlock Text="{Binding ElementName=volumeSlider, Path=Value, StringFormat=N2}"
-                                       
-                                           />
+                                Width="100" Style="{StaticResource SongTime}" 
+                                Value="{Binding Global.AudioPlayer.MediaPlayer.Volume, Mode=TwoWay}"
+                                Minimum="0" Maximum="1" />
+                                <!--PreviewMouseLeftButtonUp="VolumeSliderPreviewMouseLeftButtonUp"-->
+                        <TextBlock Text="{Binding ElementName=volumeSlider, Path=Value, StringFormat=N2}" />
                     </DockPanel>
                     <!-- /Volume -->
                 </Grid>
@@ -216,7 +213,7 @@
 
         <!-- Popups -->
         <Grid Background="#25000000" Visibility="{Binding Global.PopupVisibility}">
-        <!--<Grid Background="#25000000" Visibility="Visible">-->
+            <!--<Grid Background="#25000000" Visibility="Visible">-->
             <!-- Confirm -->
             <Border DataContext="{Binding Global.ConfirmBox}"
                 Visibility="{Binding Visibility}"
@@ -227,7 +224,7 @@
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    
+
                     <Border Grid.Row="0" 
                         Padding="20" CornerRadius="4,4,0,0"
                         Background="#272727">
@@ -264,7 +261,7 @@
                 </Grid>
             </Border>
             <!-- /Confirm -->
-            
+
             <!-- Edit Playlist -->
             <Border DataContext="{Binding Global.EditPlaylistBox}"
                 Visibility="{Binding Visibility}"

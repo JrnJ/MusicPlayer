@@ -48,8 +48,8 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button Style="{StaticResource PlaylistsItem}" 
-                                Command="{Binding ElementName=Playlists, Path=DataContext.Global.SelectPlaylistCommand}"
-                                CommandParameter="{Binding Id}" />
+                                        Command="{Binding ElementName=Playlists, Path=DataContext.Global.SelectPlaylistCommand}"
+                                        CommandParameter="{Binding Id}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

@@ -81,14 +81,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             CreatePlaylistCommand = new(o =>
             {
-                // Create sample template to add a new playlist
-                PlaylistModel playlist = new(Global.Playlists.Count, new ObservableCollection<AlbumSongModel>(), "New Playlist", "New Playlist");
-
-                Global.Playlists.Add(playlist);
-                Global.ShowPlaylist(playlist.Id);
-
-                // Save Playlists
-                FileHandler.SavePlaylists(Global.Playlists);
+                Global.ShowPlaylist(Global.CreatePlaylist().Id);
             });
 
             #region ManagerCommands
@@ -136,35 +129,6 @@ namespace MusicPlayer.MVVM.ViewModel
                 }
             });
             #endregion ManagerCommands
-
-            // Configuration
-            ConfigureSettings();
-        }
-
-        private void ConfigureSettings()
-        {
-            // Load Settings
-            AppSettings.GetSettingsFromFile();
-            Global.AudioPlayer.Volume = AppSettings.Volume;
-            Global.MyMusic = new PlaylistModel(0, new ObservableCollection<AlbumSongModel>(), "My Music", "All music from all folders.");
-
-            // Create a playlist of all songs
-            for (int i = 0; i < AppSettings.MusicFolders.Count; i++)
-            {
-                List<AlbumSongModel> songs = FileHandler.GetSongsFromFolder(AppSettings.MusicFolders[i]);
-
-                if (songs != null)
-                {
-                    //MyMusic.Songs.AddRange(songs);
-                    for (int i2 = 0; i2 < songs.Count; i2++)
-                    {
-                        AlbumSongModel song = songs[i2];
-                        song.SetId(Global.MyMusic.Songs.Count);
-
-                        Global.MyMusic.Songs.Add(song);
-                    }
-                }
-            }
         }
     }
 }

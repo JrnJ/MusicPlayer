@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using System.Windows.Media.Imaging;
 using MusicPlayer.Classes;
 using System.IO;
+using Windows.Storage.FileProperties;
+using Windows.Storage;
 
 namespace MusicPlayer.MVVM.Model
 {
@@ -24,80 +26,6 @@ namespace MusicPlayer.MVVM.Model
             set { _path = value; OnPropertyChanged(); }
         }
 
-        // Description
-        private string _title;
-
-        [JsonIgnore]
-        public string Title
-        {
-            get { return _title; }
-            set { _title = value; OnPropertyChanged(); }
-        }
-
-        private string _subtitle;
-
-        [JsonIgnore]
-        public string SubTitle
-        {
-            get { return _subtitle; }
-            set { _subtitle = value; OnPropertyChanged(); }
-        }
-
-        private string _rating;
-
-        [JsonIgnore]
-        public string Rating
-        {
-            get { return _rating; }
-            set { _rating = value; OnPropertyChanged(); }
-        }
-
-        private string _comments;
-
-        [JsonIgnore]
-        public string Comments
-        {
-            get { return _comments; }
-            set { _comments = value; OnPropertyChanged(); }
-        }
-
-        // Media
-        private string _contributingArtists;
-
-        [JsonIgnore]
-        public string ContributingArtists
-        {
-            get { return _contributingArtists; }
-            set { _contributingArtists = value; OnPropertyChanged(); }
-        }
-
-        private string _albumArtist;
-
-        [JsonIgnore]
-        public string AlbumArtist
-        {
-            get { return _albumArtist; }
-            set { _albumArtist = value; OnPropertyChanged(); }
-        }
-
-        private string _album;
-
-        [JsonIgnore]
-        public string Album
-        {
-            get { return _album; }
-            set { _album = value; OnPropertyChanged(); }
-        }
-
-        private uint _year;
-
-        [JsonIgnore]
-        public uint Year
-        {
-            get { return _year; }
-            set { _year = value; OnPropertyChanged(); }
-        }
-
         private int _id;
 
         [JsonProperty("Id")]
@@ -107,13 +35,22 @@ namespace MusicPlayer.MVVM.Model
             set { _id = value; OnPropertyChanged(); }
         }
 
-        private string _genre;
+        private Microsoft.UI.Xaml.Media.Imaging.BitmapImage _bitmapImage;
 
         [JsonIgnore]
-        public string Genre
+        public Microsoft.UI.Xaml.Media.Imaging.BitmapImage BitmapImage
         {
-            get { return _genre; }
-            set { _genre = value; OnPropertyChanged(); }
+            get { return _bitmapImage; }
+            set { _bitmapImage = value; OnPropertyChanged(); }
+        }
+
+        private Windows.Storage.FileProperties.MusicProperties _musicProperties;
+
+        [JsonIgnore]
+        public Windows.Storage.FileProperties.MusicProperties MusicProperties
+        {
+            get { return _musicProperties; }
+            set { _musicProperties = value; OnPropertyChanged(); }
         }
 
         private BitmapImage _image;
@@ -125,38 +62,35 @@ namespace MusicPlayer.MVVM.Model
             set { _image = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// Length of Media in Milliseconds
-        /// </summary>
-        private double _length;
-
-        [JsonIgnore]
-        public double Length
-        {
-            get { return _length; }
-            set { _length = value; OnPropertyChanged(); }
-        }
-
-        // Audio
-        private int _bitrate;
-
-        [JsonIgnore]
-        public int Bitrate
-        {
-            get { return _bitrate; }
-            set { _bitrate = value; OnPropertyChanged(); }
-        }
-
         // Getters
-        public string StringTime => HelperMethods.MsToTime(Length);
+        public string StringTime => HelperMethods.MsToTime(MusicProperties.Duration.TotalMilliseconds);
+        // TODO: Change how playlists work
 
         // Constructor
-        public AlbumSongModel(string path, int id)
+        public AlbumSongModel()
         {
-            Path = path;
-            Id = id;
+            
+        }
 
-            AddSongInfo();
+        public async Task Init(Windows.Storage.StorageFile storageFile)
+        {
+            MusicProperties = await storageFile.Properties.GetMusicPropertiesAsync();
+
+            if (string.IsNullOrEmpty(MusicProperties.Title))
+                MusicProperties.Title = storageFile.Name;
+
+            StorageItemThumbnail thumbnail = await storageFile.GetThumbnailAsync(ThumbnailMode.MusicView);
+
+            if (thumbnail != null)
+            {
+                BitmapImage bitmap = new();
+
+                bitmap.BeginInit();
+                bitmap.StreamSource = thumbnail.AsStreamForRead();
+                bitmap.EndInit();
+
+                Image = bitmap;
+            }
         }
 
         public void SetId(int id)
@@ -164,56 +98,6 @@ namespace MusicPlayer.MVVM.Model
             Id = id;
         }
 
-        public bool AddSongInfo()
-        {
-            if (Path != null)
-            {
-                // Get file
-                TagLib.File tFile = TagLib.File.Create(Path);
-
-                if (tFile.Tag.Pictures.Length > 0)
-                {
-                    TagLib.IPicture picture = tFile.Tag.Pictures[0];
-                    MemoryStream ms = new(picture.Data.Data);
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    BitmapImage bitmap = new();
-                    bitmap.BeginInit();
-                    bitmap.StreamSource = ms;
-                    bitmap.EndInit();
-
-                    Image = bitmap;
-                }
-
-                //
-                if (string.IsNullOrEmpty(tFile.Tag.Title) || string.IsNullOrWhiteSpace(tFile.Tag.Title))
-                {
-                    Title = Path.Split("\\")[^1];
-                }
-                else
-                {
-                    Title = tFile.Tag.Title;
-                }
-
-                // 
-                Comments = tFile.Tag.Comment;
-                ContributingArtists = tFile.Tag.FirstPerformer;
-                AlbumArtist = tFile.Tag.FirstAlbumArtist;
-                Album = tFile.Tag.Album;
-                Year = tFile.Tag.Year;
-                Genre = tFile.Tag.FirstGenre;
-
-                Length = tFile.Properties.Duration.TotalMilliseconds;
-
-                //
-                Bitrate = tFile.Properties.AudioBitrate;
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        // https://stackoverflow.com/questions/18843315/how-to-store-save-thumbnail-image-in-device-in-windows-8-metro-apps-c-sharp/18844387#18844387
     }
 }

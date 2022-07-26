@@ -1,22 +1,28 @@
-﻿using MusicPlayer.Classes;
+﻿using Microsoft.UI.Xaml.Media.Imaging;
+using MusicPlayer.Classes;
 using MusicPlayer.Core;
 using MusicPlayer.MVVM.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Windows.Media;
+using Windows.Media.Playlists;
+using Windows.Storage;
+using Windows.Storage.FileProperties;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
     internal class GlobalViewModel : ObservableObject
     {
+        #region Properties
         public static GlobalViewModel Instance { get; } = new();
-
         // Globals
 
         // Current View
@@ -31,6 +37,15 @@ namespace MusicPlayer.MVVM.ViewModel
         // ViewModels
         public PlaylistViewModel PlaylistVM { get; set; }
 
+        // AppSettings
+        private AppSettingsModel _appSettings;
+
+        public AppSettingsModel AppSettinggs
+        {
+            get { return _appSettings; }
+            set { _appSettings = value; OnPropertyChanged(); }
+        }
+
         // MusicPlayer
         private AudioPlayer _audioPlayer;
 
@@ -40,6 +55,7 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _audioPlayer = value; OnPropertyChanged(); }
         }
 
+        // Playlists
         private ObservableCollection<PlaylistModel> _playlists;
 
         public ObservableCollection<PlaylistModel> Playlists
@@ -74,6 +90,7 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _myMusic = value; OnPropertyChanged(); }
         }
 
+        // Stupidity
         private string _finalTime;
 
         public string FinalTime
@@ -132,7 +149,6 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _singleSongVisibility = value; OnPropertyChanged(); }
         }
 
-
         public int CurrentSongIndex { get; set; }
 
         // ViewModels
@@ -143,6 +159,9 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand DeletePlaylistCommand { get; set; }
 
+        public static string PlaylistsFilePath => "C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/playlists.json";
+        #endregion Properties
+
         public GlobalViewModel()
         {
             // Create ViewModels
@@ -150,15 +169,10 @@ namespace MusicPlayer.MVVM.ViewModel
             PlaylistVM = new();
 
             // Load Playlists
-            Playlists = FileHandler.GetPlaylists();
-
-            // Assign Commands
-            SelectPlaylistCommand = new(o =>
-            {
-                ShowPlaylist((int)o);
-            });
+            GetPlaylists();
 
             // Configuration
+            ConfigureSettings();
             ConfigureAudioPlayer();
             PopupVisibility = Visibility.Collapsed;
             SingleSongVisibility = Visibility.Collapsed;
@@ -171,14 +185,70 @@ namespace MusicPlayer.MVVM.ViewModel
             //AudioPlayer.MediaPlayer.AudioStateMonitor
             //AudioPlayer.MediaPlayer.PlaybackMediaMarkers
             //AudioPlayer.MediaPlayer.PlaybackSession
+
+            // Assign Commands
+            SelectPlaylistCommand = new(o =>
+            {
+                ShowPlaylist((int)o);
+            });
         }
 
         #region Configuration
+        private async void ConfigureSettings()
+        {
+            // Load Settings
+            AppSettinggs = new();
+            await AppSettinggs.GetSettingsFromFile();
+
+            // Create Home Playlist
+            MyMusic = new();
+            //List<string> filePaths = new();
+
+            //// Gather all paths
+            //for (int i = 0; i < AppSettinggs.MusicFolders.Count; i++)
+            //{
+            //    filePaths.AddRange(Directory.GetFiles(AppSettinggs.MusicFolders[i].Path));
+            //}
+
+            //// Add song to playlist
+            //for (int i = 0; i < filePaths.Count; i++)
+            //{
+            //    if (HelperMethods.IsMusicFile(filePaths[i]))
+            //        MyMusic.AddSong(filePaths[i]/*, false*/);
+            //}
+
+            for (int i = 0; i < AppSettinggs.MusicFolders.Count; i++)
+            {
+                string path = AppSettinggs.MusicFolders[i].Path;
+
+                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path);
+                IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
+                
+                foreach (StorageFile file in files)
+                {
+                    if (HelperMethods.IsMusicFile(file.Path))
+                    {
+                        await MyMusic.AddSong(file);
+                    }
+                }
+
+                //for (int j = 0; j < files.Count; j++)
+                //{
+                //    MyMusic.AddSong(files[i].Path);
+                //}
+            }   
+        }
+
         private void ConfigureAudioPlayer()
         {
             // AudioPlayer
-            AudioPlayer = new AudioPlayer();
+            AudioPlayer = new()
+            {
+                Volume = AppSettinggs.Volume
+            };
+
             AudioPlayer.MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
+            AudioPlayer.MediaPlayer.VolumeChanged += MediaPlayerVolumeChanged;
 
             // SMTC
             AudioPlayer.MediaPlayer.SystemMediaTransportControls.ButtonPressed += SystemMediaTransportControlsButtonPressed;
@@ -205,6 +275,13 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             NextSong();
         }
+
+        private void MediaPlayerVolumeChanged(Windows.Media.Playback.MediaPlayer sender, object args)
+        {
+            // Apply volume change to settings
+            AppSettinggs.Volume = sender.Volume;
+        }
+
         #endregion MediaPlayerEvents
 
         public void OpenMedia(AlbumSongModel song)
@@ -234,7 +311,7 @@ namespace MusicPlayer.MVVM.ViewModel
             // Update UI
             CurrentTime = "0:00";
             SliderValue = 0.0;
-            FinalTime = HelperMethods.MsToTime(song.Length);
+            FinalTime = HelperMethods.MsToTime(song.MusicProperties.Duration.TotalMilliseconds);
 
             // Remove whenever this mess is fixed
             AudioPlayer.Play();
@@ -278,15 +355,22 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        public void CreatePlaylist()
+        public PlaylistModel CreatePlaylist()
         {
-            int playlistId = Playlists.Count;
-            while (Playlists.Where(x => x.Id == playlistId).FirstOrDefault() != null)
-                playlistId++;
+            // Ccreate an id 
+            int id = 0;
+            for (int i = 0; i < Playlists.Count; i++)
+            {
+                if (Playlists[i].Id > id)
+                    id = Playlists[i].Id;
+            }
 
-            PlaylistModel playlist = new(playlistId, new(), "New Playlist", "None");
+            PlaylistModel playlist = new() { Id = id + 1 };
             Playlists.Add(playlist);
-            FileHandler.SavePlaylists(Playlists);
+
+            SavePlaylists();
+
+            return playlist;
         }
 
         public void ShowPlaylist(int playlistId)
@@ -300,18 +384,29 @@ namespace MusicPlayer.MVVM.ViewModel
         public void DeletePlaylist(int playlistId)
         {
             Playlists.Remove(Playlists.Where(x => x.Id == playlistId).FirstOrDefault());
-            FileHandler.SavePlaylists(Playlists);
+            SavePlaylists();
         }
 
         public void UpdatePlaylist(int playlistId, PlaylistModel playlist)
         {
-            Playlists[Playlists.IndexOf(Playlists.Where(x => x.Id == playlistId).FirstOrDefault())] = new(
-                playlistId, 
-                playlist.Songs, 
-                playlist.Name, 
-                playlist.Description
-            );
-            FileHandler.SavePlaylists(Playlists);
+            Playlists[Playlists.IndexOf(Playlists.Where(x => x.Id == playlistId).FirstOrDefault())] = new()
+            {
+                Id = playlistId,
+                Songs = playlist.Songs,
+                Name = playlist.Name,
+                Description = playlist.Description
+            };
+            SavePlaylists();
+        }
+
+        public async void GetPlaylists()
+        {
+            Playlists = await FileHandler<ObservableCollection<PlaylistModel>>.GetJSON(PlaylistsFilePath);
+        }
+
+        public void SavePlaylists()
+        {
+            FileHandler<ObservableCollection<PlaylistModel>>.SaveJSON(PlaylistsFilePath, Playlists);
         }
 
         public void AddSongToPlaylist(AlbumSongModel song, PlaylistModel playlist)
@@ -321,7 +416,7 @@ namespace MusicPlayer.MVVM.ViewModel
             FixPlaylistSongIds(playlist);
 
             // Save Playlists
-            FileHandler.SavePlaylists(Playlists);
+            SavePlaylists();
         }
 
         public void RemoveSongFromPlaylist(AlbumSongModel song, PlaylistModel playlist)
@@ -331,7 +426,7 @@ namespace MusicPlayer.MVVM.ViewModel
             FixPlaylistSongIds(playlist);
 
             // Save Playlists
-            FileHandler.SavePlaylists(Playlists);
+            SavePlaylists();
         }
 
         public void FixPlaylistSongIds(PlaylistModel playlist)

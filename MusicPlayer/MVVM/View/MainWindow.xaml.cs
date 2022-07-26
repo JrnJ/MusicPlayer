@@ -29,6 +29,11 @@ using System.Runtime.InteropServices;
 using MusicPlayer.Core;
 using Microsoft.Windows.ApplicationModel.DynamicDependency;
 
+// Resources
+//https://docs.microsoft.com/en-us/windows/apps/develop/title-bar?tabs=wasdk
+//https://docs.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-enhance
+//https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
+
 namespace MusicPlayer
 {
     /// <summary>
@@ -102,16 +107,16 @@ namespace MusicPlayer
             titleBar.ButtonInactiveForegroundColor = Windows.UI.Color.FromArgb(0, 255, 255, 255);
         }
 
-#region MediaPlayerEvents
+        #region MediaPlayerEvents
 
         //private void MediaPlayerButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
         //{
         //    // Call to MainWindow thread
         //    Dispatcher.Invoke(() => { ButtonPressed(sender, args); });
         //}
-#endregion MediaPlayerEvents
+        #endregion MediaPlayerEvents
 
-#region MusicThings
+        #region MusicThings
         //public void ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
         //{
         //    switch (args.Button)
@@ -136,9 +141,9 @@ namespace MusicPlayer
         //            break;
         //    }
         //}
-#endregion MusicThings
+        #endregion MusicThings
 
-#region WindowEvents
+        #region WindowEvents
         //private void WindowKeyDown(object sender, KeyEventArgs e)
         //{
         //    switch (e.Key)
@@ -193,7 +198,7 @@ namespace MusicPlayer
         //            break;
         //    }
         //}
-#endregion WindowEvents
+        #endregion WindowEvents
 
         private void sliderSongTimePlayed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -223,12 +228,12 @@ namespace MusicPlayer
             //}
         }
 
-#region VolumeSlider
-        private void VolumeSliderPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            // Save settings
-            AppSettings.SaveSettingsToFile();
-        }
-#endregion VolumeSlider
+        //#region VolumeSlider
+        //private void VolumeSliderPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        //{
+        //    // Save settings
+        //    Global.AppSettings.SaveSettingsToFile();
+        //}
+        //#endregion VolumeSlider
     }
 }
