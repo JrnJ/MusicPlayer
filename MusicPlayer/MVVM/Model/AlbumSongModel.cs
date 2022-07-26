@@ -63,7 +63,18 @@ namespace MusicPlayer.MVVM.Model
         }
 
         // Getters
-        public string StringTime => HelperMethods.MsToTime(MusicProperties.Duration.TotalMilliseconds);
+        public string StringTime
+        {
+            get
+            {
+                if (MusicProperties != null)
+                {
+                    return HelperMethods.MsToTime(MusicProperties.Duration.TotalMilliseconds);
+                }
+
+                return "";
+            }
+        }
         // TODO: Change how playlists work
 
         // Constructor

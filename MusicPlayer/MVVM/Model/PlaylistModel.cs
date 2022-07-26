@@ -76,7 +76,7 @@ namespace MusicPlayer.MVVM.Model
         }
 
         // TODO: RN, this is a mess fix it
-        public async Task<bool> AddSong(StorageFile storageFile)
+        public bool AddSong(StorageFile storageFile)
         {
             // Check if song already exists (and create an id meanwhile)
             int id = 0;
@@ -94,8 +94,6 @@ namespace MusicPlayer.MVVM.Model
                 Id = id,
                 Path = storageFile.Path
             };
-            await newSong.Init(storageFile);
-            //newSong.AddSongInfo();
             Songs.Add(newSong);
 
             //if (saveSettings)

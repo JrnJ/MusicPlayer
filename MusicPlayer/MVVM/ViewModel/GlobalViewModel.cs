@@ -202,21 +202,9 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Create Home Playlist
             MyMusic = new();
-            //List<string> filePaths = new();
+            List<StorageFile> storageFiles = new();
 
-            //// Gather all paths
-            //for (int i = 0; i < AppSettinggs.MusicFolders.Count; i++)
-            //{
-            //    filePaths.AddRange(Directory.GetFiles(AppSettinggs.MusicFolders[i].Path));
-            //}
-
-            //// Add song to playlist
-            //for (int i = 0; i < filePaths.Count; i++)
-            //{
-            //    if (HelperMethods.IsMusicFile(filePaths[i]))
-            //        MyMusic.AddSong(filePaths[i]/*, false*/);
-            //}
-
+            // Load UI
             for (int i = 0; i < AppSettinggs.MusicFolders.Count; i++)
             {
                 string path = AppSettinggs.MusicFolders[i].Path;
@@ -228,15 +216,17 @@ namespace MusicPlayer.MVVM.ViewModel
                 {
                     if (HelperMethods.IsMusicFile(file.Path))
                     {
-                        await MyMusic.AddSong(file);
+                        storageFiles.Add(file);
+                        MyMusic.AddSong(file);
                     }
                 }
+            }
 
-                //for (int j = 0; j < files.Count; j++)
-                //{
-                //    MyMusic.AddSong(files[i].Path);
-                //}
-            }   
+            // Load Other
+            for (int i = 0; i < MyMusic.Songs.Count; i++)
+            {
+                await MyMusic.Songs[i].Init(storageFiles[i]);
+            }
         }
 
         private void ConfigureAudioPlayer()
@@ -404,9 +394,9 @@ namespace MusicPlayer.MVVM.ViewModel
             Playlists = await FileHandler<ObservableCollection<PlaylistModel>>.GetJSON(PlaylistsFilePath);
         }
 
-        public void SavePlaylists()
+        public async void SavePlaylists()
         {
-            FileHandler<ObservableCollection<PlaylistModel>>.SaveJSON(PlaylistsFilePath, Playlists);
+            await FileHandler<ObservableCollection<PlaylistModel>>.SaveJSON(PlaylistsFilePath, Playlists);
         }
 
         public void AddSongToPlaylist(AlbumSongModel song, PlaylistModel playlist)

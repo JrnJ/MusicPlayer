@@ -89,12 +89,12 @@ namespace MusicPlayer.MVVM.Model
             this.MusicFolders = appSettings.MusicFolders;
         }
 
-        public void SaveSettingsToFile()
+        public async void SaveSettingsToFile()
         {
             // trycatch?
             // return bool?
             // something plz
-            FileHandler<AppSettingsModel>.SaveJSON(SettingsFilePath, this);
+            await FileHandler<AppSettingsModel>.SaveJSON(SettingsFilePath, this);
         }
     }
 }

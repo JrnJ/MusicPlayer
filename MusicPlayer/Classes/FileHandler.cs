@@ -34,7 +34,7 @@ namespace MusicPlayer.Classes
         /// </summary>
         /// <param name="path">File path</param>
         /// <param name="obj">T to save</param>
-        public static async void SaveJSON(string path, T obj)
+        public static async Task SaveJSON(string path, T obj)
         {
             try
             {
