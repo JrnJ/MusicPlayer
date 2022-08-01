@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace MusicPlayer.Classes
 {
+    // TODO: Turn this into an interface
     public static class FileHandler<T>
     {
         /// <summary>

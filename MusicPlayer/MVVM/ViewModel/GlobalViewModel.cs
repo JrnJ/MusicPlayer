@@ -159,7 +159,8 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand DeletePlaylistCommand { get; set; }
 
-        public static string PlaylistsFilePath => "C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/playlists.json";
+        public string PlaylistsFilePath => "C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/playlists.json";
+        public string CachedSongsFilePath => "C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/cached_songs.json";
         #endregion Properties
 
         public GlobalViewModel()
@@ -168,14 +169,12 @@ namespace MusicPlayer.MVVM.ViewModel
             PlaylistsVM = new();
             PlaylistVM = new();
 
-            // Load Playlists
-            GetPlaylists();
-
             // Configuration
-            ConfigureSettings();
-            ConfigureAudioPlayer();
-            PopupVisibility = Visibility.Collapsed;
-            SingleSongVisibility = Visibility.Collapsed;
+            Configure();
+
+            // Load Playlists
+            // TODO: Loading screen until 25 songs have been loaded
+            GetPlaylists();
 
             // Set BoxModels :: This isnt mandatory btw
             ConfirmBox = new();
@@ -194,15 +193,30 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         #region Configuration
-        private async void ConfigureSettings()
+        public async void Configure()
+        {
+            await ConfigureSettings();
+            ConfigureMusic();
+            ConfigureAudioPlayer();
+            PopupVisibility = Visibility.Collapsed;
+            SingleSongVisibility = Visibility.Collapsed;
+        }
+
+        private async Task ConfigureSettings()
         {
             // Load Settings
             AppSettinggs = new();
             await AppSettinggs.GetSettingsFromFile();
+        }
 
+        private async void ConfigureMusic()
+        {
             // Create Home Playlist
             MyMusic = new();
             List<StorageFile> storageFiles = new();
+
+            // Load Cached Music
+            AppSettinggs.CachedSongs = await FileHandler<ObservableCollection<CachedSong>>.GetJSON(CachedSongsFilePath);
 
             // Load UI
             for (int i = 0; i < AppSettinggs.MusicFolders.Count; i++)
@@ -211,7 +225,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
                 StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path);
                 IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
-                
+
                 foreach (StorageFile file in files)
                 {
                     if (HelperMethods.IsMusicFile(file.Path))
@@ -222,11 +236,28 @@ namespace MusicPlayer.MVVM.ViewModel
                 }
             }
 
-            // Load Other
+            // Load Full Songs
             for (int i = 0; i < MyMusic.Songs.Count; i++)
             {
                 await MyMusic.Songs[i].Init(storageFiles[i]);
             }
+
+            // Create new Cache
+            ObservableCollection<CachedSong> newCache = new();
+            for (int i = 0; i < MyMusic.Songs.Count; i++)
+            {
+                newCache.Add(new()
+                {
+                    Id = MyMusic.Songs[i].Id,
+                    Path = MyMusic.Songs[i].Path,
+                    Title = MyMusic.Songs[i].MusicProperties.Title,
+                    Artist = MyMusic.Songs[i].MusicProperties.Artist
+                });
+            }
+
+            // Save new cache if something changed
+            if (newCache != AppSettinggs.CachedSongs)
+                await FileHandler<ObservableCollection<CachedSong>>.SaveJSON(CachedSongsFilePath, newCache);
         }
 
         private void ConfigureAudioPlayer()
@@ -392,6 +423,14 @@ namespace MusicPlayer.MVVM.ViewModel
         public async void GetPlaylists()
         {
             Playlists = await FileHandler<ObservableCollection<PlaylistModel>>.GetJSON(PlaylistsFilePath);
+
+            for (int i = 0; i < Playlists.Count; i++)
+            {
+                //for (int i = 0; i < length; i++)
+                //{
+
+                //}
+            }
         }
 
         public async void SavePlaylists()

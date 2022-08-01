@@ -1,16 +1,11 @@
 ﻿using MusicPlayer.Core;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Windows.Media.Imaging;
 using MusicPlayer.Classes;
 using System.IO;
 using Windows.Storage.FileProperties;
-using Windows.Storage;
 
 namespace MusicPlayer.MVVM.Model
 {
@@ -44,10 +39,10 @@ namespace MusicPlayer.MVVM.Model
             set { _bitmapImage = value; OnPropertyChanged(); }
         }
 
-        private Windows.Storage.FileProperties.MusicProperties _musicProperties;
+        private MusicProperties _musicProperties;
 
         [JsonIgnore]
-        public Windows.Storage.FileProperties.MusicProperties MusicProperties
+        public MusicProperties MusicProperties
         {
             get { return _musicProperties; }
             set { _musicProperties = value; OnPropertyChanged(); }
@@ -60,20 +55,6 @@ namespace MusicPlayer.MVVM.Model
         {
             get { return _image; }
             set { _image = value; OnPropertyChanged(); }
-        }
-
-        // Getters
-        public string StringTime
-        {
-            get
-            {
-                if (MusicProperties != null)
-                {
-                    return HelperMethods.MsToTime(MusicProperties.Duration.TotalMilliseconds);
-                }
-
-                return "";
-            }
         }
         // TODO: Change how playlists work
 

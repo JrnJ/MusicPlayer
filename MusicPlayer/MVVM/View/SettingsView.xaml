@@ -57,6 +57,11 @@
                                             <Grid Grid.Column="1" 
                                                   HorizontalAlignment="Right" Margin="0,0,7,0">
                                                 <DockPanel>
+                                                    <Button Content="Open"
+                                                            Width="40" Height="26" Margin="0,0,8,0"
+                                                            Command="{Binding ElementName=musicFolders, Path=DataContext.OpenInFileExplorerCommand}"
+                                                            CommandParameter="{Binding Path}"
+                                                            />
                                                     <Button Content="X"
                                                             Width="40" Height="26" 
                                                             Command="{Binding ElementName=musicFolders, Path=DataContext.RemoveFolderCommand}"

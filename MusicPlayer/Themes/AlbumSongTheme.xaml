@@ -1,8 +1,12 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:MusicPlayer.Classes">
+
+    <converters:MillisecondConverter x:Key="MillisecondConverter" />
 
     <Style TargetType="{x:Type RadioButton}" 
            x:Key="AlbumSong">
+
         <Setter Property="Background" Value="#242424"/>
         <Setter Property="Height" Value="50" />
         <Setter Property="Margin" Value="0, 0, 0, 8" />
@@ -29,7 +33,7 @@
                                 <TextBlock Text="{Binding MusicProperties.Artist}" Foreground="#999999" FontSize="14"/>
                             </StackPanel>
                             <DockPanel HorizontalAlignment="Right" Margin="0, 0, 16, 0">
-                                <TextBlock Text="{Binding StringTime}" Foreground="#999999" />
+                                <TextBlock Text="{Binding Path=MusicProperties.Duration.TotalMilliseconds, Converter={StaticResource MillisecondConverter}}" Foreground="#999999" />
                             </DockPanel>
                         </DockPanel>
                     </Border>

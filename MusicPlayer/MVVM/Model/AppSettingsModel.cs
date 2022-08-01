@@ -34,6 +34,15 @@ namespace MusicPlayer.MVVM.Model
             set { _musicFolders = value; OnPropertyChanged(); }
         }
 
+        private ObservableCollection<CachedSong> _cachedSongs;
+
+        [JsonIgnore]
+        public ObservableCollection<CachedSong> CachedSongs
+        {
+            get { return _cachedSongs; }
+            set { _cachedSongs = value; OnPropertyChanged(); }
+        }
+
         /// <summary>
         /// Adds a new MusicFolder to the MusicFolders
         /// </summary>
