@@ -26,10 +26,10 @@
             <!-- Info -->
             <Grid Grid.Row="0" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="{Binding Global.SelectedPlaylist.Name}" Style="{StaticResource PageTitle}" />
+                    <TextBlock Text="{Binding Global.SelectedPlaylist.Name}" 
+                               Style="{StaticResource PageTitle}" />
                     <TextBlock Text="{Binding Global.SelectedPlaylist.Description}" 
-                       Foreground="LightGray"
-                       />
+                               Foreground="LightGray" />
                     <TextBlock Foreground="LightGray" Margin="0, 0, 0, 16">
                         <TextBlock.Text>
                             <MultiBinding StringFormat="{}{0} Songs, {1}">
@@ -64,9 +64,9 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
-                                         Command="{Binding ElementName=Songs, Path=DataContext.SelectSongCommand}"
-                                         CommandParameter="{Binding Id}"
-                                         Tag="{Binding ElementName=Songs, Path=DataContext}">
+                                             Command="{Binding ElementName=Songs, Path=DataContext.SelectSongCommand}"
+                                             CommandParameter="{Binding Id}"
+                                             Tag="{Binding ElementName=Songs, Path=DataContext}">
                                     <RadioButton.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Play" 

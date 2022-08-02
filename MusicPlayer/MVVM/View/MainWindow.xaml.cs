@@ -200,34 +200,6 @@ namespace MusicPlayer
         //}
         #endregion WindowEvents
 
-        private void sliderSongTimePlayed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            LeftMouseDownOnSlider = true;
-            //Track track = sliderSongTimePlayed.Template.FindName("PART_Track", sliderSongTimePlayed) as Track;
-            // This value is for getting the thubs width to play in accout if thats even needed
-
-            double value = sliderSongTimePlayed.Maximum / (sliderSongTimePlayed.ActualWidth + 0) * e.GetPosition(sliderSongTimePlayed).X;
-            sliderSongTimePlayed.Value = value;
-        }
-
-        private void sliderSongTimePlayed_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            //if (LeftMouseDownOnSlider)
-            //{
-            //    //sliderSongTimePlayed.Value = 0;
-            //    // MIN: 0
-
-            //    // Add x amount of time to song
-            //    int msToAdd = int.Parse(Math.Round(sliderSongTimePlayed.Value - AudioPlayer.MediaPlayer.Position.TotalMilliseconds, 0).ToString());
-            //    AudioPlayer.MediaPlayer.Position = AudioPlayer.MediaPlayer.Position.Add(new TimeSpan(0, 0, 0, 0, msToAdd));
-
-            //    // Start Timer
-            //    UpdateTime();
-            //    AudioPlayer.Timer.Start();
-            //    LeftMouseDownOnSlider = false;
-            //}
-        }
-
         //#region VolumeSlider
         //private void VolumeSliderPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         //{

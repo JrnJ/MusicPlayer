@@ -3,6 +3,7 @@
                     xmlns:converters="clr-namespace:MusicPlayer.Classes">
 
     <converters:MillisecondConverter x:Key="MillisecondConverter" />
+    <converters:GetIndexConverter x:Key="GetIndexConverter" />
 
     <Style TargetType="{x:Type RadioButton}" 
            x:Key="AlbumSong">
@@ -14,12 +15,18 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RadioButton}">
-                    <Border  Background="{TemplateBinding Background}" CornerRadius="4">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="4">
                         <DockPanel>
                             <Grid>
-                                <TextBlock x:Name="tblId"
-                                    Text="{Binding Id}" 
-                                    TextAlignment="Center" Width="26" />
+                                <TextBlock x:Name="tblId" 
+                                           TextAlignment="Center" Width="26">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource GetIndexConverter}">
+                                            <Binding Path="Id" />
+                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}" Path="ItemsSource"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                                 <Polygon x:Name="polygonPlay" Visibility="Collapsed"
                                          Points="0,18, 10,25, 0,32" Fill="#dba531" 
                                          HorizontalAlignment="Center" Margin="26, 0, 6, 0">

@@ -396,7 +396,15 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public void ShowPlaylist(int playlistId)
         {
-            SelectedPlaylist = Playlists.Where(x => x.Id == playlistId).FirstOrDefault();
+            //SelectedPlaylist = Playlists.FirstOrDefault(x => x.Id == playlistId);
+
+            // TODO: This wont work with async, I think
+            int playlistIndex = Playlists.IndexOf(Playlists.FirstOrDefault(x => x.Id == playlistId));
+            for (int i = 0; i < Playlists[playlistIndex].Songs.Count; i++)
+            {
+                Playlists[playlistId].Songs[i] = MyMusic.Songs.FirstOrDefault(x => x.Id == Playlists[playlistId].Songs[i].Id);
+            }
+            SelectedPlaylist = Playlists[playlistId];
 
             // Maybe do this whenever SelectedPlaylist is changed, might f up if a different view is made though
             CurrentView = PlaylistVM;
@@ -442,7 +450,6 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             // Add Song to Playlist
             Playlists[Playlists.IndexOf(playlist)].Songs.Add(song);
-            FixPlaylistSongIds(playlist);
 
             // Save Playlists
             SavePlaylists();
@@ -452,20 +459,9 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             // Remove song from Playlist
             Playlists[Playlists.IndexOf(playlist)].Songs.Remove(song);
-            FixPlaylistSongIds(playlist);
 
             // Save Playlists
             SavePlaylists();
-        }
-
-        public void FixPlaylistSongIds(PlaylistModel playlist)
-        {
-            PlaylistModel temp = Playlists[Playlists.IndexOf(playlist)];
-
-            for (int i = 0; i < temp.Songs.Count; i++)
-            {
-                Playlists[Playlists.IndexOf(playlist)].Songs[i].SetId(i);
-            }
         }
     }
 }

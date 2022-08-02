@@ -38,7 +38,6 @@ namespace MusicPlayer.MVVM.ViewModel
                 Global.OpenMedia(song);
             });
 
-
             RemoveSongCommand = new(o =>
             {
                 AlbumSongModel song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);

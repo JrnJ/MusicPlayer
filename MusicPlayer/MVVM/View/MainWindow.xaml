@@ -9,9 +9,8 @@
         mc:Ignorable="d"
         
         Title="Jrn Music Player" WindowState="Maximized" Icon="/Images/Icons/logo_gold.png"
-        Width="1280" Height="720" MinWidth="1140" MinHeight="308"
+        Width="1280" Height="720" MinWidth="960" MinHeight="308"
         Background="#202020"
-        
         >
 
     <Window.DataContext>
@@ -137,7 +136,7 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Song Info -->
-                    <Grid Grid.Column="0" HorizontalAlignment="Left">
+                    <Grid Grid.Column="0" HorizontalAlignment="Left" x:Name="testName">
                         <Button Style="{StaticResource SongInfo}"
                                 Command="{Binding ShowSongCommand}"
                                 />
@@ -183,13 +182,14 @@
 
                             <TextBlock Grid.Column="0" Text="{Binding Global.CurrentTime}" HorizontalAlignment="Left" Foreground="#999999"/>
 
-                            <Slider Grid.Column="1" x:Name="sliderSongTimePlayed" Style="{StaticResource SongTime}"
-                                            Value="{Binding Global.SliderValue, Mode=TwoWay}" Maximum="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Duration.TotalMilliseconds}"
-                                            Margin="10, 0, 10, 0" 
-                                            PreviewMouseLeftButtonDown="sliderSongTimePlayed_PreviewMouseLeftButtonDown" 
-                                            PreviewMouseLeftButtonUp="sliderSongTimePlayed_PreviewMouseLeftButtonUp"
-                                    />
-                            <TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>
+                            <extensions:CustomSlider Grid.Column="1" x:Name="hello"
+                                                     Style="{StaticResource SongTime}" Margin="10, 0, 10, 0"
+                                                     IsMoveToPointEnabled="True" 
+                                                     ClickedInSlider="{Binding ClickedInSliderr, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                     Value="{Binding Global.SliderValue, Mode=TwoWay}" 
+                                                     Maximum="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Duration.TotalMilliseconds}" />
+                            <!--<TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>-->
+                            <TextBlock Grid.Column="2" Text="{Binding ElementName=hello, Path=ClickedInSlider}" HorizontalAlignment="Right" Foreground="#999999"/>
                         </Grid>
                         <!-- /TrackBar -->
                     </StackPanel>

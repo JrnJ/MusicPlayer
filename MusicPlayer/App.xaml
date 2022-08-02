@@ -9,7 +9,8 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!-- To be grouped -->
-                <ResourceDictionary Source="Themes/CTTestTheme.xaml" />
+                <!--<ResourceDictionary Source="Themes/CTTestTheme.xaml" />-->
+                <ResourceDictionary Source="Themes/ContextMenuTheme.xaml" />
 
                 <ResourceDictionary Source="Themes/PageTabTheme.xaml" />
                 <ResourceDictionary Source="Themes/PageTitleTheme.xaml" />

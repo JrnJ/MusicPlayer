@@ -47,6 +47,20 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public SettingsViewModel SettingsVM { get; set; }
 
+        // Properties
+        private bool _clickedInSliderr;
+
+        public bool ClickedInSliderr
+        {
+            get => _clickedInSliderr; 
+            set 
+            { 
+                _clickedInSliderr = value; 
+                OnPropertyChanged(); 
+            }
+        }
+
+
         // Constructor
         public MainViewModel()
         {
@@ -114,7 +128,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             RepeatCommand = new(o =>
             {
-
+                Global.AudioPlayer.MediaPlayer.IsLoopingEnabled = !Global.AudioPlayer.MediaPlayer.IsLoopingEnabled;
             });
 
             ShowSongCommand = new(o =>
