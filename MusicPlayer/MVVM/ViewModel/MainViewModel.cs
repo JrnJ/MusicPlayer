@@ -55,11 +55,11 @@ namespace MusicPlayer.MVVM.ViewModel
             get => _clickedInSliderr; 
             set 
             { 
-                _clickedInSliderr = value; 
+                _clickedInSliderr = value;
+                Global.Thing(value);
                 OnPropertyChanged(); 
             }
         }
-
 
         // Constructor
         public MainViewModel()

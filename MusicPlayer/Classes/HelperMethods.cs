@@ -24,7 +24,7 @@ namespace MusicPlayer.Classes
 
         public static bool IsMusicFile(string path)
         {
-            if (path.Contains(".mp3"))
+            if (path.Contains(".mp3") || path.Contains(".wav"))
             {
                 return true;
             }

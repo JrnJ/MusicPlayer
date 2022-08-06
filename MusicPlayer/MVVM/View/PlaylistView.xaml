@@ -26,15 +26,15 @@
             <!-- Info -->
             <Grid Grid.Row="0" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="{Binding Global.SelectedPlaylist.Name}" 
+                    <TextBlock Text="{Binding Global.PlaylistViewing.Name}" 
                                Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="{Binding Global.SelectedPlaylist.Description}" 
+                    <TextBlock Text="{Binding Global.PlaylistViewing.Description}" 
                                Foreground="LightGray" />
                     <TextBlock Foreground="LightGray" Margin="0, 0, 0, 16">
                         <TextBlock.Text>
                             <MultiBinding StringFormat="{}{0} Songs, {1}">
-                                <Binding Path="Global.SelectedPlaylist.Songs.Count" />
-                                <Binding Path="Global.SelectedPlaylist.PlaylistDuration" />
+                                <Binding Path="Global.PlaylistViewing.Songs.Count" />
+                                <Binding Path="Global.PlaylistViewing.PlaylistDuration" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
@@ -60,7 +60,7 @@
             <!-- Songs -->
             <Grid Grid.Row="1">
                 <ScrollViewer>
-                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.SelectedPlaylist.Songs}" Margin="0, 0, 8, 0">
+                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.PlaylistViewing.Songs}" Margin="0, 0, 8, 0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"

@@ -34,21 +34,21 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             SelectSongCommand = new(o =>
             {
-                AlbumSongModel song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);
+                AlbumSongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == (int)o);
                 Global.OpenMedia(song);
             });
 
             RemoveSongCommand = new(o =>
             {
-                AlbumSongModel song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == (int)o);
+                AlbumSongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == (int)o);
 
-                Global.RemoveSongFromPlaylist(song, Global.SelectedPlaylist);
+                Global.RemoveSongFromPlaylist(song, Global.PlaylistViewing);
             });
 
             AddSongToPlaylistCommand = new(o =>
             {
                 string[] ids = o.ToString().Split(","); // 0 = playlistId, 1 = songId
-                AlbumSongModel song = Global.SelectedPlaylist.Songs.FirstOrDefault(x => x.Id == int.Parse(ids[1]));
+                AlbumSongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == int.Parse(ids[1]));
                 PlaylistModel playlist = Global.Playlists.FirstOrDefault(x => x.Id == int.Parse(ids[0]));
 
                 Global.AddSongToPlaylist(song, playlist);
@@ -57,11 +57,11 @@ namespace MusicPlayer.MVVM.ViewModel
             MoveSongUpCommand = new(o =>
             {
                 int songId = (int)o;
-                int songIndex = Global.SelectedPlaylist.Songs.IndexOf(Global.SelectedPlaylist.Songs.Where(x => x.Id == songId).FirstOrDefault());
+                int songIndex = Global.PlaylistViewing.Songs.IndexOf(Global.PlaylistViewing.Songs.Where(x => x.Id == songId).FirstOrDefault());
 
                 if (songIndex != 0)
                 {
-                    Global.SelectedPlaylist.Songs.Move(songIndex, songIndex - 1);
+                    Global.PlaylistViewing.Songs.Move(songIndex, songIndex - 1);
                     Global.SavePlaylists();
                 }
             });
@@ -69,11 +69,11 @@ namespace MusicPlayer.MVVM.ViewModel
             MoveSongDownCommand = new(o =>
             {
                 int songId = (int)o;
-                int songIndex = Global.SelectedPlaylist.Songs.IndexOf(Global.SelectedPlaylist.Songs.Where(x => x.Id == songId).FirstOrDefault());
+                int songIndex = Global.PlaylistViewing.Songs.IndexOf(Global.PlaylistViewing.Songs.Where(x => x.Id == songId).FirstOrDefault());
 
-                if (songIndex != Global.SelectedPlaylist.Songs.Count - 1)
+                if (songIndex != Global.PlaylistViewing.Songs.Count - 1)
                 {
-                    Global.SelectedPlaylist.Songs.Move(songIndex, songIndex + 1);
+                    Global.PlaylistViewing.Songs.Move(songIndex, songIndex + 1);
                     Global.SavePlaylists();
                 }
             });
@@ -83,14 +83,14 @@ namespace MusicPlayer.MVVM.ViewModel
                 // Create EditPlaylistBox
                 Global.EditPlaylistBox = new()
                 {
-                    Playlist = Global.SelectedPlaylist,
+                    Playlist = Global.PlaylistViewing,
                     Visibility = System.Windows.Visibility.Visible,
 
                     ConfirmCommand = new(o =>
                     {
                         // Save Playlist
                         // This wank af tbh, fix this crap
-                        Global.UpdatePlaylist(Global.SelectedPlaylist.Id, Global.EditPlaylistBox.Playlist);
+                        Global.UpdatePlaylist(Global.PlaylistViewing.Id, Global.EditPlaylistBox.Playlist);
 
                         Global.PopupVisibility = System.Windows.Visibility.Collapsed;
                         Global.EditPlaylistBox.Visibility = System.Windows.Visibility.Collapsed;
@@ -112,7 +112,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 Global.ConfirmBox = new()
                 {
                     Title = "Delete Playlist?",
-                    Description = $"Are you sure you want to delete {Global.SelectedPlaylist.Name}?",
+                    Description = $"Are you sure you want to delete {Global.PlaylistViewing.Name}?",
                     ConfirmText = "Cancel",
                     CancelText = "Delete",
                     Visibility = System.Windows.Visibility.Visible,
@@ -128,7 +128,7 @@ namespace MusicPlayer.MVVM.ViewModel
                         Global.ConfirmBox.Visibility = System.Windows.Visibility.Collapsed;
 
                         // Delete Playlist
-                        int playlistId = Global.SelectedPlaylist.Id;
+                        int playlistId = Global.PlaylistViewing.Id;
                         Global.DeletePlaylist(playlistId);
 
                         // Change View to Playlists View

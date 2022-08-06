@@ -64,21 +64,27 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _playlists = value; OnPropertyChanged(); }
         }
 
-        private PlaylistModel _selectedPlaylist;
+        private PlaylistModel _playlistViewing;
 
-        public PlaylistModel SelectedPlaylist
+        public PlaylistModel PlaylistViewing
         {
-            get => Playlists.FirstOrDefault(x => x.Id == _selectedPlaylist.Id);
-            set
-            {
-                PlaylistModel playlist = Playlists.FirstOrDefault(x => x.Id == value.Id);
+            get => _playlistViewing;
+            set 
+            { 
+                _playlistViewing = value;
+                OnPropertyChanged();
+            }
+        }
 
-                if (playlist != null)
-                {
-                    _selectedPlaylist = value;
-                    Playlists[Playlists.IndexOf(playlist)] = playlist;
-                    OnPropertyChanged();
-                }
+        private PlaylistModel _playlistPlaying;
+
+        public PlaylistModel PlaylistPlaying
+        {
+            get => _playlistPlaying; 
+            set 
+            { 
+                _playlistPlaying = value;
+                OnPropertyChanged();
             }
         }
 
@@ -86,7 +92,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public PlaylistModel MyMusic
         {
-            get { return _myMusic; }
+            get => _myMusic;
             set { _myMusic = value; OnPropertyChanged(); }
         }
 
@@ -148,8 +154,6 @@ namespace MusicPlayer.MVVM.ViewModel
             get { return _singleSongVisibility; }
             set { _singleSongVisibility = value; OnPropertyChanged(); }
         }
-
-        public int CurrentSongIndex { get; set; }
 
         // ViewModels
         public PlaylistsViewModel PlaylistsVM { get; set; }
@@ -308,6 +312,7 @@ namespace MusicPlayer.MVVM.ViewModel
         public void OpenMedia(AlbumSongModel song)
         {
             AudioPlayer.OpenMedia(song);
+            PlaylistPlaying = Playlists.FirstOrDefault(x => x.Id == PlaylistViewing.Id);
 
             // Reset background
             // Changed it to a radiobutton which eliminates this, until further testing of radiobutton at least
@@ -353,15 +358,45 @@ namespace MusicPlayer.MVVM.ViewModel
         }
         #endregion Configuration
 
+        public bool WasMouseOnSliderDown { get; private set; }
+
+        public void Thing(bool mousedown)
+        {
+            if (mousedown)
+            {
+                WasMouseOnSliderDown = true;
+
+                // Pause Timer
+                AudioPlayer.Timer.Stop();
+
+            }
+            else
+            {
+                // Make sure mouse was down
+                if (WasMouseOnSliderDown)
+                {
+                    WasMouseOnSliderDown = false;
+
+                    // Change where song is at
+                    //AudioPlayer.MediaPlayer.Position = 
+
+                    // Start Timer
+                    AudioPlayer.Timer.Start();
+                }
+            }
+        }
 
         public void PreviousSong()
         {
             AudioPlayer.Pause();
 
-            if (CurrentSongIndex > 0)
+            // Get song Index
+            int index = PlaylistPlaying.Songs.IndexOf(AudioPlayer.CurrentSong);
+
+            // Play previous song if there is one
+            if (index > 0)
             {
-                CurrentSongIndex -= 1;
-                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+                OpenMedia(PlaylistPlaying.Songs[index - 1]);
             }
         }
 
@@ -369,10 +404,13 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             AudioPlayer.Pause();
 
-            if (CurrentSongIndex < SelectedPlaylist.Songs.Count - 1)
+            // Get song Index
+            int index = PlaylistPlaying.Songs.IndexOf(AudioPlayer.CurrentSong);
+
+            // Play next song if there is one
+            if (index < PlaylistPlaying.Songs.Count - 1)
             {
-                CurrentSongIndex += 1;
-                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
+                OpenMedia(PlaylistPlaying.Songs[index + 1]);
             }
         }
 
@@ -404,7 +442,7 @@ namespace MusicPlayer.MVVM.ViewModel
             {
                 Playlists[playlistId].Songs[i] = MyMusic.Songs.FirstOrDefault(x => x.Id == Playlists[playlistId].Songs[i].Id);
             }
-            SelectedPlaylist = Playlists[playlistId];
+            PlaylistViewing = Playlists[playlistId];
 
             // Maybe do this whenever SelectedPlaylist is changed, might f up if a different view is made though
             CurrentView = PlaylistVM;

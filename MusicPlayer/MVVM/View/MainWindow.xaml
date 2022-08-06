@@ -182,14 +182,14 @@
 
                             <TextBlock Grid.Column="0" Text="{Binding Global.CurrentTime}" HorizontalAlignment="Left" Foreground="#999999"/>
 
-                            <extensions:CustomSlider Grid.Column="1" x:Name="hello"
+                            <extensions:CustomSlider Grid.Column="1" x:Name="hello" 
                                                      Style="{StaticResource SongTime}" Margin="10, 0, 10, 0"
                                                      IsMoveToPointEnabled="True" 
-                                                     ClickedInSlider="{Binding ClickedInSliderr, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                     ClickedInSlider="{Binding ClickedInSliderr, Mode=TwoWay}"
                                                      Value="{Binding Global.SliderValue, Mode=TwoWay}" 
                                                      Maximum="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Duration.TotalMilliseconds}" />
                             <!--<TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>-->
-                            <TextBlock Grid.Column="2" Text="{Binding ElementName=hello, Path=ClickedInSlider}" HorizontalAlignment="Right" Foreground="#999999"/>
+                            <TextBlock Grid.Column="2" Text="{Binding ElementName=hello, Path=ClickedInSlider}" HorizontalAlignment="Right" Foreground="#999999" />
                         </Grid>
                         <!-- /TrackBar -->
                     </StackPanel>
