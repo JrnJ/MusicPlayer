@@ -367,8 +367,8 @@ namespace MusicPlayer.MVVM.ViewModel
                 WasMouseOnSliderDown = true;
 
                 // Pause Timer
+                AudioPlayer.Pause();
                 AudioPlayer.Timer.Stop();
-
             }
             else
             {
@@ -378,9 +378,10 @@ namespace MusicPlayer.MVVM.ViewModel
                     WasMouseOnSliderDown = false;
 
                     // Change where song is at
-                    //AudioPlayer.MediaPlayer.Position = 
+                    AudioPlayer.MediaPlayer.Position = TimeSpan.FromMilliseconds(SliderValue);
 
                     // Start Timer
+                    AudioPlayer.Play();
                     AudioPlayer.Timer.Start();
                 }
             }
