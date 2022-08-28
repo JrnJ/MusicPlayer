@@ -89,7 +89,7 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <RadioButton GroupName="PageTabs" Style="{StaticResource PlaylistItem}" 
-                                                             Command="{Binding ElementName=PlaylistItems, Path=DataContext.Global.SelectPlaylistCommand}"
+                                                             Command="{Binding ElementName=PlaylistItems, Path=DataContext.SelectPlaylistCommand}"
                                                              CommandParameter="{Binding Id}"
                                                              />
                                             </DataTemplate>
@@ -188,8 +188,7 @@
                                                      ClickedInSlider="{Binding ClickedInSliderr, Mode=TwoWay}"
                                                      Value="{Binding Global.SliderValue, Mode=TwoWay}" 
                                                      Maximum="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Duration.TotalMilliseconds}" />
-                            <!--<TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>-->
-                            <TextBlock Grid.Column="2" Text="{Binding ElementName=hello, Path=ClickedInSlider}" HorizontalAlignment="Right" Foreground="#999999" />
+                            <TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>
                         </Grid>
                         <!-- /TrackBar -->
                     </StackPanel>
@@ -216,9 +215,9 @@
             <!--<Grid Background="#25000000" Visibility="Visible">-->
             <!-- Confirm -->
             <Border DataContext="{Binding Global.ConfirmBox}"
-                Visibility="{Binding Visibility}"
-                VerticalAlignment="Center" HorizontalAlignment="Center" 
-                CornerRadius="4" BorderThickness="1.5" BorderBrush="#353535">
+                    Visibility="{Binding Visibility}"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" 
+                    CornerRadius="4" BorderThickness="1.5" BorderBrush="#353535">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition />

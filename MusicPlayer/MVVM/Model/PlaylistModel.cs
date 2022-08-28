@@ -54,17 +54,20 @@ namespace MusicPlayer.MVVM.Model
         {
             get
             {
-                double totalMs = 0;
+                // TODO: fix this so it works okie
+                //double totalMs = 0;
 
-                for (int i = 0; i < Songs.Count; i++)
-                {
-                    if (Songs[i].MusicProperties != null)
-                    {
-                        totalMs += Songs[i].MusicProperties.Duration.TotalMilliseconds;
-                    }
-                }
+                //for (int i = 0; i < Songs.Count; i++)
+                //{
+                //    if (Songs[i].MusicProperties != null)
+                //    {
+                //        totalMs += Songs[i].MusicProperties.Duration.TotalMilliseconds;
+                //    }
+                //}
 
-                return HelperMethods.MsToTime(totalMs);
+                //return HelperMethods.MsToTime(totalMs);
+
+                return HelperMethods.MsToTime(0);
             }
         }
 

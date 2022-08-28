@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Windows.Media;
+using Windows.Media.Playback;
 
 namespace MusicPlayer.Classes
 {
@@ -25,8 +26,6 @@ namespace MusicPlayer.Classes
             get { return _currentSong; }
             set { _currentSong = value; OnPropertyChanged(); }
         }
-
-        public bool IsPlaying { get; private set; }
 
         public double Volume
         {
@@ -159,7 +158,6 @@ namespace MusicPlayer.Classes
         public void Play()
         {
             MediaPlayer.Play();
-            IsPlaying = true;
 
             Timer.Start();
 
@@ -176,15 +174,39 @@ namespace MusicPlayer.Classes
         public void Pause()
         {
             MediaPlayer.Pause();
-            IsPlaying = false;
 
             Timer.Stop();
 
             // Notify Server
-            // Notify Server
             if (AudioServer != null)
             {
                 AudioServer.Pause();
+            }
+        }
+
+        /// <summary>
+        /// Pause or Play
+        /// </summary>
+        public void PausePlay()
+        {
+            switch (MediaPlayer.CurrentState)
+            {
+                case MediaPlayerState.Closed:
+                    break;
+                case MediaPlayerState.Opening:
+                    break;
+                case MediaPlayerState.Buffering:
+                    break;
+                case MediaPlayerState.Playing:
+                    Pause();
+                    break;
+                case MediaPlayerState.Paused:
+                    Play();
+                    break;
+                case MediaPlayerState.Stopped:
+                    break;
+                default:
+                    break;
             }
         }
 

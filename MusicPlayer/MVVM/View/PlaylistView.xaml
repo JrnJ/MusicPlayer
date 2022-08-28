@@ -39,20 +39,37 @@
                         </TextBlock.Text>
                     </TextBlock>
 
-                    <DockPanel>
-                        <Button 
+                    <StackPanel>
+                        <DockPanel>
+                            <Button 
                             Content="Edit"
                             Width="100" Height="35"
                             HorizontalAlignment="Left"
                             Command="{Binding EditPlaylistCommand}" />
-                        <Button 
+                            <Button 
                             Content="Delete"
                             Width="100" Height="35"
                             HorizontalAlignment="Left"
                             Margin="18,0,0,0"
                             Background="#ff4040"
                             Command="{Binding DeletePlaylistCommand}" />
-                    </DockPanel>
+                        </DockPanel>
+                        <DockPanel Margin="0,8,0,0">
+                            <Button 
+                                Content="Loop"
+                                Width="100" Height="35"
+                                HorizontalAlignment="Left"
+                                Background="{Binding LoopButtonColor}"
+                                Command="{Binding LoopPlaylistCommand}" />
+                            <Button 
+                                Content="Shuffle"
+                                Width="100" Height="35"
+                                HorizontalAlignment="Left"
+                                Background="{Binding ShuffleButtonColor}"
+                                Margin="18,0,0,0"
+                                Command="{Binding ShufflePlaylistCommand}" />
+                        </DockPanel>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
             <!-- /Info -->

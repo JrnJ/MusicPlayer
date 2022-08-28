@@ -14,7 +14,7 @@ namespace MusicPlayer.MVVM.Model
     internal class AppSettingsModel : ObservableObject
     {
         [JsonIgnore]
-        public static readonly string SettingsFilePath = "C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/settings.json";
+        public static string SettingsFilePath => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\settings.json";
 
         private double _volume;
 
@@ -94,6 +94,12 @@ namespace MusicPlayer.MVVM.Model
         public async Task GetSettingsFromFile()
         {
             AppSettingsModel appSettings = await FileHandler<AppSettingsModel>.GetJSON(SettingsFilePath);
+
+            appSettings ??= new()
+            {
+                Volume = 0.5,
+                MusicFolders = new()
+            };
             this.Volume = appSettings.Volume;
             this.MusicFolders = appSettings.MusicFolders;
         }

@@ -4,10 +4,11 @@ using MusicPlayer.MVVM.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
-    internal class PlaylistViewModel
+    internal class PlaylistViewModel : ObservableObject
     {
         // <GlobalViewModel> //
         public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
@@ -29,12 +30,36 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand DeletePlaylistCommand { get; set; }
 
+        public RelayCommand LoopPlaylistCommand { get; set; }
+
+        public RelayCommand ShufflePlaylistCommand { get; set; }
+
+        // Properties
+        private SolidColorBrush _loopButtonColor;
+
+        public SolidColorBrush LoopButtonColor
+        {
+            get { return _loopButtonColor; }
+            set { _loopButtonColor = value; OnPropertyChanged(); }
+        }
+
+        private SolidColorBrush _shuffleButtonColor;
+
+        public SolidColorBrush ShuffleButtonColor
+        {
+            get { return _shuffleButtonColor; }
+            set { _shuffleButtonColor = value; OnPropertyChanged(); }
+        }
 
         public PlaylistViewModel()
         {
+            LoopButtonColor = GetSelectedColor(false);
+            ShuffleButtonColor = GetSelectedColor(false);
+
             SelectSongCommand = new(o =>
             {
                 AlbumSongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == (int)o);
+                //AlbumSongModel song = Global.MyMusic.Songs.FirstOrDefault(x => x.Id == (int)o);
                 Global.OpenMedia(song);
             });
 
@@ -139,6 +164,20 @@ namespace MusicPlayer.MVVM.ViewModel
                 // Show ConfirmBox
                 Global.PopupVisibility = System.Windows.Visibility.Visible;
             });
+
+            LoopPlaylistCommand = new(o =>
+            {
+                Global.LoopPlaylistEnabled = !Global.LoopPlaylistEnabled;
+                LoopButtonColor = GetSelectedColor(Global.LoopPlaylistEnabled);
+            });
+
+            ShufflePlaylistCommand = new(o =>
+            {
+                Global.ShufflePlaylistEnabled = !Global.ShufflePlaylistEnabled;
+                ShuffleButtonColor = GetSelectedColor(Global.ShufflePlaylistEnabled);
+            });
         }
+
+        public SolidColorBrush GetSelectedColor(bool isSelected) => isSelected ? new SolidColorBrush(Color.FromRgb(49, 49, 49)) : new SolidColorBrush(Color.FromRgb(41, 41, 41));
     }
 }

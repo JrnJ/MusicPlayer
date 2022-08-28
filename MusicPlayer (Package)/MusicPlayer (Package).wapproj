@@ -42,13 +42,13 @@
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
     <EntryPointProjectUniqueName>..\MusicPlayer\MusicPlayer.csproj</EntryPointProjectUniqueName>
-    <PackageCertificateThumbprint>0FE44BA4AFE638531FFA49B37C035780D950FB5D</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>2FFFA5C11F90C104346CBCC374B37915F6F9847F</PackageCertificateThumbprint>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
-    <AppInstallerUri>C:\Dev\wpf\Icons\MSIX</AppInstallerUri>
+    <AppInstallerUri>C:\Dev\wpf\MusicPlayerMSIX</AppInstallerUri>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">

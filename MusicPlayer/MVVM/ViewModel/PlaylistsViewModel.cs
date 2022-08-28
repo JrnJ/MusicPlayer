@@ -16,11 +16,18 @@ namespace MusicPlayer.MVVM.ViewModel
         // Commands
         public RelayCommand NewPlaylistCommand { get; set; }
 
+        public RelayCommand ShowPlaylistCommand { get; set; }
+
         public PlaylistsViewModel()
         {
             NewPlaylistCommand = new(o =>
             {
                 Global.CreatePlaylist();
+            });
+
+            ShowPlaylistCommand = new(o =>
+            {
+                Global.ShowPlaylist((int)o);
             });
         }
     }

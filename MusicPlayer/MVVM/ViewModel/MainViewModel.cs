@@ -26,6 +26,8 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand CreatePlaylistCommand { get; set; }
 
+        public RelayCommand SelectPlaylistCommand { get; set; }
+
         // Control Commands
         public RelayCommand PausePlayCommand { get; set; }
 
@@ -56,7 +58,7 @@ namespace MusicPlayer.MVVM.ViewModel
             set 
             { 
                 _clickedInSliderr = value;
-                Global.Thing(value);
+                Global.SliderMouseDownOrUpEvent(value);
                 OnPropertyChanged(); 
             }
         }
@@ -95,20 +97,18 @@ namespace MusicPlayer.MVVM.ViewModel
 
             CreatePlaylistCommand = new(o =>
             {
-                Global.ShowPlaylist(Global.CreatePlaylist().Id);
+                Global.CreatePlaylist();
+            });
+
+            SelectPlaylistCommand = new(o =>
+            {
+                Global.ShowPlaylist((int)o);
             });
 
             #region ManagerCommands
             PausePlayCommand = new(o =>
             {
-                if (Global.AudioPlayer.IsPlaying)
-                {
-                    Global.AudioPlayer.Pause();
-                }
-                else
-                {
-                    Global.AudioPlayer.Play();
-                }
+                Global.AudioPlayer.PausePlay();
             });
 
             PreviousSongCommand = new(o =>

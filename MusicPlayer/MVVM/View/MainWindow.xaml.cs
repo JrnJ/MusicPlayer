@@ -48,9 +48,18 @@ namespace MusicPlayer
 
         public static AppWindow AppWindow { get; private set; }
 
+
+        //[DllImport("winmm.dll")]
+        //public static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
+
         public MainWindow()
         {
             InitializeComponent();
+
+            //IntPtr hwo = null;
+            //uint o;
+            //waveOutGetVolume(, o);
+            //MessageBox.Show(o.ToString());
 
             try
             {

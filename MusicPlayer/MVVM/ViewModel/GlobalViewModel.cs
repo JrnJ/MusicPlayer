@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -97,6 +99,10 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         // Stupidity
+        public bool ShufflePlaylistEnabled { get; set; }
+
+        public bool LoopPlaylistEnabled { get; set; }
+
         private string _finalTime;
 
         public string FinalTime
@@ -158,13 +164,9 @@ namespace MusicPlayer.MVVM.ViewModel
         // ViewModels
         public PlaylistsViewModel PlaylistsVM { get; set; }
 
-        // Commands ?
-        public RelayCommand SelectPlaylistCommand { get; set; }
+        public string PlaylistsFilePath => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\playlists.json";
 
-        public RelayCommand DeletePlaylistCommand { get; set; }
-
-        public string PlaylistsFilePath => "C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/playlists.json";
-        public string CachedSongsFilePath => "C:/Users/jeroe/AppData/Roaming/.jeroenj/MusicPlayer/cached_songs.json";
+        public string CachedSongsFilePath => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\cached_songs.json";
         #endregion Properties
 
         public GlobalViewModel()
@@ -176,10 +178,6 @@ namespace MusicPlayer.MVVM.ViewModel
             // Configuration
             Configure();
 
-            // Load Playlists
-            // TODO: Loading screen until 25 songs have been loaded
-            GetPlaylists();
-
             // Set BoxModels :: This isnt mandatory btw
             ConfirmBox = new();
             EditPlaylistBox = new();
@@ -188,22 +186,47 @@ namespace MusicPlayer.MVVM.ViewModel
             //AudioPlayer.MediaPlayer.AudioStateMonitor
             //AudioPlayer.MediaPlayer.PlaybackMediaMarkers
             //AudioPlayer.MediaPlayer.PlaybackSession
-
-            // Assign Commands
-            SelectPlaylistCommand = new(o =>
-            {
-                ShowPlaylist((int)o);
-            });
         }
 
         #region Configuration
         public async void Configure()
         {
+            // Validate
+            await Validate();
+
+            // Configure
             await ConfigureSettings();
             ConfigureMusic();
+
             ConfigureAudioPlayer();
             PopupVisibility = Visibility.Collapsed;
             SingleSongVisibility = Visibility.Collapsed;
+        }
+
+        public async Task Validate()
+        {
+            // Check for JeroenJ folder
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            try
+            {
+                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path);
+                await folder.CreateFolderAsync("JeroenJ", CreationCollisionOption.FailIfExists);
+            }
+            catch (Exception)
+            {
+
+            }
+
+            try
+            {
+                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path + "\\JeroenJ");
+                await folder.CreateFolderAsync("MusicPlayer", CreationCollisionOption.FailIfExists);
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         private async Task ConfigureSettings()
@@ -220,7 +243,10 @@ namespace MusicPlayer.MVVM.ViewModel
             List<StorageFile> storageFiles = new();
 
             // Load Cached Music
-            AppSettinggs.CachedSongs = await FileHandler<ObservableCollection<CachedSong>>.GetJSON(CachedSongsFilePath);
+            ObservableCollection<CachedSong> cachedSongs = await FileHandler<ObservableCollection<CachedSong>>.GetJSON(CachedSongsFilePath);
+            cachedSongs ??= new();
+
+            AppSettinggs.CachedSongs = cachedSongs;
 
             // Load UI
             for (int i = 0; i < AppSettinggs.MusicFolders.Count; i++)
@@ -239,6 +265,10 @@ namespace MusicPlayer.MVVM.ViewModel
                     }
                 }
             }
+
+            // Load Playlists
+            // TODO: Loading screen until 25 songs have been loaded
+            GetPlaylists();
 
             // Load Full Songs
             for (int i = 0; i < MyMusic.Songs.Count; i++)
@@ -264,6 +294,45 @@ namespace MusicPlayer.MVVM.ViewModel
                 await FileHandler<ObservableCollection<CachedSong>>.SaveJSON(CachedSongsFilePath, newCache);
         }
 
+        public async void GetPlaylists()
+        {
+            Playlists = new();
+
+            ObservableCollection<PlaylistModel> playlistss = await FileHandler<ObservableCollection<PlaylistModel>>.GetJSON(PlaylistsFilePath);
+            playlistss ??= new();
+
+            for (int i = 0; i < playlistss.Count; i++)
+            {
+                //// Create Playlist
+                //PlaylistModel playlist = new()
+                //{
+                //    Id = playlists[i].Id,
+                //    Name = playlists[i].Name,
+                //    Description = playlists[i].Description
+                //};
+
+                //// Add Songs
+                //for (int j = 0; j < playlists[i].Songs.Count; j++)
+                //{
+                //    playlist.Songs.Add(MyMusic.Songs.FirstOrDefault(x => x.Id == playlists[i].Songs[j].Id));
+                //}
+
+                //// Add Playlist
+                //Playlists.Add(playlist);
+
+                // Add Songs
+                for (int j = 0; j < playlistss[i].Songs.Count; j++)
+                {
+                    playlistss[i].Songs[j] = MyMusic.Songs.FirstOrDefault(x => x.Id == playlistss[i].Songs[j].Id);
+                }
+
+                // Add Playlist
+                Playlists.Add(playlistss[i]);
+            }
+
+            int bp = 0;
+        }
+
         private void ConfigureAudioPlayer()
         {
             // AudioPlayer
@@ -280,6 +349,10 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Timer Tick Event
             AudioPlayer.Timer.Tick += Timer_Tick;
+
+            // Slider Values
+            CurrentTime = "0:00";
+            FinalTime = "0:00";
         }
 
         #region MediaPlayerEvents
@@ -298,7 +371,14 @@ namespace MusicPlayer.MVVM.ViewModel
 
         private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
         {
-            NextSong();
+            if (ShufflePlaylistEnabled)
+            {
+                AutoPlayNextSong();
+            }
+            else
+            {
+                NextSong();
+            }
         }
 
         private void MediaPlayerVolumeChanged(Windows.Media.Playback.MediaPlayer sender, object args)
@@ -360,7 +440,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public bool WasMouseOnSliderDown { get; private set; }
 
-        public void Thing(bool mousedown)
+        public void SliderMouseDownOrUpEvent(bool mousedown)
         {
             if (mousedown)
             {
@@ -379,6 +459,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
                     // Change where song is at
                     AudioPlayer.MediaPlayer.Position = TimeSpan.FromMilliseconds(SliderValue);
+                    UpdateTime();
 
                     // Start Timer
                     AudioPlayer.Play();
@@ -413,11 +494,29 @@ namespace MusicPlayer.MVVM.ViewModel
             {
                 OpenMedia(PlaylistPlaying.Songs[index + 1]);
             }
+            // If not, play first song
+            else
+            {
+                if (LoopPlaylistEnabled)
+                {
+                    OpenMedia(PlaylistPlaying.Songs[0]);
+                }
+            }
+        }
+
+        public void AutoPlayNextSong()
+        {
+            AudioPlayer.Pause();
+
+            // Generate random
+            Random random = new();
+            int rndIndex = random.Next(0, PlaylistPlaying.Songs.Count);
+            OpenMedia(PlaylistPlaying.Songs[rndIndex]);
         }
 
         public PlaylistModel CreatePlaylist()
         {
-            // Ccreate an id 
+            // Create an id 
             int id = 0;
             for (int i = 0; i < Playlists.Count; i++)
             {
@@ -435,17 +534,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public void ShowPlaylist(int playlistId)
         {
-            //SelectedPlaylist = Playlists.FirstOrDefault(x => x.Id == playlistId);
-
-            // TODO: This wont work with async, I think
-            int playlistIndex = Playlists.IndexOf(Playlists.FirstOrDefault(x => x.Id == playlistId));
-            for (int i = 0; i < Playlists[playlistIndex].Songs.Count; i++)
-            {
-                Playlists[playlistId].Songs[i] = MyMusic.Songs.FirstOrDefault(x => x.Id == Playlists[playlistId].Songs[i].Id);
-            }
-            PlaylistViewing = Playlists[playlistId];
-
-            // Maybe do this whenever SelectedPlaylist is changed, might f up if a different view is made though
+            PlaylistViewing = Playlists.FirstOrDefault(x => x.Id == playlistId);
             CurrentView = PlaylistVM;
         }
 
@@ -465,19 +554,6 @@ namespace MusicPlayer.MVVM.ViewModel
                 Description = playlist.Description
             };
             SavePlaylists();
-        }
-
-        public async void GetPlaylists()
-        {
-            Playlists = await FileHandler<ObservableCollection<PlaylistModel>>.GetJSON(PlaylistsFilePath);
-
-            for (int i = 0; i < Playlists.Count; i++)
-            {
-                //for (int i = 0; i < length; i++)
-                //{
-
-                //}
-            }
         }
 
         public async void SavePlaylists()
