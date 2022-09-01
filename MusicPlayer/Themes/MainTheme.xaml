@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+
     <Style TargetType="TextBlock">
         <Setter Property="Foreground" Value="White" />
     </Style>
@@ -52,11 +52,11 @@
                         Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="4">
-                        <Grid>
+                        <Grid VerticalAlignment="Center">
                             <TextBlock Text="{TemplateBinding Tag}" 
                                        Visibility="Visible"
                                        Padding="6,4,4,4" 
-                                       Foreground="#707070"
+                                       Foreground="#777777"
                                        FontSize="{TemplateBinding FontSize}" />
                             <TextBox Padding="4" 
                                      FontSize="{TemplateBinding FontSize}"

@@ -40,6 +40,7 @@
                 
                 <!-- Settings -->
                 <ResourceDictionary Source="Themes/MusicFolderItemTheme.xaml" />
+                <ResourceDictionary Source="Themes/ProfileDropdownTheme.xaml" />
                 <!-- /Settings -->
             </ResourceDictionary.MergedDictionaries>
 

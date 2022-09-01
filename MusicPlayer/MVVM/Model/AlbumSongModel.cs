@@ -18,7 +18,12 @@ namespace MusicPlayer.MVVM.Model
         public string Path
         {
             get => _path;
-            set { _path = value; OnPropertyChanged(); }
+            set 
+            { 
+                _path = value;
+                FileType = value.Split('.')[^1];
+                OnPropertyChanged(); 
+            }
         }
 
         private int _id;
@@ -56,12 +61,14 @@ namespace MusicPlayer.MVVM.Model
             get { return _image; }
             set { _image = value; OnPropertyChanged(); }
         }
-        // TODO: Change how playlists work
 
-        // Constructor
-        public AlbumSongModel()
+        private string _fileType;
+
+        [JsonIgnore]
+        public string FileType
         {
-            
+            get { return _fileType.ToUpper(); }
+            set { _fileType = value; OnPropertyChanged(); }
         }
 
         public async Task Init(Windows.Storage.StorageFile storageFile)

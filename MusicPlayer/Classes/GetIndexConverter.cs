@@ -14,12 +14,6 @@ namespace MusicPlayer.Classes
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            //ObservableCollection<string> lista = (ObservableCollection<string>)values[1];
-            //return String.Concat(lista.IndexOf(values[0].ToString()), " ", values[0].ToString());
-
-            //var collection = (ListCollectionView)values[1];
-            //var itemIndex = collection.IndexOf(values[0]);
-
             ObservableCollection<AlbumSongModel> list = (ObservableCollection<AlbumSongModel>)values[1];
             for (int i = 0; i < list.Count; i++)
             {

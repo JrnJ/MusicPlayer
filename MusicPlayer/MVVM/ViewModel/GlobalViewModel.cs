@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Windows.ApplicationModel.Activation;
 using Windows.Media;
 using Windows.Media.Playlists;
 using Windows.Storage;
@@ -201,6 +202,21 @@ namespace MusicPlayer.MVVM.ViewModel
             ConfigureAudioPlayer();
             PopupVisibility = Visibility.Collapsed;
             SingleSongVisibility = Visibility.Collapsed;
+
+            // CLA
+            string[] cmdLine = Environment.GetCommandLineArgs();
+            if (cmdLine.Length > 1)
+            {
+                AlbumSongModel song = new()
+                {
+                    Id = 0,
+                    Path = cmdLine[1]
+                };
+                StorageFile storageFile = await StorageFile.GetFileFromPathAsync(cmdLine[1]);
+                await song.Init(storageFile);
+
+                OpenMedia(song, true);
+            }
         }
 
         public async Task Validate()
@@ -329,8 +345,6 @@ namespace MusicPlayer.MVVM.ViewModel
                 // Add Playlist
                 Playlists.Add(playlistss[i]);
             }
-
-            int bp = 0;
         }
 
         private void ConfigureAudioPlayer()
@@ -389,10 +403,25 @@ namespace MusicPlayer.MVVM.ViewModel
 
         #endregion MediaPlayerEvents
 
-        public void OpenMedia(AlbumSongModel song)
+        public void OpenMedia(AlbumSongModel song, bool singleSongMode = false)
         {
             AudioPlayer.OpenMedia(song);
-            PlaylistPlaying = Playlists.FirstOrDefault(x => x.Id == PlaylistViewing.Id);
+
+            // TODO: mode can be SingleSong
+            if (PlaylistViewing != null)
+            {
+                PlaylistModel playlistPlaying = Playlists.FirstOrDefault(x => x.Id == PlaylistViewing.Id);
+
+                if (playlistPlaying != null)
+                {
+                    PlaylistPlaying = playlistPlaying;
+                }
+
+                if (singleSongMode)
+                {
+                    SingleSongVisibility = Visibility.Visible;
+                }
+            }
 
             // Reset background
             // Changed it to a radiobutton which eliminates this, until further testing of radiobutton at least
@@ -412,7 +441,7 @@ namespace MusicPlayer.MVVM.ViewModel
             //CurrentUISong.IsChecked.Equals(true);
 
             // Maybe change where this is placed
-            
+
 
             // Update UI
             CurrentTime = "0:00";
@@ -439,6 +468,7 @@ namespace MusicPlayer.MVVM.ViewModel
         #endregion Configuration
 
         public bool WasMouseOnSliderDown { get; private set; }
+        public bool WasMusicPlaying { get; private set; }
 
         public void SliderMouseDownOrUpEvent(bool mousedown)
         {
@@ -447,6 +477,8 @@ namespace MusicPlayer.MVVM.ViewModel
                 WasMouseOnSliderDown = true;
 
                 // Pause Timer
+                // TODO:
+                WasMusicPlaying = AudioPlayer.MediaPlayer.CurrentState == Windows.Media.Playback.MediaPlayerState.Playing;
                 AudioPlayer.Pause();
                 AudioPlayer.Timer.Stop();
             }
@@ -461,9 +493,12 @@ namespace MusicPlayer.MVVM.ViewModel
                     AudioPlayer.MediaPlayer.Position = TimeSpan.FromMilliseconds(SliderValue);
                     UpdateTime();
 
-                    // Start Timer
-                    AudioPlayer.Play();
-                    AudioPlayer.Timer.Start();
+                    // Start Timer if it was playing
+                    if (WasMusicPlaying)
+                    {
+                        AudioPlayer.Play();
+                        AudioPlayer.Timer.Start();
+                    }
                 }
             }
         }
