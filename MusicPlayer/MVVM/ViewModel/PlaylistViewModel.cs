@@ -1,10 +1,14 @@
-﻿using MusicPlayer.Classes;
+﻿using Microsoft.UI.Xaml.Controls;
+using MusicPlayer.Classes;
 using MusicPlayer.Core;
 using MusicPlayer.MVVM.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
@@ -49,6 +53,20 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             get { return _shuffleButtonColor; }
             set { _shuffleButtonColor = value; OnPropertyChanged(); }
+        }
+
+        // Properties
+        private string _searchText;
+
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                Global.SearchSongInPlaylist(value);
+                OnPropertyChanged();
+            }
         }
 
         public PlaylistViewModel()
@@ -124,6 +142,11 @@ namespace MusicPlayer.MVVM.ViewModel
                     {
                         Global.PopupVisibility = System.Windows.Visibility.Collapsed;
                         Global.EditPlaylistBox.Visibility = System.Windows.Visibility.Collapsed;
+                    }),
+                    ChangeImageCommand = new(o =>
+                    {
+                        // Open File Explorer for image
+                        OpenFilePicker();
                     })
                 };
 
@@ -176,6 +199,21 @@ namespace MusicPlayer.MVVM.ViewModel
                 Global.ShufflePlaylistEnabled = !Global.ShufflePlaylistEnabled;
                 ShuffleButtonColor = GetSelectedColor(Global.ShufflePlaylistEnabled);
             });
+        }
+
+        private async void OpenFilePicker()
+        {
+            FileOpenPicker filePicker = new();
+            filePicker.FileTypeFilter.Add(".png");
+            filePicker.FileTypeFilter.Add(".jpg");
+            filePicker.FileTypeFilter.Add(".jpeg");
+
+            StorageFile file = await AppWindowExtensions.OpenFilePicker(filePicker);
+
+            if (file.ContentType.Contains("image"))
+            {
+                Global.EditPlaylistBox.Playlist.ImagePath = file.Path;
+            }
         }
 
         public SolidColorBrush GetSelectedColor(bool isSelected) => isSelected ? new SolidColorBrush(Color.FromRgb(49, 49, 49)) : new SolidColorBrush(Color.FromRgb(41, 41, 41));

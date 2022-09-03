@@ -29,11 +29,10 @@ namespace MusicPlayer.Core
         /// Opens a native Windows FolderPicker
         /// </summary>
         /// <param name="folderPicker">Change FolderPicker behaviour</param>
-        /// <returns></returns>
+        /// <returns>Folder Selected</returns>
         public static async Task<StorageFolder> OpenFolderPicker(FolderPicker folderPicker = null)
         {
-            if (folderPicker == null)
-                folderPicker = new();
+            folderPicker ??= new();
 
             MainWindow window = (MusicPlayer.MainWindow)App.Current.MainWindow;
             IntPtr hwnd = new WindowInteropHelper(window).EnsureHandle();
@@ -41,6 +40,23 @@ namespace MusicPlayer.Core
 
             StorageFolder folder = await folderPicker.PickSingleFolderAsync();
             return folder;
+        }
+
+        /// <summary>
+        /// Opens a native Windows FileOpenPicker
+        /// </summary>
+        /// <param name="filePicker">Change FileOpenPicker behaviour</param>
+        /// <returns>File(s) Selected</returns>
+        public static async Task<StorageFile> OpenFilePicker(FileOpenPicker filePicker = null)
+        {
+            filePicker ??= new();
+
+            MainWindow window = (MusicPlayer.MainWindow)App.Current.MainWindow;
+            IntPtr hwnd = new WindowInteropHelper(window).EnsureHandle();
+            InitializeWithWindow.Initialize(filePicker, hwnd);
+
+            StorageFile file = await filePicker.PickSingleFileAsync();
+            return file;
         }
     }
 }

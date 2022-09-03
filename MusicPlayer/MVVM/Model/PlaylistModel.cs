@@ -41,6 +41,15 @@ namespace MusicPlayer.MVVM.Model
             set { _description = value; OnPropertyChanged(); }
         }
 
+        private string _imagePath;
+
+        [JsonProperty("ImagePath")]
+        public string ImagePath
+        {
+            get { return _imagePath; }
+            set { _imagePath = value; OnPropertyChanged(); }
+        }
+
         private ObservableCollection<AlbumSongModel> _songs;
 
         [JsonProperty("Songs")]
@@ -79,17 +88,27 @@ namespace MusicPlayer.MVVM.Model
         }
 
         // TODO: RN, this is a mess fix it
-        public bool AddSong(StorageFile storageFile)
+        public AlbumSongModel AddSong(StorageFile storageFile, int id = 0)
         {
             // Check if song already exists (and create an id meanwhile)
-            int id = 0;
-            for (int i = 0; i < Songs.Count; i++)
+            if (id == 0)
             {
-                if (Songs[i].Path == storageFile.Path)
-                    return false;
+                for (int i = 0; i < Songs.Count; i++)
+                {
+                    if (Songs[i].Path == storageFile.Path)
+                        return null;
 
-                if (Songs[i].Id + 1 > id)
-                    id = Songs[i].Id + 1;
+                    if (Songs[i].Id + 1 > id)
+                        id = Songs[i].Id + 1;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < Songs.Count; i++)
+                {
+                    if (Songs[i].Path == storageFile.Path)
+                        return null;
+                }
             }
 
             AlbumSongModel newSong = new()
@@ -102,7 +121,7 @@ namespace MusicPlayer.MVVM.Model
             //if (saveSettings)
             //    SaveSettings();
 
-            return true;
+            return newSong;
         }
 
         public bool RemoveSong(int id)

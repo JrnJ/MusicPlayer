@@ -42,6 +42,8 @@ namespace MusicPlayer.MVVM.ViewModel
         // Other Commands
         public RelayCommand ShowSongCommand { get; set; }
 
+        public RelayCommand SelectPlaylistImageCommand { get; set; }
+
         // ViewModels
         public HomeViewModel HomeVM { get; set; }
 
@@ -78,6 +80,7 @@ namespace MusicPlayer.MVVM.ViewModel
             HomeViewCommand = new(o =>
             {
                 Global.CurrentView = HomeVM;
+                Global.PlaylistViewing = Global.MyMusic;
             });
 
             PlaylistsViewCommand = new(o =>

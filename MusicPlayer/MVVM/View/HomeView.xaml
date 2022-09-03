@@ -24,20 +24,25 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
             
+            <!-- Info -->
             <Grid Grid.Row="0" Margin="0,0,0,16">
                 <TextBlock Text="Home" Style="{StaticResource PageTitle}" />
             </Grid>
+            <!-- /Info -->
 
-            <TextBox Grid.Row="1" Tag="Search..." 
-                     Style="{StaticResource TextBox}" 
+            <!-- Search Bar -->
+            <TextBox Grid.Row="1"
+                     Style="{StaticResource TextBox}" Tag="Search..." 
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                      Height="40" Width="320" HorizontalAlignment="Left"
                      Margin="0,0,0,12"
                      FontSize="16" />
+            <!-- /Search Bar -->
 
+            <!-- Songs -->
             <Grid Grid.Row="2" >
-                <!-- Songs -->
                 <ScrollViewer>
-                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.MyMusic.Songs}" Margin="0, 0, 8, 0">
+                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.PlaylistViewing.Songs}" Margin="0, 0, 8, 0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
@@ -72,8 +77,8 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-                <!-- /Songs -->
             </Grid>
+            <!-- /Songs -->
         </Grid>
     </Grid>
 </UserControl>

@@ -33,5 +33,7 @@ namespace MusicPlayer.MVVM.Model
         public RelayCommand ConfirmCommand { get; set; }
 
         public RelayCommand CancelCommand { get; set; }
+
+        public RelayCommand ChangeImageCommand { get; set; }
     }
 }

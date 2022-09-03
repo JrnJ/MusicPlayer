@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
-    internal class HomeViewModel
+    internal class HomeViewModel : ObservableObject
     {
         // <GlobalViewModel> //
         public GlobalViewModel Global { get; } = GlobalViewModel.Instance;
@@ -19,6 +19,20 @@ namespace MusicPlayer.MVVM.ViewModel
         public RelayCommand AddSongToPlaylistCommand { get; set; }
 
         public RelayCommand RemoveSongCommand { get; set; }
+
+        // Properties
+        private string _searchText;
+
+        public string SearchText
+        {
+            get =>_searchText; 
+            set
+            { 
+                _searchText = value;
+                Global.SearchSongInMyMusic(value);
+                OnPropertyChanged(); 
+            }
+        }
 
         public HomeViewModel()
         {

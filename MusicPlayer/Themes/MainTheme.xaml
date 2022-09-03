@@ -64,7 +64,7 @@
                                      BorderThickness="0"
                                      CaretBrush="{TemplateBinding Foreground}"
                                      Foreground="{TemplateBinding Foreground}" 
-                                     Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Text}" />
+                                     Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Text, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
                     </Border>
 

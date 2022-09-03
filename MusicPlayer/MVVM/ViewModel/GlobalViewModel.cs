@@ -99,6 +99,14 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _myMusic = value; OnPropertyChanged(); }
         }
 
+        private PlaylistModel _searchingPlaylist;
+
+        public PlaylistModel SearchingPlaylist
+        {
+            get { return _searchingPlaylist; }
+            set { _searchingPlaylist = value; OnPropertyChanged(); }
+        }
+
         // Stupidity
         public bool ShufflePlaylistEnabled { get; set; }
 
@@ -170,6 +178,7 @@ namespace MusicPlayer.MVVM.ViewModel
         public string CachedSongsFilePath => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\cached_songs.json";
         #endregion Properties
 
+        // TODO: caching breaks when a song is added to a Folder
         public GlobalViewModel()
         {
             // Create ViewModels
@@ -202,6 +211,7 @@ namespace MusicPlayer.MVVM.ViewModel
             ConfigureAudioPlayer();
             PopupVisibility = Visibility.Collapsed;
             SingleSongVisibility = Visibility.Collapsed;
+            PlaylistViewing = MyMusic;
 
             // CLA
             string[] cmdLine = Environment.GetCommandLineArgs();
@@ -256,7 +266,10 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             // Create Home Playlist
             MyMusic = new();
+
+            // Create Temporary collections
             List<StorageFile> storageFiles = new();
+            List<StorageFile> nonCachedSongs = new();
 
             // Load Cached Music
             ObservableCollection<CachedSong> cachedSongs = await FileHandler<ObservableCollection<CachedSong>>.GetJSON(CachedSongsFilePath);
@@ -265,20 +278,76 @@ namespace MusicPlayer.MVVM.ViewModel
             AppSettinggs.CachedSongs = cachedSongs;
 
             // Load UI
+            // Get All Files in All Folders
             for (int i = 0; i < AppSettinggs.MusicFolders.Count; i++)
             {
-                string path = AppSettinggs.MusicFolders[i].Path;
-
-                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path);
+                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettinggs.MusicFolders[i].Path);
                 IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
-
+                ObservableCollection<StorageFile> musicFiles = new();
                 foreach (StorageFile file in files)
                 {
                     if (HelperMethods.IsMusicFile(file.Path))
                     {
-                        storageFiles.Add(file);
-                        MyMusic.AddSong(file);
+                        musicFiles.Add(file);
                     }
+                }
+
+                // Loop over Files in Folder
+                //foreach (StorageFile file in files)
+                //{
+                //    // Check if File is Music
+                //    if (HelperMethods.IsMusicFile(file.Path))
+                //    {
+                //        bool isFileInCache = false;
+
+                //        // Check if File exists in the cache
+                //        for (int j = 0; j < cachedSongs.Count; j++)
+                //        {
+                //            if (cachedSongs[j].Path == file.Path)
+                //            {
+                //                // Add to MyMusic
+                //                storageFiles.Add(file);
+                //                MyMusic.AddSong(file);
+
+                //                // Remove and Break
+                //                cachedSongs.RemoveAt(j);
+                //                isFileInCache = true;
+                //                j--;
+                //                break;
+                //            }
+                //        }
+
+                //        if (!isFileInCache)
+                //        {
+                //            // Do Something
+                //            nonCachedSongs.Add(file);
+                //        }
+                //    }
+                //}
+
+                // Loop over Songs in Cache
+                for (int j = 0; j < cachedSongs.Count; j++)
+                {
+                    // Check if File in Cache exists in Folder
+                    for (int k = 0; k < musicFiles.Count; k++)
+                    {
+                        if (cachedSongs[j].Path == musicFiles[k].Path)
+                        {
+                            storageFiles.Add(musicFiles[k]);
+                            MyMusic.AddSong(musicFiles[k], cachedSongs[j].Id);
+
+                            // Remove and break
+                            musicFiles.RemoveAt(k);
+                            k--;
+                            break;
+                        }
+                    }
+                }
+
+                // Add remaining files to nonCachedSongs
+                for (int j = 0; j < musicFiles.Count; j++)
+                {
+                    nonCachedSongs.Add(musicFiles[j]);
                 }
             }
 
@@ -286,12 +355,28 @@ namespace MusicPlayer.MVVM.ViewModel
             // TODO: Loading screen until 25 songs have been loaded
             GetPlaylists();
 
+            await ConfigureFullSongs(nonCachedSongs);
+
+            await CreateNewCache();
+        }
+
+        private async Task ConfigureFullSongs(List<StorageFile> nonCachedSongs)
+        {
             // Load Full Songs
             for (int i = 0; i < MyMusic.Songs.Count; i++)
             {
-                await MyMusic.Songs[i].Init(storageFiles[i]);
+                await MyMusic.Songs[i].Init(await StorageFile.GetFileFromPathAsync(MyMusic.Songs[i].Path));
             }
 
+            // Load Non Cached Songs
+            for (int i = 0; i < nonCachedSongs.Count; i++)
+            {
+                await MyMusic.AddSong(nonCachedSongs[i]).Init(await StorageFile.GetFileFromPathAsync(nonCachedSongs[i].Path));
+            }
+        }
+
+        private async Task CreateNewCache()
+        {
             // Create new Cache
             ObservableCollection<CachedSong> newCache = new();
             for (int i = 0; i < MyMusic.Songs.Count; i++)
@@ -314,36 +399,28 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             Playlists = new();
 
-            ObservableCollection<PlaylistModel> playlistss = await FileHandler<ObservableCollection<PlaylistModel>>.GetJSON(PlaylistsFilePath);
-            playlistss ??= new();
+            // Get all Playlists and make new if none exists
+            ObservableCollection<PlaylistModel> playlists = await FileHandler<ObservableCollection<PlaylistModel>>.GetJSON(PlaylistsFilePath);
+            playlists ??= new();
 
-            for (int i = 0; i < playlistss.Count; i++)
+            for (int i = 0; i < playlists.Count; i++)
             {
-                //// Create Playlist
-                //PlaylistModel playlist = new()
-                //{
-                //    Id = playlists[i].Id,
-                //    Name = playlists[i].Name,
-                //    Description = playlists[i].Description
-                //};
-
-                //// Add Songs
-                //for (int j = 0; j < playlists[i].Songs.Count; j++)
-                //{
-                //    playlist.Songs.Add(MyMusic.Songs.FirstOrDefault(x => x.Id == playlists[i].Songs[j].Id));
-                //}
-
-                //// Add Playlist
-                //Playlists.Add(playlist);
-
                 // Add Songs
-                for (int j = 0; j < playlistss[i].Songs.Count; j++)
+                for (int j = 0; j < playlists[i].Songs.Count; j++)
                 {
-                    playlistss[i].Songs[j] = MyMusic.Songs.FirstOrDefault(x => x.Id == playlistss[i].Songs[j].Id);
+                    if (MyMusic.Songs.FirstOrDefault(x => x.Id == playlists[i].Songs[j].Id) != null)
+                    {
+                        playlists[i].Songs[j] = MyMusic.Songs.FirstOrDefault(x => x.Id == playlists[i].Songs[j].Id);
+                    }
+                    else
+                    {
+                        playlists[i].Songs.RemoveAt(j);
+                        j--;
+                    }
                 }
 
                 // Add Playlist
-                Playlists.Add(playlistss[i]);
+                Playlists.Add(playlists[i]);
             }
         }
 
@@ -403,55 +480,6 @@ namespace MusicPlayer.MVVM.ViewModel
 
         #endregion MediaPlayerEvents
 
-        public void OpenMedia(AlbumSongModel song, bool singleSongMode = false)
-        {
-            AudioPlayer.OpenMedia(song);
-
-            // TODO: mode can be SingleSong
-            if (PlaylistViewing != null)
-            {
-                PlaylistModel playlistPlaying = Playlists.FirstOrDefault(x => x.Id == PlaylistViewing.Id);
-
-                if (playlistPlaying != null)
-                {
-                    PlaylistPlaying = playlistPlaying;
-                }
-
-                if (singleSongMode)
-                {
-                    SingleSongVisibility = Visibility.Visible;
-                }
-            }
-
-            // Reset background
-            // Changed it to a radiobutton which eliminates this, until further testing of radiobutton at least
-            //if (CurrentUISong != null)
-            //    CurrentUISong.Style = Application.Current.FindResource("AlbumSong") as Style;
-
-            //UIElement uiElement = (UIElement)icSongs.ItemContainerGenerator.ContainerFromIndex(CurrentSongIndex);
-            //CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as Button;
-
-            //CurrentUISong.Style = Application.Current.FindResource("SelectedAlbumSong") as Style;
-
-            // Change SelectedRadioButton
-            // Doesnt work, tbh cant be botherd atm so will change this later
-            // this code is very questionable anyways, lets rework this some day, thanos snapping it atm
-            //UIElement uiElement = (UIElement)icSongs.ItemContainerGenerator.ContainerFromIndex(CurrentSongIndex);
-            //CurrentUISong = VisualTreeHelper.GetChild(uiElement, 0) as RadioButton;
-            //CurrentUISong.IsChecked.Equals(true);
-
-            // Maybe change where this is placed
-
-
-            // Update UI
-            CurrentTime = "0:00";
-            SliderValue = 0.0;
-            FinalTime = HelperMethods.MsToTime(song.MusicProperties.Duration.TotalMilliseconds);
-
-            // Remove whenever this mess is fixed
-            AudioPlayer.Play();
-        }
-
         private void Timer_Tick(object sender, EventArgs e)
         {
             UpdateTime();
@@ -467,7 +495,9 @@ namespace MusicPlayer.MVVM.ViewModel
         }
         #endregion Configuration
 
+        #region Slider
         public bool WasMouseOnSliderDown { get; private set; }
+
         public bool WasMusicPlaying { get; private set; }
 
         public void SliderMouseDownOrUpEvent(bool mousedown)
@@ -501,6 +531,31 @@ namespace MusicPlayer.MVVM.ViewModel
                     }
                 }
             }
+        }
+        #endregion Slider
+
+        public void OpenMedia(AlbumSongModel song, bool singleSongMode = false)
+        {
+            AudioPlayer.OpenMedia(song);
+
+            // TODO: mode can be SingleSong
+            if (PlaylistViewing != null)
+            {
+                PlaylistPlaying = PlaylistViewing;
+
+                if (singleSongMode)
+                {
+                    SingleSongVisibility = Visibility.Visible;
+                }
+            }
+
+            // Update UI
+            CurrentTime = "0:00";
+            SliderValue = 0.0;
+            FinalTime = HelperMethods.MsToTime(song.MusicProperties.Duration.TotalMilliseconds);
+
+            // Remove whenever this mess is fixed
+            AudioPlayer.Play();
         }
 
         public void PreviousSong()
@@ -567,16 +622,16 @@ namespace MusicPlayer.MVVM.ViewModel
             return playlist;
         }
 
-        public void ShowPlaylist(int playlistId)
-        {
-            PlaylistViewing = Playlists.FirstOrDefault(x => x.Id == playlistId);
-            CurrentView = PlaylistVM;
-        }
-
         public void DeletePlaylist(int playlistId)
         {
             Playlists.Remove(Playlists.Where(x => x.Id == playlistId).FirstOrDefault());
             SavePlaylists();
+        }
+
+        public void ShowPlaylist(int playlistId)
+        {
+            PlaylistViewing = Playlists.FirstOrDefault(x => x.Id == playlistId);
+            CurrentView = PlaylistVM;
         }
 
         public void UpdatePlaylist(int playlistId, PlaylistModel playlist)
@@ -586,7 +641,8 @@ namespace MusicPlayer.MVVM.ViewModel
                 Id = playlistId,
                 Songs = playlist.Songs,
                 Name = playlist.Name,
-                Description = playlist.Description
+                Description = playlist.Description,
+                ImagePath = playlist.ImagePath,
             };
             SavePlaylists();
         }
@@ -612,6 +668,78 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Save Playlists
             SavePlaylists();
+        }
+
+        /// <summary>
+        /// Uses PlaylistViewing to look for a song
+        /// </summary>
+        /// <param name="value">Text to search on</param>
+        public void SearchSongInPlaylist(string value)
+        {
+            // TODO: This is very inefficient
+            // If empty, set back to PlaylistViewing
+            if (!string.IsNullOrEmpty(value))
+            {
+                SearchingPlaylist = new()
+                {
+                    Id = PlaylistViewing.Id,
+                    Name = PlaylistViewing.Name,
+                    Songs = new(),
+                    Description = PlaylistViewing.Description,
+                };
+                ObservableCollection<AlbumSongModel> songs = new();
+
+                for (int i = 0; i < PlaylistViewing.Songs.Count; i++)
+                {
+                    if (PlaylistViewing.Songs[i].MusicProperties.Title.ToLower().Contains(value.ToLower()))
+                    {
+                        songs.Add(PlaylistViewing.Songs[i]);
+                    }
+                }
+
+                SearchingPlaylist.Songs = songs;
+                PlaylistViewing = SearchingPlaylist;
+            }
+            else
+            {
+                PlaylistViewing = Playlists.Where(x => x.Id == PlaylistViewing.Id).FirstOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// Uses MyMusic to look for a song
+        /// </summary>
+        /// <param name="value">Text to search on</param>
+        public void SearchSongInMyMusic(string value)
+        {
+            // TODO: This is very inefficient
+            // If empty, set back to PlaylistViewing
+            if (!string.IsNullOrEmpty(value))
+            {
+                SearchingPlaylist = new()
+                {
+                    Id = PlaylistViewing.Id,
+                    Name = PlaylistViewing.Name,
+                    Songs = new(),
+                    Description = PlaylistViewing.Description,
+                };
+                ObservableCollection<AlbumSongModel> songs = new();
+
+                for (int i = 0; i < PlaylistViewing.Songs.Count; i++)
+                {
+                    if (PlaylistViewing.Songs[i].MusicProperties.Title.ToLower().Contains(value.ToLower()))
+                    {
+                        songs.Add(PlaylistViewing.Songs[i]);
+                    }
+                }
+
+                SearchingPlaylist.Songs = songs;
+                PlaylistViewing = SearchingPlaylist;
+            }
+            else
+            {
+                PlaylistViewing = MyMusic;
+            }
         }
     }
 }

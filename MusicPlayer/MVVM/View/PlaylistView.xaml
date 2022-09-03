@@ -20,6 +20,7 @@
         <Grid Margin="0,0,16,16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
 
@@ -73,9 +74,18 @@
                 </StackPanel>
             </Grid>
             <!-- /Info -->
+            
+            <!-- Search Bar -->
+            <TextBox Grid.Row="1"
+                     Style="{StaticResource TextBox}" Tag="Search..." 
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Height="40" Width="320" HorizontalAlignment="Left"
+                     Margin="0,0,0,12"
+                     FontSize="16" />
+            <!-- /Search Bar -->
 
             <!-- Songs -->
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="2">
                 <ScrollViewer>
                     <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.PlaylistViewing.Songs}" Margin="0, 0, 8, 0">
                         <ItemsControl.ItemTemplate>
