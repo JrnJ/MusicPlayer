@@ -131,7 +131,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             RepeatCommand = new(o =>
             {
-                Global.AudioPlayer.MediaPlayer.IsLoopingEnabled = !Global.AudioPlayer.MediaPlayer.IsLoopingEnabled;
+                Global.AudioPlayer.IsLoopingEnabled = !Global.AudioPlayer.IsLoopingEnabled;
             });
 
             ShowSongCommand = new(o =>

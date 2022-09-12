@@ -92,7 +92,7 @@
                             <DataTemplate>
                                 <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
                                              Command="{Binding ElementName=Songs, Path=DataContext.SelectSongCommand}"
-                                             CommandParameter="{Binding Id}"
+                                             CommandParameter="{Binding Id}" IsChecked="{Binding IsPlaying}"
                                              Tag="{Binding ElementName=Songs, Path=DataContext}">
                                     <RadioButton.ContextMenu>
                                         <ContextMenu>

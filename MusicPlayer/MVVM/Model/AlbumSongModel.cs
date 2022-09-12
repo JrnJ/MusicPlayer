@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using MusicPlayer.Classes;
 using System.IO;
 using Windows.Storage.FileProperties;
+using Windows.Security.Authentication.Identity.Core;
 
 namespace MusicPlayer.MVVM.Model
 {
@@ -33,6 +34,15 @@ namespace MusicPlayer.MVVM.Model
         {
             get { return _id; }
             set { _id = value; OnPropertyChanged(); }
+        }
+
+        private bool _isPlaying;
+
+        [JsonIgnore]
+        public bool IsPlaying
+        {
+            get { return _isPlaying; }
+            set { _isPlaying = value; OnPropertyChanged(); }
         }
 
         private Microsoft.UI.Xaml.Media.Imaging.BitmapImage _bitmapImage;
@@ -69,6 +79,11 @@ namespace MusicPlayer.MVVM.Model
         {
             get { return _fileType.ToUpper(); }
             set { _fileType = value; OnPropertyChanged(); }
+        }
+
+        public AlbumSongModel()
+        {
+            IsPlaying = false;
         }
 
         public async Task Init(Windows.Storage.StorageFile storageFile)

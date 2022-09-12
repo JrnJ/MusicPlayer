@@ -488,10 +488,10 @@ namespace MusicPlayer.MVVM.ViewModel
         private void UpdateTime()
         {
             // Set Slider Accordingly
-            SliderValue = AudioPlayer.MediaPlayer.Position.TotalMilliseconds;
+            SliderValue = AudioPlayer.Position.TotalMilliseconds;
 
             // Update UI
-            CurrentTime = HelperMethods.MsToTime(AudioPlayer.MediaPlayer.Position.TotalMilliseconds);
+            CurrentTime = HelperMethods.MsToTime(AudioPlayer.Position.TotalMilliseconds);
         }
         #endregion Configuration
 
@@ -499,6 +499,14 @@ namespace MusicPlayer.MVVM.ViewModel
         public bool WasMouseOnSliderDown { get; private set; }
 
         public bool WasMusicPlaying { get; private set; }
+
+        private int _test;
+
+        public int Testt
+        {
+            get { return _test; }
+            set { _test = value; OnPropertyChanged(); }
+        }
 
         public void SliderMouseDownOrUpEvent(bool mousedown)
         {
@@ -508,9 +516,10 @@ namespace MusicPlayer.MVVM.ViewModel
 
                 // Pause Timer
                 // TODO:
-                WasMusicPlaying = AudioPlayer.MediaPlayer.CurrentState == Windows.Media.Playback.MediaPlayerState.Playing;
+                WasMusicPlaying = AudioPlayer.CurrentState == AudioPlayerState.Playing;
                 AudioPlayer.Pause();
                 AudioPlayer.Timer.Stop();
+                Testt++;
             }
             else
             {
@@ -520,7 +529,7 @@ namespace MusicPlayer.MVVM.ViewModel
                     WasMouseOnSliderDown = false;
 
                     // Change where song is at
-                    AudioPlayer.MediaPlayer.Position = TimeSpan.FromMilliseconds(SliderValue);
+                    AudioPlayer.Position = TimeSpan.FromMilliseconds(SliderValue);
                     UpdateTime();
 
                     // Start Timer if it was playing
@@ -630,7 +639,13 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public void ShowPlaylist(int playlistId)
         {
+            if (PlaylistViewing != null)
+            {
+                PlaylistViewing.IsSelected = false;
+            }
+
             PlaylistViewing = Playlists.FirstOrDefault(x => x.Id == playlistId);
+            PlaylistViewing.IsSelected = true;
             CurrentView = PlaylistVM;
         }
 

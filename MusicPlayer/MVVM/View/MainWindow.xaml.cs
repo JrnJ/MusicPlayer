@@ -41,13 +41,7 @@ namespace MusicPlayer
     /// </summary>
     public partial class MainWindow : Window
     {
-        // Classes
-        public RadioButton CurrentUISong = new RadioButton();
-
-        public bool LeftMouseDownOnSlider = false;
-
         public static AppWindow AppWindow { get; private set; }
-
 
         //[DllImport("winmm.dll")]
         //public static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
@@ -55,11 +49,6 @@ namespace MusicPlayer
         public MainWindow()
         {
             InitializeComponent();
-
-            //IntPtr hwo = null;
-            //uint o;
-            //waveOutGetVolume(, o);
-            //MessageBox.Show(o.ToString());
 
             try
             {
@@ -115,106 +104,5 @@ namespace MusicPlayer
             titleBar.ButtonInactiveBackgroundColor = Windows.UI.Color.FromArgb(0, 32, 32, 32);
             titleBar.ButtonInactiveForegroundColor = Windows.UI.Color.FromArgb(0, 255, 255, 255);
         }
-
-        #region MediaPlayerEvents
-
-        //private void MediaPlayerButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
-        //{
-        //    // Call to MainWindow thread
-        //    Dispatcher.Invoke(() => { ButtonPressed(sender, args); });
-        //}
-        #endregion MediaPlayerEvents
-
-        #region MusicThings
-        //public void ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
-        //{
-        //    switch (args.Button)
-        //    {
-        //        case SystemMediaTransportControlsButton.Previous:
-        //            PauseMusic();
-        //            if (CurrentSongIndex >= 1)
-        //            {
-        //                CurrentSongIndex -= 1;
-        //                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-        //                PlayMusic();
-        //            }
-        //            break;
-        //        case SystemMediaTransportControlsButton.Next:
-        //            PauseMusic();
-        //            if (SelectedPlaylist.Songs.Count - 1 > CurrentSongIndex)
-        //            {
-        //                CurrentSongIndex += 1;
-        //                OpenMedia(SelectedPlaylist.Songs[CurrentSongIndex]);
-        //                PlayMusic();
-        //            }
-        //            break;
-        //    }
-        //}
-        #endregion MusicThings
-
-        #region WindowEvents
-        //private void WindowKeyDown(object sender, KeyEventArgs e)
-        //{
-        //    switch (e.Key)
-        //    {
-        //        #region Reverse
-        //        // Reverse 10s
-        //        case Key.J:
-        //            AudioPlayer.SubtractTime(10);
-        //            break;
-        //        // Reverse 5
-        //        case Key.Left:
-        //            AudioPlayer.SubtractTime(5);
-        //            break;
-        //        #endregion Reverse
-        //        #region Forward
-        //        // Forward 10s
-        //        case Key.L:
-        //            AudioPlayer.AddTime(10);
-        //            break;
-        //        // Forward 5
-        //        case Key.Right:
-        //            AudioPlayer.AddTime(5);
-        //            break;
-        //        #endregion Forward
-        //        #region Playpause
-        //        case Key.Space:
-        //            if (AudioPlayer.IsPlaying)
-        //                AudioPlayer.Pause();
-        //            else
-        //                AudioPlayer.Play();
-        //            break;
-        //        case Key.K:
-        //            if (AudioPlayer.IsPlaying)
-        //                AudioPlayer.Pause();
-        //            else
-        //                AudioPlayer.Play();
-        //            break;
-        //        #endregion Playpause
-
-        //        // Do this
-        //        // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
-        //        #region ChangeVolume
-        //        // https://blog.magnusmontin.net/2015/03/31/implementing-global-hot-keys-in-wpf/
-        //        case Key.NumPad8:
-        //            AppSettings.Volume += 0.05;
-        //            break;
-        //        case Key.NumPad2:
-        //            AppSettings.Volume -= 0.05;
-        //            break;
-        //        #endregion ChangeVolume
-        //        default:
-        //            break;
-        //    }
-        //}
-        #endregion WindowEvents
-
-        //#region VolumeSlider
-        //private void VolumeSliderPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        //{
-        //    // Save settings
-        //    Global.AppSettings.SaveSettingsToFile();
-        //}
-        //#endregion VolumeSlider
     }
 }

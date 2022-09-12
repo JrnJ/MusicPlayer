@@ -59,6 +59,14 @@ namespace MusicPlayer.MVVM.Model
             set { _songs = value; OnPropertyChanged(); }
         }
 
+        private bool _isSelected;
+
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
+
         public string PlaylistDuration
         {
             get

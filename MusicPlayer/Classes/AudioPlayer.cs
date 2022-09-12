@@ -11,12 +11,22 @@ using Windows.Media.Playback;
 
 namespace MusicPlayer.Classes
 {
+    internal enum AudioPlayerState
+    {
+        Closed = 0,
+        Opening = 1,
+        Buffering = 2,
+        Playing = 3,
+        Paused = 4,
+        Stopped = 5
+    }
+
     internal class AudioPlayer : ObservableObject
     {
         // Unsure about accesibility here
         public SystemMediaTransportControls MediaControls { get; set; }
 
-        public Windows.Media.Playback.MediaPlayer MediaPlayer { get; set; }
+        public MediaPlayer MediaPlayer { get; set; }
 
         // Stoopid props
         private AlbumSongModel _currentSong;
@@ -32,6 +42,20 @@ namespace MusicPlayer.Classes
             get => MediaPlayer.Volume;
             set => MediaPlayer.Volume = value;
         }
+
+        public TimeSpan Position
+        {
+            get => MediaPlayer.Position;
+            set => MediaPlayer.Position = value;
+        }
+
+        public bool IsLoopingEnabled
+        {
+            get => MediaPlayer.IsLoopingEnabled;
+            set => MediaPlayer.IsLoopingEnabled = value;
+        }
+
+        public AudioPlayerState CurrentState => (AudioPlayerState)MediaPlayer.CurrentState;
 
         // Discord Integration
         private AudioServer _audioServer;
@@ -61,20 +85,28 @@ namespace MusicPlayer.Classes
         private void ConfigureMediaPlayer()
         {
             // Mediaplayer
-            MediaPlayer = new Windows.Media.Playback.MediaPlayer();
+            MediaPlayer = new();
+
+            MediaPlayer.SystemMediaTransportControls.IsPlayEnabled = false;
+            MediaPlayer.SystemMediaTransportControls.IsPauseEnabled = false;
+            MediaPlayer.SystemMediaTransportControls.IsStopEnabled = false;
+
+            // Properties
+            MediaPlayer.CommandManager.IsEnabled = true;
 
             // Events
             MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
             MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
 
-            // Properties
-            MediaPlayer.CommandManager.IsEnabled = true;
-
             // SMTC
-            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Type = MediaPlaybackType.Video;
-            MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
-            MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true; 
+            //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
+            //MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true; 
             // https://github.com/microsoft/Windows-universal-samples/blob/dev/Samples/SystemMediaTransportControls/cs/Scenario1.xaml.cs
+        }
+
+        private void CommandManager_NextReceived(MediaPlaybackCommandManager sender, MediaPlaybackCommandManagerNextReceivedEventArgs args)
+        {
+            throw new NotImplementedException();
         }
 
         private void ConfigureAudioServer()
@@ -98,29 +130,45 @@ namespace MusicPlayer.Classes
         // This is a joke and doesnt even work
         private void UpdateSMTCDisplay()
         {
+            //if (CurrentSong != null && 1 == 2)
+            //{
+            //    SystemMediaTransportControls smtc = MediaPlayer.SystemMediaTransportControls;
+            //    //smtc.DisplayUpdater.ClearAll();
+            //    //smtc.IsNextEnabled = true;
+            //    //smtc.IsPreviousEnabled = true;
+            //    smtc.DisplayUpdater.Type = MediaPlaybackType.Video;
+            //    smtc.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
+            //    smtc.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
+            //    smtc.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
+            //    smtc.IsNextEnabled = true;
+            //    smtc.IsPreviousEnabled = true;
+
+            //    // Update the system media transport controls
+            //    smtc.DisplayUpdater.Update();
+
+            //    // LateUpdate??
+            //    //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
+            //    //MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Could not update SMTC display because song is null");
+            //}
+
             if (CurrentSong != null)
             {
-                SystemMediaTransportControls smtc = MediaPlayer.SystemMediaTransportControls;
-                //smtc.DisplayUpdater.ClearAll();
-                //smtc.IsNextEnabled = true;
-                //smtc.IsPreviousEnabled = true;
-                smtc.DisplayUpdater.Type = MediaPlaybackType.Video;
-                smtc.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
-                smtc.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
-                smtc.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
-                smtc.IsNextEnabled = true;
-                smtc.IsPreviousEnabled = true;
-
-                // Update the system media transport controls
-                smtc.DisplayUpdater.Update();
-
-                // LateUpdate??
+                // Set Other
                 //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
                 //MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
-            }
-            else
-            {
-                Console.WriteLine("Could not update SMTC display because song is null");
+
+                // Set DisplayUpdater properties
+                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Type = MediaPlaybackType.Video;
+                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
+                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
+                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
+
+                // Update Display
+                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Update();
             }
         }
 
@@ -128,7 +176,13 @@ namespace MusicPlayer.Classes
 
         public void OpenMedia(AlbumSongModel song)
         {
+            if (CurrentSong != null)
+            {
+                CurrentSong.IsPlaying = false;
+            }
+
             CurrentSong = song;
+            CurrentSong.IsPlaying = true;
             Pause();
 
             MediaPlayer.SetUriSource(new Uri(song.Path));
@@ -189,23 +243,21 @@ namespace MusicPlayer.Classes
         /// </summary>
         public void PausePlay()
         {
-            switch (MediaPlayer.CurrentState)
+            switch (CurrentState)
             {
-                case MediaPlayerState.Closed:
+                case AudioPlayerState.Closed:
                     break;
-                case MediaPlayerState.Opening:
+                case AudioPlayerState.Opening:
                     break;
-                case MediaPlayerState.Buffering:
+                case AudioPlayerState.Buffering:
                     break;
-                case MediaPlayerState.Playing:
+                case AudioPlayerState.Playing:
                     Pause();
                     break;
-                case MediaPlayerState.Paused:
+                case AudioPlayerState.Paused:
                     Play();
                     break;
-                case MediaPlayerState.Stopped:
-                    break;
-                default:
+                case AudioPlayerState.Stopped:
                     break;
             }
         }
@@ -216,8 +268,7 @@ namespace MusicPlayer.Classes
         /// <param name="amount">Time in seconds</param>
         public void AddTime(int amount)
         {
-            MediaPlayer.Position = MediaPlayer.Position.Add(new TimeSpan(0, 0, amount));
-            //UpdateTime(); this only updates the ui so it wont take a full second to move, nothing major breaking atm
+            Position = Position.Add(new TimeSpan(0, 0, amount));
         }
 
         /// <summary>
@@ -226,8 +277,7 @@ namespace MusicPlayer.Classes
         /// <param name="amount">Time in seconds</param>
         public void SubtractTime(int amount)
         {
-            MediaPlayer.Position = MediaPlayer.Position.Subtract(new TimeSpan(0, 0, amount));
-            //UpdateTime();
+            Position = Position.Subtract(new TimeSpan(0, 0, amount));
         }
     }
 }

@@ -25,8 +25,8 @@ namespace MusicPlayer.Core
 
         private static void OnClickedInSliderChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            CustomSlider element = (CustomSlider)sender;
-            element.ClickedInSlider = (bool)e.NewValue;
+            //CustomSlider element = (CustomSlider)sender;
+            //element.ClickedInSlider = (bool)e.NewValue;
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -39,6 +39,11 @@ namespace MusicPlayer.Core
                     RoutedEvent = MouseLeftButtonDownEvent,
                     Source = e.Source
                 });
+            }
+            else
+            {
+                // Show a new line to indicate where the track will stop
+                // Show a timestamp of where your mouse is
             }
         }
 

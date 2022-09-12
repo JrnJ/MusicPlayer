@@ -67,6 +67,7 @@
                             <!-- Navigation -->
                             <Grid Grid.Row="0">
                                 <StackPanel Margin="6,6,6,0">
+                                    <TextBlock Text="{Binding Global.Testt}" />
                                     <RadioButton GroupName="PageTabs" IsChecked="True" Command="{Binding HomeViewCommand}"
                                              Content="Home" Style="{StaticResource PageTab}" 
                                              extensions:CustomProperty.ImageSource="/Images/Icons/logo_gold.png" />
@@ -90,7 +91,7 @@
                                             <DataTemplate>
                                                 <RadioButton GroupName="PageTabs" Style="{StaticResource PlaylistItem}" 
                                                              Command="{Binding ElementName=PlaylistItems, Path=DataContext.SelectPlaylistCommand}"
-                                                             CommandParameter="{Binding Id}"
+                                                             CommandParameter="{Binding Id}" IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                                              />
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -199,7 +200,7 @@
                         HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
                         <Slider x:Name="volumeSlider"
                                 Width="100" Style="{StaticResource SongTime}" 
-                                Value="{Binding Global.AudioPlayer.MediaPlayer.Volume, Mode=TwoWay}"
+                                Value="{Binding Global.AudioPlayer.Volume, Mode=TwoWay}"
                                 Minimum="0" Maximum="1" />
                                 <!--PreviewMouseLeftButtonUp="VolumeSliderPreviewMouseLeftButtonUp"-->
                         <TextBlock Text="{Binding ElementName=volumeSlider, Path=Value, StringFormat=N2}" />
