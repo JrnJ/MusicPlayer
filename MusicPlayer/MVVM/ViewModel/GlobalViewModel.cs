@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
+using MusicPlayer.DiscordGameSDK;
 using MusicPlayer.MVVM.Model;
 using System;
 using System.Collections.Generic;
@@ -178,6 +179,15 @@ namespace MusicPlayer.MVVM.ViewModel
         public string CachedSongsFilePath => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\cached_songs.json";
         #endregion Properties
 
+        private DiscordGameSDKWrapper _discordGameSDKWrapper;
+
+        public DiscordGameSDKWrapper DiscordGameSDKWrapper
+        {
+            get { return _discordGameSDKWrapper; }
+            set { _discordGameSDKWrapper = value; }
+        }
+
+
         // TODO: caching breaks when a song is added to a Folder
         public GlobalViewModel()
         {
@@ -196,6 +206,8 @@ namespace MusicPlayer.MVVM.ViewModel
             //AudioPlayer.MediaPlayer.AudioStateMonitor
             //AudioPlayer.MediaPlayer.PlaybackMediaMarkers
             //AudioPlayer.MediaPlayer.PlaybackSession
+
+            //DiscordGameSDKWrapper = new("1035920401445957722");
         }
 
         #region Configuration
@@ -248,6 +260,26 @@ namespace MusicPlayer.MVVM.ViewModel
             {
                 StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path + "\\JeroenJ");
                 await folder.CreateFolderAsync("MusicPlayer", CreationCollisionOption.FailIfExists);
+            }
+            catch (Exception)
+            {
+
+            }
+
+            try
+            {
+                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path + "\\JeroenJ\\MusicPlayer");
+                await folder.CreateFolderAsync("Themes", CreationCollisionOption.FailIfExists);
+            }
+            catch (Exception)
+            {
+                
+            }
+
+            try
+            {
+                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path + "\\JeroenJ\\MusicPlayer");
+                await folder.CreateFolderAsync("Profiles", CreationCollisionOption.FailIfExists);
             }
             catch (Exception)
             {
@@ -500,14 +532,6 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public bool WasMusicPlaying { get; private set; }
 
-        private int _test;
-
-        public int Testt
-        {
-            get { return _test; }
-            set { _test = value; OnPropertyChanged(); }
-        }
-
         public void SliderMouseDownOrUpEvent(bool mousedown)
         {
             if (mousedown)
@@ -519,7 +543,6 @@ namespace MusicPlayer.MVVM.ViewModel
                 WasMusicPlaying = AudioPlayer.CurrentState == AudioPlayerState.Playing;
                 AudioPlayer.Pause();
                 AudioPlayer.Timer.Stop();
-                Testt++;
             }
             else
             {
@@ -569,6 +592,9 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public void PreviousSong()
         {
+            if (AudioPlayer.CurrentSong == null)
+                return;
+
             AudioPlayer.Pause();
 
             // Get song Index
@@ -583,6 +609,9 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public void NextSong()
         {
+            if (AudioPlayer.CurrentSong == null)
+                return;
+
             AudioPlayer.Pause();
 
             // Get song Index

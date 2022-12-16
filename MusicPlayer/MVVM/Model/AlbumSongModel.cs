@@ -1,12 +1,10 @@
 ﻿using MusicPlayer.Core;
 using System;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using System.Windows.Media.Imaging;
-using MusicPlayer.Classes;
 using System.IO;
 using Windows.Storage.FileProperties;
-using Windows.Security.Authentication.Identity.Core;
+using System.Text.Json.Serialization;
 
 namespace MusicPlayer.MVVM.Model
 {
@@ -15,7 +13,7 @@ namespace MusicPlayer.MVVM.Model
         // Other
         private string _path;
 
-        [JsonProperty("Path")]
+        [JsonPropertyName("Path")]
         public string Path
         {
             get => _path;
@@ -29,7 +27,7 @@ namespace MusicPlayer.MVVM.Model
 
         private int _id;
 
-        [JsonProperty("Id")]
+        [JsonPropertyName("Id")]
         public int Id
         {
             get { return _id; }

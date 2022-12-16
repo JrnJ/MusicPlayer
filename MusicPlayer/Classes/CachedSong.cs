@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace MusicPlayer.Classes
 {
@@ -11,7 +11,7 @@ namespace MusicPlayer.Classes
     {
 		private int _id;
 
-		[JsonProperty("Id")]
+		[JsonPropertyName("Id")]
 		public int Id
 		{
 			get { return _id; }
@@ -20,7 +20,7 @@ namespace MusicPlayer.Classes
 
 		private string _path;
 
-		[JsonProperty("Path")]
+		[JsonPropertyName("Path")]
 		public string Path
 		{
 			get { return _path; }
@@ -29,7 +29,7 @@ namespace MusicPlayer.Classes
 
 		private string _title;
 
-		[JsonProperty("Title")]
+		[JsonPropertyName("Title")]
 		public string Title
 		{
 			get { return _title; }
@@ -38,7 +38,7 @@ namespace MusicPlayer.Classes
 
 		private string _artist;
 
-		[JsonProperty("Artist")]
+		[JsonPropertyName("Artist")]
 		public string Artist
 		{
 			get { return _artist; }

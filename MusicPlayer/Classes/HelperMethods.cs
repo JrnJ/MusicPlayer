@@ -19,12 +19,12 @@ namespace MusicPlayer.Classes
             hours = Math.Floor(hours);
             minutes = Math.Floor(minutes);
 
-            return (hours > 0 ? hours + ":" : "") + minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+            return ((hours > 0 ? (hours + ":") : "") + ((minutes < 10 && hours > 0 ? "0" : "") + minutes + ":") + ((seconds < 10 ? "0" : "") + seconds));
         }
 
         public static bool IsMusicFile(string path)
         {
-            if (path.Contains(".mp3") || path.Contains(".wav"))
+            if (path.Contains(".mp3") || path.Contains(".wav") || path.Contains(".mp2"))
             {
                 return true;
             }

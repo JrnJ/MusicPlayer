@@ -24,5 +24,12 @@ namespace MusicPlayer.MVVM.View
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            ItemsControl itemscontrol = new();
+            double heightPerItem = scroller.ActualHeight / itemscontrol.Items.Count;
+            scroller.ScrollToVerticalOffset(heightPerItem * 10);
+        }
     }
 }

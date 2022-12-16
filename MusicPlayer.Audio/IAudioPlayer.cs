@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace MusicPlayer.Audio
 {
-    internal interface IAudioPlayer : IDisposable
+    public interface IAudioPlayer : IDisposable
     {
-        Task Play();
+        Task PlaySong(SongModel song);
 
         Task Pause();
 

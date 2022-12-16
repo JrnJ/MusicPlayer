@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
@@ -24,6 +26,12 @@ namespace MusicPlayer.Core
             // Return AppWindow from the WindowId.
             return AppWindow.GetFromWindowId(windowId);
         }
+
+        /// <summary>
+        /// Does what it says
+        /// </summary>
+        /// <returns>The MainWindow</returns>
+        public static MainWindow GetMainWindow() => (MusicPlayer.MainWindow) App.Current.MainWindow;
 
         /// <summary>
         /// Opens a native Windows FolderPicker

@@ -1,27 +1,20 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MusicPlayer.Classes
 {
-    // TODO: Turn this into an interface
-    public static class FileHandler<T>
+    internal static class FileHandler<T>
     {
-        /// <summary>
-        /// Gets JSON from a file
-        /// </summary>
-        /// <param name="path">File path</param>
-        /// <returns>T</returns>
-        public static async Task<T> GetJSON(string path)
+        internal static async Task<T> GetJSON(string path)
         {
             try
             {
-                string json = await File.ReadAllTextAsync(path);
-                return JsonConvert.DeserializeObject<T>(json);
+                FileStream stream = File.OpenRead(path);
+                T result = await JsonSerializer.DeserializeAsync<T>(stream);
+                await stream.DisposeAsync();
+                return result;
             }
             catch (Exception ex)
             {
@@ -30,17 +23,13 @@ namespace MusicPlayer.Classes
             }
         }
 
-        /// <summary>
-        /// Saves JSON to a file
-        /// </summary>
-        /// <param name="path">File path</param>
-        /// <param name="obj">T to save</param>
-        public static async Task SaveJSON(string path, T obj)
+        internal static async Task SaveJSON(string path, T obj)
         {
             try
             {
-                string json = JsonConvert.SerializeObject(obj);
-                await File.WriteAllTextAsync(path, json);
+                FileStream stream = File.Create(path);
+                await JsonSerializer.SerializeAsync(stream, obj);
+                await stream.DisposeAsync();
             }
             catch (Exception ex)
             {

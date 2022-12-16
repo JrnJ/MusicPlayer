@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace MusicPlayer.MVVM.Model
 {
@@ -11,7 +11,7 @@ namespace MusicPlayer.MVVM.Model
     {
         private int _id;
 
-        [JsonProperty("Id")]
+        [JsonPropertyName("Id")]
         public int Id
         {
             get { return _id; }
@@ -20,7 +20,7 @@ namespace MusicPlayer.MVVM.Model
 
         private string _path;
 
-        [JsonProperty("Path")]
+        [JsonPropertyName("Path")]
         public string Path
         {
             get { return _path; }

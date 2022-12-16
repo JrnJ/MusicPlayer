@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI;
+using Microsoft.UI.Xaml.Controls;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
 using MusicPlayer.MVVM.Model;
@@ -7,6 +8,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,11 +32,23 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand OpenInFileExplorerCommand { get; set; }
 
+        private ScrollViewer _scrollViewer;
+
+        public ScrollViewer ScrollViewer
+        {
+            get { return _scrollViewer; }
+            set { _scrollViewer = value; OnPropertyChanged(); }
+        }
+
         public SettingsViewModel()
         {
             AddFolderCommand = new(o =>
             {
-                AddMusicFolder();
+                // We have to do this with a custom property or a custom element(preffered I think)
+
+                // AddMusicFolder();
+                //double heightPerItem = scroller.ActualHeight / itemscontrol.Items.Count;
+                ScrollViewer.ScrollToVerticalOffset(ScrollViewer.ActualHeight / 2);
             });
 
             RemoveFolderCommand = new(o =>

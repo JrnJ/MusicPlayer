@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
-using Newtonsoft.Json;
 using Windows.Media.Playlists;
 using Windows.Storage;
 
@@ -16,7 +16,7 @@ namespace MusicPlayer.MVVM.Model
     {
         private int _id;
 
-        [JsonProperty("Id")]
+        [JsonPropertyName("Id")]
         public int Id
         {
             get { return _id; }
@@ -25,7 +25,7 @@ namespace MusicPlayer.MVVM.Model
 
         private string _name;
 
-        [JsonProperty("Name")]
+        [JsonPropertyName("Name")]
         public string Name
         {
             get { return _name; }
@@ -34,7 +34,7 @@ namespace MusicPlayer.MVVM.Model
 
         private string _description;
 
-        [JsonProperty("Description")]
+        [JsonPropertyName("Description")]
         public string Description
         {
             get { return _description; }
@@ -43,7 +43,7 @@ namespace MusicPlayer.MVVM.Model
 
         private string _imagePath;
 
-        [JsonProperty("ImagePath")]
+        [JsonPropertyName("ImagePath")]
         public string ImagePath
         {
             get { return _imagePath; }
@@ -52,15 +52,21 @@ namespace MusicPlayer.MVVM.Model
 
         private ObservableCollection<AlbumSongModel> _songs;
 
-        [JsonProperty("Songs")]
+        [JsonPropertyName("Songs")]
         public ObservableCollection<AlbumSongModel> Songs
         {
             get { return _songs; }
-            set { _songs = value; OnPropertyChanged(); }
+            set 
+            { 
+                _songs = value; 
+                OnPropertyChanged();
+                OnPropertyChanged(PlaylistDuration);
+            }
         }
 
         private bool _isSelected;
 
+        [JsonIgnore]
         public bool IsSelected
         {
             get { return _isSelected; }
@@ -71,20 +77,20 @@ namespace MusicPlayer.MVVM.Model
         {
             get
             {
-                // TODO: fix this so it works okie
-                //double totalMs = 0;
+                if (Songs == null)
+                    return HelperMethods.MsToTime(0);
 
-                //for (int i = 0; i < Songs.Count; i++)
-                //{
-                //    if (Songs[i].MusicProperties != null)
-                //    {
-                //        totalMs += Songs[i].MusicProperties.Duration.TotalMilliseconds;
-                //    }
-                //}
+                double ms = 0.0;
 
-                //return HelperMethods.MsToTime(totalMs);
+                for (int i = 0; i < Songs.Count; i++)
+                {
+                    if (Songs[i].MusicProperties != null)
+                    {
+                        ms += Songs[i].MusicProperties.Duration.TotalMilliseconds;
+                    }
+                }
 
-                return HelperMethods.MsToTime(0);
+                return HelperMethods.MsToTime(ms);
             }
         }
 
@@ -125,6 +131,7 @@ namespace MusicPlayer.MVVM.Model
                 Path = storageFile.Path
             };
             Songs.Add(newSong);
+            OnPropertyChanged(PlaylistDuration);
 
             //if (saveSettings)
             //    SaveSettings();
@@ -137,6 +144,7 @@ namespace MusicPlayer.MVVM.Model
             try
             {
                 Songs.Remove(Songs.Where(x => x.Id == id).FirstOrDefault());
+                OnPropertyChanged(PlaylistDuration);
                 //if (saveSettings)
                 //    SaveSettings();
 

@@ -17,6 +17,8 @@
         <viewModel:MainViewModel />
     </Window.DataContext>
 
+    <!-- https://learn.microsoft.com/en-us/previous-versions/dotnet/netframework-4.0/ff702565(v=vs.100) -->
+    <!-- https://learn.microsoft.com/en-us/dotnet/api/system.windows.shell.taskbariteminfo?view=windowsdesktop-6.0 -->
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo x:Name="taskBarItemInfo"
                          Description="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Title, StringFormat='{}Playing: {0}'}">
@@ -25,15 +27,20 @@
                     <ThumbButtonInfo
                         DismissWhenClicked="False"
                         Description="Previous"
-                        ImageSource="/Images/Icons/previous_icon.png" />
+                        ImageSource="/Images/Icons/previous_icon.png" 
+                        Command="{Binding PreviousSongCommand}"
+                        />
                     <ThumbButtonInfo
                         DismissWhenClicked="False"
                         Description="Play"
-                        ImageSource="/Images/Icons/pause_icon.png" />
+                        ImageSource="/Images/Icons/pause_icon.png" 
+                        Command="{Binding PausePlayCommand}"
+                        />
                     <ThumbButtonInfo
                         DismissWhenClicked="False"
                         Description="Next"
                         ImageSource="/Images/Icons/next_icon.png"
+                        Command="{Binding NextSongCommand}"
                         />
                 </ThumbButtonInfoCollection>
             </TaskbarItemInfo.ThumbButtonInfos>
@@ -41,6 +48,12 @@
     </Window.TaskbarItemInfo>
 
     <Grid>
+        <!-- <Image> -->
+        <!--<Grid>
+            <Image Source="/Images/1080p.png" Width="1920" Height="1080" />
+        </Grid>-->
+        <!-- </Image> -->
+
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -66,8 +79,7 @@
 
                             <!-- Navigation -->
                             <Grid Grid.Row="0">
-                                <StackPanel Margin="6,6,6,0">
-                                    <TextBlock Text="{Binding Global.Testt}" />
+                                <StackPanel Margin="6,8,6,0">
                                     <RadioButton GroupName="PageTabs" IsChecked="True" Command="{Binding HomeViewCommand}"
                                              Content="Home" Style="{StaticResource PageTab}" 
                                              extensions:CustomProperty.ImageSource="/Images/Icons/logo_gold.png" />
@@ -123,19 +135,22 @@
 
             <!-- Single Song View? -->
             <Grid Grid.Row="0" Background="#151515" Visibility="{Binding Global.SingleSongVisibility}">
-                
+                <Image Source="./../../Images/logo.png" 
+                       Margin="100" Opacity="0.25"
+                       />
             </Grid>
             <!-- /Single Song View? -->
 
             <!-- Controls -->
             <Grid Grid.Row="1" Background="#242424">
+                
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    
+
                     <!-- Song Info -->
                     <Grid Grid.Column="0" HorizontalAlignment="Left" x:Name="testName">
                         <Button Style="{StaticResource SongInfo}"
@@ -202,7 +217,7 @@
                                 Width="100" Style="{StaticResource SongTime}" 
                                 Value="{Binding Global.AudioPlayer.Volume, Mode=TwoWay}"
                                 Minimum="0" Maximum="1" />
-                                <!--PreviewMouseLeftButtonUp="VolumeSliderPreviewMouseLeftButtonUp"-->
+                        <!--PreviewMouseLeftButtonUp="VolumeSliderPreviewMouseLeftButtonUp"-->
                         <TextBlock Text="{Binding ElementName=volumeSlider, Path=Value, StringFormat=N2}" />
                     </DockPanel>
                     <!-- /Volume -->
@@ -210,6 +225,40 @@
             </Grid>
             <!-- /Controls -->
         </Grid>
+
+        <!-- <TitleBar> -->
+        <Grid x:Name="AppTitleBar" Height="32" 
+            VerticalAlignment="Top">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="LeftPaddingColumn"        Width="0" />
+                <ColumnDefinition x:Name="IconTitleColumn"          Width="*" />
+                <ColumnDefinition x:Name="TitleBarButtonsColumn"    Width="Auto" />
+                <ColumnDefinition x:Name="RightPaddingColumn"       Width="0" />
+            </Grid.ColumnDefinitions>
+            
+            <Grid Grid.Column="1">
+                <DockPanel Height="32" >
+                    <Image Source="/Images/Icons/logo_gold.png" Height="20" Margin="6,0,6,0" />
+                    <TextBlock Text="MusicPlayer" VerticalAlignment="Center" />
+                </DockPanel>
+            </Grid>
+            
+
+            <!-- Window Control Buttons-->
+            <Grid Grid.Column="2">
+                <!-- Extra Buttons -->
+                <Grid>
+                    <DockPanel Grid.Column="1" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource TitleBarButton}" Command="{Binding SettingsViewCommand}"
+                            Width="46" Content="V" />
+                    </DockPanel>
+                </Grid>
+                <!-- Extra Buttons -->
+            </Grid>
+            <!-- Window Control Buttons-->
+        </Grid>
+        <!-- </TitleBar> -->
 
         <!-- Popups -->
         <Grid Background="#25000000" Visibility="{Binding Global.PopupVisibility}">

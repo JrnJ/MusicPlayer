@@ -107,10 +107,81 @@
                     <Grid Grid.Row="0">
                         <TextBlock Text="Customization"
                        FontSize="24" Foreground="White" FontWeight="SemiBold" />
+                        <Button Content="Center" />
                     </Grid>
 
                     <Grid Grid.Row="1">
                         <RadioButton IsChecked="True" />
+
+                        <ScrollViewer x:Name="scroller" DataContext="{Binding ScrollViewer}">
+                            <StackPanel>
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                                <Button Content="Haha" />
+                            </StackPanel>
+                        </ScrollViewer>
                     </Grid>
                 </Grid>
             </Grid>

@@ -27,12 +27,11 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using System.Runtime.InteropServices;
 using MusicPlayer.Core;
-using Microsoft.Windows.ApplicationModel.DynamicDependency;
 
 // Resources
-//https://docs.microsoft.com/en-us/windows/apps/develop/title-bar?tabs=wasdk
-//https://docs.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-enhance
-//https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
+// https://docs.microsoft.com/en-us/windows/apps/develop/title-bar?tabs=wasdk
+// https://docs.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-enhance
+// https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
 
 namespace MusicPlayer
 {
@@ -42,6 +41,17 @@ namespace MusicPlayer
     public partial class MainWindow : Window
     {
         public static AppWindow AppWindow { get; private set; }
+
+        [DllImport("Shcore.dll", SetLastError = true)]
+        internal static extern int GetDpiForMonitor(IntPtr hmonitor, Monitor_DPI_Type dpiType, out uint dpiX, out uint dpiY);
+
+        internal enum Monitor_DPI_Type : int
+        {
+            MDT_Effective_DPI = 0,
+            MDT_Angular_DPI = 1,
+            MDT_Raw_DPI = 2,
+            MDT_Default = MDT_Effective_DPI
+        }
 
         //[DllImport("winmm.dll")]
         //public static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
@@ -59,6 +69,8 @@ namespace MusicPlayer
                     if (AppWindowTitleBar.IsCustomizationSupported())
                     {
                         CustomizeTitleBar();
+                        this.Loaded += MainWindow_Loaded;
+                        this.SizeChanged += MainWindow_SizeChanged;
                     }
                     else
                     {
@@ -75,7 +87,17 @@ namespace MusicPlayer
             }
         }
 
-        public void CustomizeTitleBar()
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            SetDragRegionForCustomTitleBar();
+        }
+
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            SetDragRegionForCustomTitleBar();
+        }
+
+        private void CustomizeTitleBar()
         {
             // AppWindowTitleBar
             AppWindowTitleBar titleBar = AppWindow.TitleBar;
@@ -98,11 +120,57 @@ namespace MusicPlayer
             // Buttons
             titleBar.ButtonBackgroundColor = Windows.UI.Color.FromArgb(0, 32, 32, 32);
             titleBar.ButtonForegroundColor = Windows.UI.Color.FromArgb(0, 255, 255, 255);
-            titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(255, 37, 37, 37);
-            titleBar.ButtonPressedBackgroundColor = Windows.UI.Color.FromArgb(255, 41, 41, 41);
+            titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(255, 37, 37, 37);   // #252525
+            titleBar.ButtonPressedBackgroundColor = Windows.UI.Color.FromArgb(255, 41, 41, 41); // #292929
             /// Inactive
             titleBar.ButtonInactiveBackgroundColor = Windows.UI.Color.FromArgb(0, 32, 32, 32);
             titleBar.ButtonInactiveForegroundColor = Windows.UI.Color.FromArgb(0, 255, 255, 255);
+        }
+
+        private double GetScaleAdjustment()
+        {
+            DisplayArea displayArea = DisplayArea.GetFromWindowId(AppWindowExtensions.GetAppWindowFromWPFWindow(this).Id, DisplayAreaFallback.Primary);
+            IntPtr hMonitor = Win32Interop.GetMonitorFromDisplayId(displayArea.DisplayId);
+
+            // Get DPI
+            int result = GetDpiForMonitor(hMonitor, Monitor_DPI_Type.MDT_Default, out uint dpiX, out uint _);
+            if (result != 0)
+            {
+                // Error handling here
+                throw new Exception("Could not get DPI for monitor.");
+            }
+
+            return (uint)(((long)dpiX * 100 + (96 >> 1)) / 96) / 100.0;
+        }
+
+        private void SetDragRegionForCustomTitleBar()
+        {
+            if (AppWindow.TitleBar.ExtendsContentIntoTitleBar)
+            {
+                double scaleAdjustment = GetScaleAdjustment();
+
+                LeftPaddingColumn.Width = new GridLength(AppWindow.TitleBar.LeftInset / scaleAdjustment);
+                RightPaddingColumn.Width = new GridLength(AppWindow.TitleBar.RightInset / scaleAdjustment);
+
+                List<Windows.Graphics.RectInt32> dragRectsList = new();
+
+                Windows.Graphics.RectInt32 dragRectL;
+                dragRectL.X = (int)((LeftPaddingColumn.ActualWidth) * scaleAdjustment);
+                dragRectL.Y = 0;
+                dragRectL.Height = (int)(AppTitleBar.ActualHeight * scaleAdjustment);
+                dragRectL.Width = (int)((IconTitleColumn.ActualWidth/* + SomethingElse*/) * scaleAdjustment);
+                dragRectsList.Add(dragRectL);
+
+                Windows.Graphics.RectInt32 dragRectR;
+                dragRectR.X = (int)((LeftPaddingColumn.ActualWidth + IconTitleColumn.ActualWidth) * scaleAdjustment);
+                dragRectR.Y = 0;
+                dragRectR.Height = (int)(AppTitleBar.ActualHeight * scaleAdjustment);
+                dragRectR.Width = 0/*(int)(RightDragColumn.ActualWidth * scaleAdjustment)*/;
+                dragRectsList.Add(dragRectR);
+
+                Windows.Graphics.RectInt32[] dragRects = dragRectsList.ToArray();
+                AppWindow.TitleBar.SetDragRectangles(dragRects);
+            }
         }
     }
 }

@@ -83,6 +83,11 @@
     <Content Include="Images\StoreLogo.png" />
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
     <None Include="MusicPlayer %28Package%29_TemporaryKey.pfx" />
+    <Content Include="Native\discord_game_sdk.bundle" />
+    <Content Include="Native\discord_game_sdk.dll" />
+    <Content Include="Native\discord_game_sdk.dll.lib" />
+    <Content Include="Native\discord_game_sdk.dylib" />
+    <Content Include="Native\discord_game_sdk.so" />
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
   <ItemGroup>

@@ -1,12 +1,12 @@
 ﻿using MusicPlayer.Classes;
 using MusicPlayer.Core;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MusicPlayer.MVVM.Model
@@ -18,7 +18,7 @@ namespace MusicPlayer.MVVM.Model
 
         private double _volume;
 
-        [JsonProperty("Volume")]
+        [JsonPropertyName("Volume")]
         public double Volume
         {
             get { return _volume; }
@@ -27,7 +27,7 @@ namespace MusicPlayer.MVVM.Model
 
         private ObservableCollection<MusicFolder> _musicFolders;
 
-        [JsonProperty("MusicFolders")]
+        [JsonPropertyName("MusicFolders")]
         public ObservableCollection<MusicFolder> MusicFolders
         {
             get { return _musicFolders; }
