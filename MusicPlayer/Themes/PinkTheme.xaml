@@ -1,0 +1,44 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Themes/Colors.xaml" />
+        <!-- To be grouped -->
+        <!--<ResourceDictionary Source="Themes/CTTestTheme.xaml" />-->
+        <ResourceDictionary Source="/Themes/Dark/ContextMenuTheme.xaml" />
+
+        <ResourceDictionary Source="/Themes/Dark/PageTabTheme.xaml" />
+        <ResourceDictionary Source="/Themes/Dark/PageTitleTheme.xaml" />
+
+        <ResourceDictionary Source="/Themes/Dark/SongInfoTheme.xaml" />
+
+        <ResourceDictionary Source="/Themes/Dark/ImageButtonTheme.xaml" />
+
+        <ResourceDictionary Source="/Themes/Dark/TestTheme.xaml" />
+        <!-- /To be grouped -->
+
+        <!-- General -->
+        <ResourceDictionary Source="/Themes/Dark/MainTheme.xaml" />
+        <ResourceDictionary Source="/Themes/Dark/ScrollbarTheme.xaml" />
+        <ResourceDictionary Source="/Themes/Dark/SongTimeSliderTheme.xaml" />
+        <ResourceDictionary Source="/Themes/Dark/TitleBarButtonTheme.xaml" />
+        <!-- /General -->
+
+        <!-- Navigation -->
+        <ResourceDictionary Source="/Themes/Dark/PlaylistItemTheme.xaml" />
+        <!-- /Navigation -->
+
+        <!-- Playlist -->
+        <ResourceDictionary Source="/Themes/Dark/PlaylistsItemTheme.xaml" />
+        <ResourceDictionary Source="/Themes/Dark/EditPlaylistImageButtonTheme.xaml" />
+
+        <ResourceDictionary Source="/Themes/Dark/AlbumSongTheme.xaml" />
+        <ResourceDictionary Source="/Themes/Dark/AlbumSongBasicTheme.xaml" />
+        <!-- /Playlist -->
+
+        <!-- Settings -->
+        <ResourceDictionary Source="/Themes/Dark/MusicFolderItemTheme.xaml" />
+        <ResourceDictionary Source="/Themes/Dark/ProfileDropdownTheme.xaml" />
+        <!-- /Settings -->
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

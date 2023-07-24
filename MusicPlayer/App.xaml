@@ -8,42 +8,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- To be grouped -->
-                <!--<ResourceDictionary Source="Themes/CTTestTheme.xaml" />-->
-                <ResourceDictionary Source="Themes/ContextMenuTheme.xaml" />
-
-                <ResourceDictionary Source="Themes/PageTabTheme.xaml" />
-                <ResourceDictionary Source="Themes/PageTitleTheme.xaml" />
-
-                <ResourceDictionary Source="Themes/SongInfoTheme.xaml" />
-
-                <ResourceDictionary Source="Themes/ImageButtonTheme.xaml" />
-
-                <ResourceDictionary Source="Themes/TestTheme.xaml" />
-                <!-- /To be grouped -->
-
-                <!-- General -->
-                <ResourceDictionary Source="Themes/MainTheme.xaml" />
-                <ResourceDictionary Source="Themes/ScrollbarTheme.xaml" />
-                <ResourceDictionary Source="Themes/SongTimeSliderTheme.xaml" />
-                <ResourceDictionary Source="Themes/TitleBarButtonTheme.xaml" />
-                <!-- /General -->
-
-                <!-- Navigation -->
-                <ResourceDictionary Source="Themes/PlaylistItemTheme.xaml" />
-                <!-- /Navigation -->
-
-                <!-- Playlist -->
-                <ResourceDictionary Source="Themes/PlaylistsItemTheme.xaml" />
-                <ResourceDictionary Source="Themes/EditPlaylistImageButtonTheme.xaml" />
-
-                <ResourceDictionary Source="Themes/AlbumSongTheme.xaml" />
-                <!-- /Playlist -->
-
-                <!-- Settings -->
-                <ResourceDictionary Source="Themes/MusicFolderItemTheme.xaml" />
-                <ResourceDictionary Source="Themes/ProfileDropdownTheme.xaml" />
-                <!-- /Settings -->
+                <ResourceDictionary Source="/Themes/PinkTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Navigation -->
@@ -59,6 +24,10 @@
                 <view:DiscordView />
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type viewModel:SpotifyViewModel}">
+                <view:SpotifyView />
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type viewModel:SettingsViewModel}">
                 <view:SettingsView />
             </DataTemplate>
@@ -68,6 +37,9 @@
                 <view:PlaylistView />
             </DataTemplate>
 
+            <!--<Color x:Key="Colors.Main.TrackBarColor">#FFDBA531</Color>
+            <SolidColorBrush x:Key="TrackBarColor" Color="{StaticResource Colors.Main.TrackBarColor}" />-->
+            
             <!-- Colors -->
             <Color x:Key="Colors.Main.Grey">#292929</Color>
             <!-- /Colors -->

@@ -21,6 +21,8 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public RelayCommand DiscordViewCommand { get; set; }
 
+        public RelayCommand SpotifyViewCommand { get; set; }
+
         public RelayCommand SettingsViewCommand { get; set; }
         #endregion Navigation
 
@@ -49,6 +51,8 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public DiscordViewModel DiscordVM { get; set; }
 
+        public SpotifyViewModel SpotifyVM { get; set; }
+
         public SettingsViewModel SettingsVM { get; set; }
 
         // Properties
@@ -71,6 +75,7 @@ namespace MusicPlayer.MVVM.ViewModel
             // Create ViewModels
             HomeVM = new();
             DiscordVM = new();
+            SpotifyVM = new();
             SettingsVM = new();
             
             // Set a default
@@ -91,6 +96,11 @@ namespace MusicPlayer.MVVM.ViewModel
             DiscordViewCommand = new(o => 
             {
                 Global.CurrentView = DiscordVM;
+            });
+
+            SpotifyViewCommand = new(o =>
+            {
+                Global.CurrentView = SpotifyVM;
             });
 
             SettingsViewCommand = new(o =>

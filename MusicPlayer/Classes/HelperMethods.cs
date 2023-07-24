@@ -13,13 +13,14 @@ namespace MusicPlayer.Classes
         /// <returns>a h:m:ss string</returns>
         public static string MsToTime(double ms)
         {
-            double hours = ms / 1000 / 60 / 60;
-            double minutes = hours % 1 * 60;
-            double seconds = Math.Floor(minutes % 1 * 60);
+            double hours = ms / 1000.0 / 60.0 / 60.0;
+            double minutes = hours % 1.0 * 60.0;
+            double seconds = Math.Floor(minutes % 1.0 * 60.0);
             hours = Math.Floor(hours);
             minutes = Math.Floor(minutes);
 
-            return ((hours > 0 ? (hours + ":") : "") + ((minutes < 10 && hours > 0 ? "0" : "") + minutes + ":") + ((seconds < 10 ? "0" : "") + seconds));
+            // return (hours > 0.0 ? (hours + " hr ") : "") + (minutes > 0.0 ? (minutes + " min ") : "") + seconds + " seconds";
+            return ((hours > 0.0 ? (hours + ":") : "") + ((minutes < 10.0 && hours > 0.0 ? "0" : "") + minutes + ":") + ((seconds < 10.0 ? "0" : "") + seconds));
         }
 
         public static bool IsMusicFile(string path)
@@ -34,12 +35,12 @@ namespace MusicPlayer.Classes
 
         public static Rect GetAbsolutePlacement(this FrameworkElement element, bool relativeToScreen = false)
         {
-            var absolutePos = element.PointToScreen(new System.Windows.Point(0, 0));
+            var absolutePos = element.PointToScreen(new System.Windows.Point(0.0, 0.0));
             if (relativeToScreen)
             {
                 return new Rect(absolutePos.X, absolutePos.Y, element.ActualWidth, element.ActualHeight);
             }
-            var posMW = Application.Current.MainWindow.PointToScreen(new System.Windows.Point(0, 0));
+            var posMW = Application.Current.MainWindow.PointToScreen(new System.Windows.Point(0.0, 0.0));
             absolutePos = new System.Windows.Point(absolutePos.X - posMW.X, absolutePos.Y - posMW.Y);
             return new Rect(absolutePos.X, absolutePos.Y, element.ActualWidth, element.ActualHeight);
         }

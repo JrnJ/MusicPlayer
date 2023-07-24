@@ -8,7 +8,7 @@
     <Style TargetType="{x:Type RadioButton}" 
            x:Key="AlbumSong">
 
-        <Setter Property="Background" Value="#242424" />
+        <Setter Property="Background" Value="#161616" />
         <Setter Property="Height" Value="50" />
         <Setter Property="Margin" Value="0, 0, 0, 8" />
 
@@ -32,10 +32,10 @@
                                     </TextBlock.Text>
                                 </TextBlock>
                                 <Polygon x:Name="polygonPlay" Visibility="Collapsed"
-                                         Points="0,18, 10,25, 0,32" Fill="#dba531" 
+                                         Points="0,18, 10,25, 0,32" Fill="#FFDBA531" 
                                          HorizontalAlignment="Center" Margin="26, 0, 6, 0">
                                     <Polygon.Effect>
-                                        <DropShadowEffect ShadowDepth="0" Color="#dba531" Opacity="0.5" BlurRadius="20"/>
+                                        <DropShadowEffect ShadowDepth="0" Color="#FFDBA531" Opacity="0.5" BlurRadius="20"/>
                                     </Polygon.Effect>
                                 </Polygon>
                             </Grid>
@@ -62,14 +62,14 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#282828" />
+                            <Setter Property="Background" Value="#181818" />
                         </Trigger>
                         <Trigger Property="IsMouseCaptured" Value="True">
-                            <Setter Property="Background" Value="#292929" />
+                            <Setter Property="Background" Value="#202020" />
                         </Trigger>
 
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" Value="#292929" />
+                            <Setter Property="Background" Value="#202020" />
                             <Setter TargetName="polygonPlay" Property="Visibility" Value="Visible" />
                             <Setter TargetName="tblId" Property="Visibility" Value="Collapsed" />
                         </Trigger>

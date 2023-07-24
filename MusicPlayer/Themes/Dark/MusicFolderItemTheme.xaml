@@ -3,7 +3,7 @@
 
     <Style TargetType="{x:Type Border}" x:Key="MusicFolderItem">
         <Setter Property="Margin" Value="0,0,0,8" />
-        <Setter Property="Background" Value="#242424" />
+        <Setter Property="Background" Value="#161616" />
         <Setter Property="Height" Value="40" />
         <Setter Property="CornerRadius" Value="4" />
 

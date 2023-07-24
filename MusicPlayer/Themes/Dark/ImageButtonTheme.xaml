@@ -17,11 +17,10 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#303030" />
-                            <!--<Setter Property="Background" Value="#25000000" notthesameokie/>-->
+                            <Setter Property="Background" Value="#181818" />
                         </Trigger>
                         <Trigger Property="IsMouseCaptured" Value="True">
-                            <Setter Property="Background" Value="#353535" />
+                            <Setter Property="Background" Value="#202020" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

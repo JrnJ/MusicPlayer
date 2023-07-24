@@ -118,10 +118,10 @@ namespace MusicPlayer
             titleBar.InactiveForegroundColor = Windows.UI.Color.FromArgb(255, 255, 255, 255);
 
             // Buttons
-            titleBar.ButtonBackgroundColor = Windows.UI.Color.FromArgb(0, 32, 32, 32);
-            titleBar.ButtonForegroundColor = Windows.UI.Color.FromArgb(0, 255, 255, 255);
-            titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(255, 37, 37, 37);   // #252525
-            titleBar.ButtonPressedBackgroundColor = Windows.UI.Color.FromArgb(255, 41, 41, 41); // #292929
+            titleBar.ButtonBackgroundColor = Windows.UI.Color.FromArgb(0, 32, 32, 32);          // #0
+            titleBar.ButtonForegroundColor = Windows.UI.Color.FromArgb(0, 255, 255, 255);       // #0
+            titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(255, 18, 18, 18);   // #121212
+            titleBar.ButtonPressedBackgroundColor = Windows.UI.Color.FromArgb(255, 22, 22, 22); // #161616
             /// Inactive
             titleBar.ButtonInactiveBackgroundColor = Windows.UI.Color.FromArgb(0, 32, 32, 32);
             titleBar.ButtonInactiveForegroundColor = Windows.UI.Color.FromArgb(0, 255, 255, 255);
@@ -170,6 +170,40 @@ namespace MusicPlayer
 
                 Windows.Graphics.RectInt32[] dragRects = dragRectsList.ToArray();
                 AppWindow.TitleBar.SetDragRectangles(dragRects);
+            }
+        }
+
+        bool isMaximized = false;
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key) {
+                case Key.F11:
+                    isMaximized = !isMaximized;
+
+                    if (isMaximized)
+                    { // Fullscreen
+                        // Collapse Content
+                        this.AppTitleBar.Visibility = Visibility.Collapsed;
+
+                        // 
+                        this.WindowStyle = WindowStyle.None;
+                        this.WindowState = WindowState.Normal;
+                        this.WindowState = WindowState.Maximized;
+                    }
+                    else
+                    { // Normal
+                        // Collapse Content
+                        this.AppTitleBar.Visibility = Visibility.Visible;
+
+                        // 
+                        this.WindowStyle = WindowStyle.SingleBorderWindow;
+                        this.WindowState = WindowState.Maximized;
+                    }
+
+                    this.UpdateLayout();
+
+                    break;
             }
         }
     }

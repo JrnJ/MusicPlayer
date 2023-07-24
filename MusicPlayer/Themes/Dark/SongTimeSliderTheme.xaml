@@ -1,18 +1,20 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Style TargetType="{x:Type Slider}"
-           x:Key="SongTime" >
+    <Color x:Key="Colors.Main.TrackBarColor">#FFFEB4B8</Color>
+    <SolidColorBrush x:Key="TrackBarColor" Color="{StaticResource Colors.Main.TrackBarColor}" />
+
+    <Style TargetType="{x:Type Slider}" x:Key="SongTime" >
         <Setter Property="IsSelectionRangeEnabled" Value="True" />
         <Setter Property="SelectionStart" Value="{Binding Minimum, RelativeSource={RelativeSource Self}}" />
         <Setter Property="SelectionEnd" Value="{Binding Value, RelativeSource={RelativeSource Self}}" />
-        <Setter Property="Foreground" Value="#dba531" />
+        <Setter Property="Foreground" Value="{StaticResource TrackBarColor}" />
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Slider}">
                     <Grid VerticalAlignment="Center">
-                        <Border x:Name="borderBackground" Margin="6,0" Height="6" Background="#303030" CornerRadius="4"/>
+                        <Border x:Name="borderBackground" Margin="6,0" Height="6" Background="#151515" CornerRadius="4"/>
                         <Canvas Margin="0, -6, 0, 0" VerticalAlignment="Center">
                             <Border x:Name="PART_SelectionRange"
                                         HorizontalAlignment="Left" Height="6" Background="{TemplateBinding Foreground}" 
@@ -20,7 +22,7 @@
                                         >
                                 <Border.Effect>
                                     <DropShadowEffect ShadowDepth="0"
-                                                      Color="#dba531"
+                                                      Color="{StaticResource Colors.Main.TrackBarColor}"
                                                       Opacity="0.5" BlurRadius="20" />
                                 </Border.Effect>
                             </Border>
@@ -34,7 +36,7 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate TargetType="{x:Type Thumb}">
-                                                            <Ellipse Fill="#dba531" />
+                                                            <Ellipse Fill="{StaticResource TrackBarColor}" />
                                                         </ControlTemplate>
                                                     </Setter.Value>
                                                 </Setter>

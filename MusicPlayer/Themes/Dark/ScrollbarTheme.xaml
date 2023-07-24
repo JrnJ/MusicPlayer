@@ -4,7 +4,7 @@
     <!-- ScrollBars -->
     <Style TargetType="{x:Type ScrollBar}">
         <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
-        <Setter Property="Foreground" Value="#303030" />
+        <Setter Property="Foreground" Value="#161616" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Width" Value="8" />
         

@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
@@ -46,9 +47,9 @@ namespace MusicPlayer.MVVM.ViewModel
             {
                 // We have to do this with a custom property or a custom element(preffered I think)
 
-                // AddMusicFolder();
+                AddMusicFolder();
                 //double heightPerItem = scroller.ActualHeight / itemscontrol.Items.Count;
-                ScrollViewer.ScrollToVerticalOffset(ScrollViewer.ActualHeight / 2);
+                //ScrollViewer.ScrollToVerticalOffset(ScrollViewer.ActualHeight / 2);
             });
 
             RemoveFolderCommand = new(o =>

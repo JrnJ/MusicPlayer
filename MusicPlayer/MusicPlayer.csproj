@@ -12,6 +12,7 @@
 	<ItemGroup>
 	  <Content Remove="Images\1080p.png" />
 	  <Content Remove="Images\Icons\External\Discord-Logo-White.png" />
+	  <Content Remove="Images\Icons\External\Spotify_Icon_RGB_White.png" />
 	  <Content Remove="Images\Icons\logo_gold.png" />
 	  <Content Remove="Images\Icons\next_icon.png" />
 	  <Content Remove="Images\Icons\pause_icon.png" />
@@ -42,6 +43,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\Icons\External\Discord-Logo-White.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Icons\External\Spotify_Icon_RGB_White.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\Icons\logo_gold.png">
@@ -99,5 +103,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MusicPlayer.Audio\MusicPlayer.Audio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Themes\Pink\" />
   </ItemGroup>
 </Project>

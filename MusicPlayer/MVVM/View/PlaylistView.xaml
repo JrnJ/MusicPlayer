@@ -17,81 +17,92 @@
     </UserControl.Resources>
 
     <Grid>
-        <Grid Margin="0,0,16,16">
+        <Grid Margin="0,0,0,8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <!-- Info -->
-            <Grid Grid.Row="0" Margin="0,0,0,16">
-                <StackPanel>
-                    <TextBlock Text="{Binding Global.PlaylistViewing.Name}" 
-                               Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="{Binding Global.PlaylistViewing.Description}" 
-                               Foreground="LightGray" />
-                    <TextBlock Foreground="LightGray" Margin="0, 0, 0, 16">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0} Songs, {1}">
-                                <Binding Path="Global.PlaylistViewing.Songs.Count" />
-                                <Binding Path="Global.PlaylistViewing.PlaylistDuration" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
+            <Grid Grid.Row="0" Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
+                <!-- Image -->
+                <Grid Grid.Column="0"
+                      Height="250" Margin="0,0,24,0">
+                    <Image Source="{Binding Global.PlaylistViewing.ImagePath}">
+                        <Image.Effect>
+                            <DropShadowEffect ShadowDepth="0"
+                                                      Color="#303030"
+                                                      Opacity="1" BlurRadius="36" />
+                        </Image.Effect>
+                    </Image>
+                </Grid>
+                <!-- /Image -->
+                
+                <!-- Info -->
+                <Grid Grid.Column="1">
                     <StackPanel>
-                        <DockPanel>
-                            <Button 
-                            Content="Edit"
-                            Width="100" Height="35"
-                            HorizontalAlignment="Left"
-                            Command="{Binding EditPlaylistCommand}" />
-                            <Button 
-                            Content="Delete"
-                            Width="100" Height="35"
-                            HorizontalAlignment="Left"
-                            Margin="18,0,0,0"
-                            Background="#ff4040"
-                            Command="{Binding DeletePlaylistCommand}" />
-                        </DockPanel>
-                        <DockPanel Margin="0,8,0,0">
-                            <Button 
-                                Content="Loop"
-                                Width="100" Height="35"
-                                HorizontalAlignment="Left"
-                                Background="{Binding LoopButtonColor}"
-                                Command="{Binding LoopPlaylistCommand}" />
-                            <Button 
-                                Content="Shuffle"
-                                Width="100" Height="35"
-                                HorizontalAlignment="Left"
-                                Background="{Binding ShuffleButtonColor}"
-                                Margin="18,0,0,0"
-                                Command="{Binding ShufflePlaylistCommand}" />
-                        </DockPanel>
+                        <TextBlock x:Name="removeThis" />
+                        <TextBlock Text="{Binding Global.PlaylistViewing.Name}" 
+                               Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="{Binding Global.PlaylistViewing.Description}" 
+                               Foreground="LightGray" />
+                        <TextBlock Foreground="LightGray" Margin="0, 0, 0, 16">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} Songs, {1}">
+                                    <Binding Path="Global.PlaylistViewing.Songs.Count" />
+                                    <Binding Path="Global.PlaylistViewing.PlaylistDuration" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+
+                        <StackPanel>
+                            <DockPanel>
+                                <Button Content="Edit"
+                                        Width="100" Height="35"
+                                        HorizontalAlignment="Left"
+                                        Command="{Binding EditPlaylistCommand}" />
+                                <Button Content="Delete"
+                                        Width="100" Height="35"
+                                        HorizontalAlignment="Left"
+                                        Margin="18,0,0,0"
+                                        Background="#ff4040"
+                                        Command="{Binding DeletePlaylistCommand}" />
+                            </DockPanel>
+                            <DockPanel Margin="0,8,0,0">
+                                <Button Content="Loop"
+                                        Width="100" Height="35"
+                                        HorizontalAlignment="Left"
+                                        Background="{Binding LoopButtonColor}"
+                                        Command="{Binding LoopPlaylistCommand}" />
+                                <Button Content="Shuffle"
+                                        Width="100" Height="35"
+                                        HorizontalAlignment="Left"
+                                        Background="{Binding ShuffleButtonColor}"
+                                        Margin="18,0,0,0"
+                                        Command="{Binding ShufflePlaylistCommand}" />
+                            </DockPanel>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
+                </Grid>
+                <!-- /Info -->
             </Grid>
             <!-- /Info -->
-            
-            <!-- Search Bar -->
-            <TextBox Grid.Row="1"
-                     Style="{StaticResource TextBox}" Tag="Search..." 
-                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                     Height="40" Width="320" HorizontalAlignment="Left"
-                     Margin="0,0,0,12"
-                     FontSize="16" />
-            <!-- /Search Bar -->
 
             <!-- Songs -->
-            <Grid Grid.Row="2">
-                <ScrollViewer>
-                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.PlaylistViewing.Songs}" Margin="0, 0, 8, 0">
+            <Grid Grid.Row="1">
+                <ScrollViewer x:Name="songsScroller">
+                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.PlaylistViewing.Songs}" Margin="0, 0, 4, 0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
                                              Command="{Binding ElementName=Songs, Path=DataContext.SelectSongCommand}"
+                                             PreviewMouseDown="RadioButton_PreviewMouseDown"
+                                             PreviewMouseUp="RadioButton_PreviewMouseUp"
                                              CommandParameter="{Binding Id}" IsChecked="{Binding IsPlaying}"
                                              Tag="{Binding ElementName=Songs, Path=DataContext}">
                                     <RadioButton.ContextMenu>
@@ -133,6 +144,28 @@
                 </ScrollViewer>
             </Grid>
             <!-- /Songs -->
+            
+            <!-- Song Dragging -->
+            <Grid Grid.Row="1">
+                <Canvas x:Name="canvas" Margin="0,0,26,0">
+                    <RadioButton Style="{StaticResource AlbumSongBasic}" x:Name="meow"
+                                 Visibility="Hidden" IsChecked="False"
+                                 Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Canvas}}"
+                                 >
+                    </RadioButton>
+                </Canvas>
+            </Grid>
+            <!--/Song Dragging -->
+
+            <!-- Search Bar -->
+            <!-- Not In Use -->
+            <!--<TextBox Grid.Row="1"
+                     Style="{StaticResource TextBox}" Tag="Search..." 
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Height="40" Width="320" HorizontalAlignment="Left"
+                     Margin="0,0,0,12"
+                     FontSize="16" />-->
+            <!-- /Search Bar -->
         </Grid>
     </Grid>
 </UserControl>

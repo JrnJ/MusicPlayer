@@ -7,7 +7,7 @@
 
     <!-- Button -->
     <Style TargetType="{x:Type Button}">
-        <Setter Property="Background" Value="#292929" />
+        <Setter Property="Background" Value="#161616" />
         <Setter Property="Foreground" Value="White" />
 
         <Setter Property="Template">
@@ -26,10 +26,10 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#10FFFFFF" />
+                            <Setter Property="Background" Value="#181818" />
                         </Trigger>
                         <Trigger Property="IsMouseCaptured" Value="True">
-                            <Setter Property="Background" Value="#15FFFFFF" />
+                            <Setter Property="Background" Value="#202020" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -40,10 +40,10 @@
 
     <!-- TextBox -->
     <Style TargetType="{x:Type TextBox}" x:Key="TextBox">
-        <Setter Property="Background" Value="#191919" />
+        <Setter Property="Background" Value="#121212" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="#353535" />
+        <Setter Property="BorderBrush" Value="#787878" />
 
         <Setter Property="Template">
             <Setter.Value>
