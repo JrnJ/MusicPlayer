@@ -71,6 +71,8 @@ namespace MusicPlayer.MVVM.View
                 // Element Visuals
                 ElementSelected.Visibility = Visibility.Hidden;
                 meow.Visibility = Visibility.Visible;
+                // TODO
+                // element shows at 0, 0 before the drag really happens so it looks like it will snap, canvas thing
 
                 // Start Dragging
                 Mouse.Capture(null);
@@ -119,25 +121,46 @@ namespace MusicPlayer.MVVM.View
                 double elementHalfHeight = toMove.ActualHeight / 2.0;
                 double marginBetweenElements = 8.0;
 
-                double visualY = Math.Clamp(mousePos.Y - elementHalfHeight, 0.0, canvas.ActualHeight - elementHalfHeight - 24);
-                double actualY = Math.Clamp(mousePos.Y + songsScroller.VerticalOffset, 0.0, canvas.ActualHeight - elementHalfHeight - 24);
+                double maxCanvasY = canvas.ActualHeight - elementHalfHeight - 24.0;
+                double visualY = Math.Clamp(mousePos.Y - elementHalfHeight, 0.0, maxCanvasY);
+                double actualY = Math.Clamp(mousePos.Y + songsScroller.VerticalOffset, 0.0, songsScroller.ScrollableHeight + maxCanvasY);
 
                 // TODO
                 // if it reaches the bottom
                 // then start scrolling down
                 // if it reaches the top
                 // then start scrolling up
-                if (visualY == 0.0)
+
+                removeThis.Text = "ActualY: " + actualY +
+                    " CanvasScrollableHeight: " + songsScroller.ScrollableHeight +
+                    " CanvasActualHeight: " + canvas.ActualHeight +
+                    " MaxCanvasY: " + maxCanvasY
+                    ;
+
+                if (visualY <= 1.0)
                 {
                     // scroll scrollbar down based on a percentage
                     // songsScroller.ActualHeight;
+                    double newVerticalOffset = songsScroller.VerticalOffset - songsScroller.ScrollableHeight * 0.01;
+                    if (newVerticalOffset < 0.0)
+                    {
+                        newVerticalOffset = 0.0;
+                    }
+
+                    // removeThis.Text = "A: " + newVerticalOffset;
+                    songsScroller.ScrollToVerticalOffset(newVerticalOffset);
+                }
+
+                if (actualY >= maxCanvasY + songsScroller.VerticalOffset)
+                {
                     double newVerticalOffset = songsScroller.VerticalOffset + songsScroller.ScrollableHeight * 0.01;
                     if (newVerticalOffset > songsScroller.ScrollableHeight)
                     {
                         newVerticalOffset = songsScroller.ScrollableHeight;
                     }
-
                     songsScroller.ScrollToVerticalOffset(newVerticalOffset);
+
+                    // removeThis.Text = "B: " + actualY + " C: " + maxCanvasY;
                 }
 
                 int elementsPassed = int.Parse(Math.Floor(actualY / (toMove.ActualHeight + marginBetweenElements)).ToString());

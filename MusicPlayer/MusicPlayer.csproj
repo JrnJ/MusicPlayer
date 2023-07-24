@@ -27,6 +27,7 @@
 	  <Content Remove="Images\repeat.png" />
 	  <Content Remove="Images\shuffle.png" />
 	  <Content Remove="Images\SongImagePlaceholder.png" />
+	  <Content Remove="Images\TreeTest.png" />
 	  <Content Remove="Images\Triangle_Filled.png" />
 	</ItemGroup>
 
@@ -88,6 +89,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\SongImagePlaceholder.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\TreeTest.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\Triangle_Filled.png">

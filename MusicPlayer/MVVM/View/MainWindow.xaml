@@ -10,7 +10,7 @@
         
         Title="Jrn Music Player" WindowState="Maximized" Icon="/Images/Icons/logo_gold.png"
         Width="1280" Height="720" MinWidth="960" MinHeight="308"
-        Background="#0f0f0f" KeyDown="Window_KeyDown"
+        Background="#0f0f0f" KeyDown="Window_KeyDown" WindowStyle="SingleBorderWindow"
         >
 
     <Window.DataContext>
@@ -49,8 +49,13 @@
 
     <Grid>
         <!-- <Image> -->
+        <!-- Change Widget background to #F1131313-->
         <!--<Grid>
-            <Image Source="/Images/1080p.png" Width="1920" Height="1080" />
+            <Image Source="/Images/TreeTest.png" Width="1920" Height="1080">
+                <Image.Effect>
+                    <BlurEffect Radius="36" />
+                </Image.Effect>
+            </Image>
         </Grid>-->
         <!-- </Image> -->
 
@@ -144,7 +149,7 @@
             </Grid>
 
             <!-- Single Song View? -->
-            <Grid Grid.Row="0" Background="#151515" Visibility="{Binding Global.SingleSongVisibility}">
+            <Grid Grid.Row="0" Background="#121212" Visibility="{Binding Global.SingleSongVisibility}">
                 <Image Source="./../../Images/logo.png" 
                        Margin="100" Opacity="0.25"
                        />
@@ -283,7 +288,7 @@
             <Border DataContext="{Binding Global.ConfirmBox}"
                     Visibility="{Binding Visibility}"
                     VerticalAlignment="Center" HorizontalAlignment="Center" 
-                    CornerRadius="4" BorderThickness="1.5" BorderBrush="#353535">
+                    CornerRadius="4" BorderThickness="1.5" BorderBrush="#242424">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition />
@@ -292,7 +297,7 @@
 
                     <Border Grid.Row="0" 
                         Padding="20" CornerRadius="4,4,0,0"
-                        Background="#272727">
+                        Background="#121212">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left">
                             <TextBlock Text="{Binding Title}" 
                                FontSize="28" />
@@ -303,7 +308,7 @@
 
                     <Border Grid.Row="1" 
                             Padding="20" CornerRadius="0,0,4,4"
-                            Background="#242424">
+                            Background="#101010">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />

@@ -210,6 +210,11 @@ namespace MusicPlayer.MVVM.ViewModel
 
             StorageFile file = await AppWindowExtensions.OpenFilePicker(filePicker);
 
+            if (file == null)
+            {
+                return;
+            }
+
             if (file.ContentType.Contains("image"))
             {
                 Global.EditPlaylistBox.Playlist.ImagePath = file.Path;

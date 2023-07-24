@@ -71,6 +71,10 @@ namespace MusicPlayer
                         CustomizeTitleBar();
                         this.Loaded += MainWindow_Loaded;
                         this.SizeChanged += MainWindow_SizeChanged;
+
+                        // Ensure first call to functions
+                        MainWindow_Loaded(null, null);
+                        MainWindow_SizeChanged(null, null);
                     }
                     else
                     {
@@ -201,7 +205,7 @@ namespace MusicPlayer
                         this.WindowState = WindowState.Maximized;
                     }
 
-                    this.UpdateLayout();
+                    // this.UpdateLayout();
 
                     break;
             }
