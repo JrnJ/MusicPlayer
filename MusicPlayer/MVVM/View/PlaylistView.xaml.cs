@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -44,6 +45,10 @@ namespace MusicPlayer.MVVM.View
         private int SongId { get; set; }
         private int PreviousMoveIndex { get; set; } = 0;
 
+        // AutoScrolling
+        private DispatcherTimer AutoScrollTimer { get; set; }
+        private bool AutoScrollUp { get; set; }
+
         public PlaylistView()
         {
             InitializeComponent();
@@ -52,6 +57,12 @@ namespace MusicPlayer.MVVM.View
                 Interval = TimeSpan.FromMilliseconds(10)
             };
             Timer.Tick += Timer_Tick;
+
+            AutoScrollTimer = new()
+            {
+                Interval = TimeSpan.FromMilliseconds(10)
+            };
+            AutoScrollTimer.Tick += AutoScrollTimerTick;
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -93,6 +104,35 @@ namespace MusicPlayer.MVVM.View
             AppWindowExtensions.GetMainWindow().PreviewMouseUp += WindowPreviewMouseUp;
         }
 
+        private void AutoScrollTimerTick(object sender, EventArgs e)
+        {
+            // double newVerticalOffset = Math.Clamp(songsScroller.VerticalOffset + (AutoScrollUp ? 5.0 : -5.0), 0.0, songsScroller.ScrollableHeight);
+
+            if (AutoScrollUp)
+            {
+                double newVerticalOffset = songsScroller.VerticalOffset - 5.0;
+                if (newVerticalOffset < 0.0)
+                {
+                    newVerticalOffset = 0.0;
+                    AutoScrollTimer.Stop();
+                }
+
+                songsScroller.ScrollToVerticalOffset(newVerticalOffset);
+            }
+            else
+            {
+                double newVerticalOffset = songsScroller.VerticalOffset + 5.0;
+                if (newVerticalOffset > songsScroller.ScrollableHeight)
+                {
+                    newVerticalOffset = songsScroller.ScrollableHeight;
+                    AutoScrollTimer.Stop();
+                }
+                songsScroller.ScrollToVerticalOffset(newVerticalOffset);
+            }
+
+            MouseMoved(null);
+        }
+
         private void RadioButton_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             Timer.Stop();
@@ -115,8 +155,16 @@ namespace MusicPlayer.MVVM.View
             if (IsDragging)
             {
                 RadioButton toMove = meow;
-                Point mousePos = e.GetPosition(canvas);
-
+                Point mousePos;
+                if (e != null)
+                {
+                    mousePos = e.GetPosition(canvas);
+                }
+                else
+                {
+                    mousePos = Mouse.GetPosition(canvas);
+                }
+                
                 // For now cap on heigth
                 double elementHalfHeight = toMove.ActualHeight / 2.0;
                 double marginBetweenElements = 8.0;
@@ -131,36 +179,30 @@ namespace MusicPlayer.MVVM.View
                 // if it reaches the top
                 // then start scrolling up
 
-                removeThis.Text = "ActualY: " + actualY +
-                    " CanvasScrollableHeight: " + songsScroller.ScrollableHeight +
-                    " CanvasActualHeight: " + canvas.ActualHeight +
-                    " MaxCanvasY: " + maxCanvasY
-                    ;
+                //removeThis.Text = "ActualY: " + actualY +
+                //    " CanvasScrollableHeight: " + songsScroller.ScrollableHeight +
+                //    " CanvasActualHeight: " + canvas.ActualHeight +
+                //    " MaxCanvasY: " + maxCanvasY
+                //    ;
 
+                // Scroll Up
                 if (visualY <= 1.0)
                 {
-                    // scroll scrollbar down based on a percentage
-                    // songsScroller.ActualHeight;
-                    double newVerticalOffset = songsScroller.VerticalOffset - songsScroller.ScrollableHeight * 0.01;
-                    if (newVerticalOffset < 0.0)
+                    if (!AutoScrollTimer.IsEnabled)
                     {
-                        newVerticalOffset = 0.0;
+                        AutoScrollUp = true;
+                        AutoScrollTimer.Start();
                     }
-
-                    // removeThis.Text = "A: " + newVerticalOffset;
-                    songsScroller.ScrollToVerticalOffset(newVerticalOffset);
                 }
 
+                // Scroll Down
                 if (actualY >= maxCanvasY + songsScroller.VerticalOffset)
                 {
-                    double newVerticalOffset = songsScroller.VerticalOffset + songsScroller.ScrollableHeight * 0.01;
-                    if (newVerticalOffset > songsScroller.ScrollableHeight)
+                    if (!AutoScrollTimer.IsEnabled)
                     {
-                        newVerticalOffset = songsScroller.ScrollableHeight;
+                        AutoScrollUp = false;
+                        AutoScrollTimer.Start();
                     }
-                    songsScroller.ScrollToVerticalOffset(newVerticalOffset);
-
-                    // removeThis.Text = "B: " + actualY + " C: " + maxCanvasY;
                 }
 
                 int elementsPassed = int.Parse(Math.Floor(actualY / (toMove.ActualHeight + marginBetweenElements)).ToString());
@@ -172,8 +214,6 @@ namespace MusicPlayer.MVVM.View
 
                     // Reset
                     PreviousMoveIndex = elementsPassed;
-
-                    // Finally, on mouse let go, save the playlist
                 }
 
                 // Move in Canvas
@@ -192,6 +232,8 @@ namespace MusicPlayer.MVVM.View
                 ElementSelected.Visibility = Visibility.Visible;
                 ElementSelected = null;
                 meow.Visibility = Visibility.Hidden;
+
+                GlobalViewModel.Instance.SavePlaylists();
             }
         }
     }
