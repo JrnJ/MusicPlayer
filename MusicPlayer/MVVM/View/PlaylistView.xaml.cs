@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Microsoft.UI.Xaml.Input;
 using MusicPlayer.Core;
 using MusicPlayer.MVVM.Model;
 using MusicPlayer.MVVM.ViewModel;
@@ -48,6 +49,8 @@ namespace MusicPlayer.MVVM.View
         // AutoScrolling
         private DispatcherTimer AutoScrollTimer { get; set; }
         private bool AutoScrollUp { get; set; }
+        private double UnClamppedVisualY { get; set; }
+        private double MaxCanvasY { get; set; }
 
         public PlaylistView()
         {
@@ -110,7 +113,7 @@ namespace MusicPlayer.MVVM.View
 
             if (AutoScrollUp)
             {
-                double newVerticalOffset = songsScroller.VerticalOffset - 5.0;
+                double newVerticalOffset = songsScroller.VerticalOffset - (5.0 * (7.0 / 100.0 * Math.Abs(UnClamppedVisualY)));
                 if (newVerticalOffset < 0.0)
                 {
                     newVerticalOffset = 0.0;
@@ -121,7 +124,7 @@ namespace MusicPlayer.MVVM.View
             }
             else
             {
-                double newVerticalOffset = songsScroller.VerticalOffset + 5.0;
+                double newVerticalOffset = songsScroller.VerticalOffset + (5.0 * (7.0 / 100.0 * (UnClamppedVisualY - MaxCanvasY)));
                 if (newVerticalOffset > songsScroller.ScrollableHeight)
                 {
                     newVerticalOffset = songsScroller.ScrollableHeight;
@@ -169,24 +172,21 @@ namespace MusicPlayer.MVVM.View
                 double elementHalfHeight = toMove.ActualHeight / 2.0;
                 double marginBetweenElements = 8.0;
 
-                double maxCanvasY = canvas.ActualHeight - elementHalfHeight - 24.0;
-                double visualY = Math.Clamp(mousePos.Y - elementHalfHeight, 0.0, maxCanvasY);
-                double actualY = Math.Clamp(mousePos.Y + songsScroller.VerticalOffset, 0.0, songsScroller.ScrollableHeight + maxCanvasY);
-
-                // TODO
-                // if it reaches the bottom
-                // then start scrolling down
-                // if it reaches the top
-                // then start scrolling up
+                MaxCanvasY = canvas.ActualHeight - elementHalfHeight - 24.0;
+                UnClamppedVisualY = mousePos.Y - elementHalfHeight;
+                double visualY = Math.Clamp(UnClamppedVisualY, 0.0, MaxCanvasY);
+                double actualY = Math.Clamp(mousePos.Y + songsScroller.VerticalOffset, 0.0, songsScroller.ScrollableHeight + MaxCanvasY);
 
                 //removeThis.Text = "ActualY: " + actualY +
                 //    " CanvasScrollableHeight: " + songsScroller.ScrollableHeight +
                 //    " CanvasActualHeight: " + canvas.ActualHeight +
-                //    " MaxCanvasY: " + maxCanvasY
+                //    " MaxCanvasY: " + MaxCanvasY + 
+                //    " VisualY: " + visualY +
+                //    " UnClampedVisualY: " + UnClamppedVisualY
                 //    ;
 
                 // Scroll Up
-                if (visualY <= 1.0)
+                if (UnClamppedVisualY < 0.0)
                 {
                     if (!AutoScrollTimer.IsEnabled)
                     {
@@ -194,15 +194,23 @@ namespace MusicPlayer.MVVM.View
                         AutoScrollTimer.Start();
                     }
                 }
+                else if (AutoScrollTimer.IsEnabled && AutoScrollUp)
+                {
+                    AutoScrollTimer.Stop();
+                }
 
                 // Scroll Down
-                if (actualY >= maxCanvasY + songsScroller.VerticalOffset)
+                if (UnClamppedVisualY > MaxCanvasY)
                 {
                     if (!AutoScrollTimer.IsEnabled)
                     {
                         AutoScrollUp = false;
                         AutoScrollTimer.Start();
                     }
+                }
+                else if (AutoScrollTimer.IsEnabled && !AutoScrollUp)
+                {
+                    AutoScrollTimer.Stop();
                 }
 
                 int elementsPassed = int.Parse(Math.Floor(actualY / (toMove.ActualHeight + marginBetweenElements)).ToString());
