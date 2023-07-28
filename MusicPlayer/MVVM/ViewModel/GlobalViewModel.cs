@@ -187,6 +187,7 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _discordGameSDKWrapper = value; }
         }
 
+        // public SystemVolumeChanger SystemVolumeChanger { get; set; }
 
         // TODO: caching breaks when a song is added to a Folder
         public GlobalViewModel()
@@ -197,6 +198,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Configuration
             Configure();
+
 
             // Set BoxModels :: This isnt mandatory btw
             ConfirmBox = new();

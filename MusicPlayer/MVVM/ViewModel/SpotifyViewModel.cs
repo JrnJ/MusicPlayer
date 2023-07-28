@@ -29,8 +29,8 @@ namespace MusicPlayer.MVVM.ViewModel
 
         // <Spotify Stuff> //
 
-        public string ClientId = "6b4917d2b18d4a8c8384a9658655af77";
-        public string ClientSecret = "997e57ed686b4da8b476d8eee5f8b7d6";
+        public string ClientId = "";
+        public string ClientSecret = "";
         public string RedirectUrl = "http://localhost:8888/callback";
 
         public string Scope = "user-read-private user-read-email";

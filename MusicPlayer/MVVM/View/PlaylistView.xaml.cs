@@ -181,7 +181,7 @@ namespace MusicPlayer.MVVM.View
                 //    " CanvasScrollableHeight: " + songsScroller.ScrollableHeight +
                 //    " CanvasActualHeight: " + canvas.ActualHeight +
                 //    " MaxCanvasY: " + MaxCanvasY + 
-                //    " VisualY: " + visualY +
+                //    " VisualY: " + visualY + 
                 //    " UnClampedVisualY: " + UnClamppedVisualY
                 //    ;
 

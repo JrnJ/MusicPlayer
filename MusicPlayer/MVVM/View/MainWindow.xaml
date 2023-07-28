@@ -247,6 +247,14 @@
             <!-- /Controls -->
         </Grid>
 
+        <!-- <Custom ToolTips> -->
+        <Grid>
+            <Grid Height="20" Width="40" Background="Red">
+                <TextBlock Text="20" />
+            </Grid>
+        </Grid>
+        <!-- </Custom ToolTips> -->
+        
         <!-- <TitleBar> -->
         <Grid x:Name="AppTitleBar" Height="32" 
             VerticalAlignment="Top">

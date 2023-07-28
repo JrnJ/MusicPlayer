@@ -43,6 +43,11 @@
                                             </Style.Setters>
                                         </Style>
                                     </Thumb.Style>
+                                    <Thumb.ToolTip>
+                                        <ToolTip Content="50" Placement="Top">
+                                            
+                                        </ToolTip>
+                                    </Thumb.ToolTip>
                                 </Thumb>
                             </Track.Thumb>
                         </Track>
