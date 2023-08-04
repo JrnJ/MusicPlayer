@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows.Media.Media3D;
 
 namespace MusicPlayer.Core
 {
@@ -119,17 +120,20 @@ namespace MusicPlayer.Core
             AudioEndpointVolume = audioEndpointVolume;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="volume">Between 0.0f and 1.0f</param>
         public void SetSystemVolume(float volume)
         {
-            volume = Math.Clamp(volume, 0.0f, 100.0f);
+            volume = Math.Clamp(volume, 0.0f, 1.0f);
             Guid eventContext = Guid.Empty;
-            Hr = AudioEndpointVolume.SetMasterVolumeLevel(volume, eventContext);
+            Hr = AudioEndpointVolume.SetMasterVolumeLevelScalar(volume, eventContext);
         }
 
         public float GetSystemVolume()
         {
-            float volume = 0.0f;
-            Hr = AudioEndpointVolume.GetMasterVolumeLevel(out volume);
+            Hr = AudioEndpointVolume.GetMasterVolumeLevelScalar(out float volume);
             return volume;
         }
 

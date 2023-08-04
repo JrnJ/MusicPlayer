@@ -198,6 +198,8 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Configuration
             Configure();
+            SystemVolumeChanger snlrf = new();
+            snlrf.SetSystemVolume(1.0f);
 
 
             // Set BoxModels :: This isnt mandatory btw
