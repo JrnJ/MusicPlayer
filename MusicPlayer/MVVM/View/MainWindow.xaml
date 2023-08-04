@@ -249,9 +249,9 @@
 
         <!-- <Custom ToolTips> -->
         <Grid>
-            <Grid Height="20" Width="40" Background="Red">
+            <!--<Grid Height="20" Width="40" Background="Red">
                 <TextBlock Text="20" />
-            </Grid>
+            </Grid>-->
         </Grid>
         <!-- </Custom ToolTips> -->
         

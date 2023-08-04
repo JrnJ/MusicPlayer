@@ -24,23 +24,23 @@ namespace MusicPlayer.Classes
     internal class AudioPlayer : ObservableObject
     {
         // Unsure about accesibility here
-        public SystemMediaTransportControls MediaControls { get; set; }
+        public SystemMediaTransportControls MediaControls { get; private set; }
 
-        public MediaPlayer MediaPlayer { get; set; }
+        public MediaPlayer MediaPlayer { get; private set; }
 
         // Stoopid props
         private AlbumSongModel _currentSong;
 
         public AlbumSongModel CurrentSong
         {
-            get { return _currentSong; }
+            get =>_currentSong;
             set { _currentSong = value; OnPropertyChanged(); }
         }
 
         public double Volume
         {
             get => MediaPlayer.Volume;
-            set => MediaPlayer.Volume = value;
+            set { MediaPlayer.Volume = value; OnPropertyChanged(); }
         }
 
         public TimeSpan Position
@@ -87,16 +87,18 @@ namespace MusicPlayer.Classes
             // Mediaplayer
             MediaPlayer = new();
 
-            MediaPlayer.SystemMediaTransportControls.IsPlayEnabled = false;
-            MediaPlayer.SystemMediaTransportControls.IsPauseEnabled = false;
-            MediaPlayer.SystemMediaTransportControls.IsStopEnabled = false;
+            SMTC();
 
-            // Properties
-            MediaPlayer.CommandManager.IsEnabled = true;
+            //MediaPlayer.SystemMediaTransportControls.IsPlayEnabled = false;
+            //MediaPlayer.SystemMediaTransportControls.IsPauseEnabled = false;
+            //MediaPlayer.SystemMediaTransportControls.IsStopEnabled = false;
 
-            // Events
-            MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
-            MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
+            //// Properties
+            //MediaPlayer.CommandManager.IsEnabled = true;
+
+            //// Events
+            //MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
+            //MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
 
             // SMTC
             //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
@@ -104,73 +106,128 @@ namespace MusicPlayer.Classes
             // https://github.com/microsoft/Windows-universal-samples/blob/dev/Samples/SystemMediaTransportControls/cs/Scenario1.xaml.cs
         }
 
-        private void CommandManager_NextReceived(MediaPlaybackCommandManager sender, MediaPlaybackCommandManagerNextReceivedEventArgs args)
+        #region SMTC
+        private void SMTC()
         {
-            throw new NotImplementedException();
+            // MediaControls Event enabling
+            MediaPlayer.CommandManager.IsEnabled = true;
+            MediaPlayer.CommandManager.PreviousBehavior.EnablingRule = MediaCommandEnablingRule.Always;
+            MediaPlayer.CommandManager.NextBehavior.EnablingRule = MediaCommandEnablingRule.Always;
+            MediaPlayer.CommandManager.PlayBehavior.EnablingRule = MediaCommandEnablingRule.Always;
+            MediaPlayer.CommandManager.PauseBehavior.EnablingRule = MediaCommandEnablingRule.Always;
+
+            MediaPlayer.SystemMediaTransportControls.IsPlayEnabled = true;
+            MediaPlayer.SystemMediaTransportControls.IsPauseEnabled = true;
+            MediaPlayer.SystemMediaTransportControls.IsStopEnabled = true;
+
+            // SystemMediaTransportControls Visual
+            MediaPlayer.SystemMediaTransportControls.IsEnabled = true;
+            MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
+
+            // Catch MediaControl clicks
+            MediaPlayer.SystemMediaTransportControls.ButtonPressed += SystemMediaTransportControls_ButtonPressed;
         }
+
+        private void MediaPlayerMediaOpened(Windows.Media.Playback.MediaPlayer sender, object args)
+        {
+            UpdateSMTCDisplay();
+        }
+
+        private void SystemMediaTransportControls_ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
+        {
+            switch (args.Button)
+            {
+                case SystemMediaTransportControlsButton.Play:
+                case SystemMediaTransportControlsButton.Pause:
+                    // PausePlay();
+                    break;
+                case SystemMediaTransportControlsButton.Previous:
+                    
+                    break;
+                case SystemMediaTransportControlsButton.Next:
+                    break;
+            }
+        }
+
+        private void UpdateSMTCDisplay()
+        {
+            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Type = MediaPlaybackType.Video;
+            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
+            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
+            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Thumbnail = 
+                Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
+
+            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Update();
+        }
+        #endregion SMTC
+
+        //private void CommandManager_NextReceived(MediaPlaybackCommandManager sender, MediaPlaybackCommandManagerNextReceivedEventArgs args)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         private void ConfigureAudioServer()
         {
             AudioServer = new AudioServer();
         }
 
-        #region MediaPlayerEvents
-        private void MediaPlayerMediaOpened(Windows.Media.Playback.MediaPlayer sender, object args)
-        {
-            UpdateSMTCDisplay();
-        }
+        //#region MediaPlayerEvents
+        //private void MediaPlayerMediaOpened(Windows.Media.Playback.MediaPlayer sender, object args)
+        //{
+        //    UpdateSMTCDisplay();
+        //}
 
-        private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
-        {
-            // Call to MainWindow thread
-            //Dispatcher.Invoke(() => { MediaEnded(); });
-        }
-        #endregion MediaPlayerEvents
+        //private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
+        //{
+        //    // Call to MainWindow thread
+        //    //Dispatcher.Invoke(() => { MediaEnded(); });
+        //}
+        //#endregion MediaPlayerEvents
 
-        // This is a joke and doesnt even work
-        private void UpdateSMTCDisplay()
-        {
-            //if (CurrentSong != null && 1 == 2)
-            //{
-            //    SystemMediaTransportControls smtc = MediaPlayer.SystemMediaTransportControls;
-            //    //smtc.DisplayUpdater.ClearAll();
-            //    //smtc.IsNextEnabled = true;
-            //    //smtc.IsPreviousEnabled = true;
-            //    smtc.DisplayUpdater.Type = MediaPlaybackType.Video;
-            //    smtc.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
-            //    smtc.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
-            //    smtc.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
-            //    smtc.IsNextEnabled = true;
-            //    smtc.IsPreviousEnabled = true;
+        //// This is a joke and doesnt even work
+        //private void UpdateSMTCDisplay()
+        //{
+        //    //if (CurrentSong != null && 1 == 2)
+        //    //{
+        //    //    SystemMediaTransportControls smtc = MediaPlayer.SystemMediaTransportControls;
+        //    //    //smtc.DisplayUpdater.ClearAll();
+        //    //    //smtc.IsNextEnabled = true;
+        //    //    //smtc.IsPreviousEnabled = true;
+        //    //    smtc.DisplayUpdater.Type = MediaPlaybackType.Video;
+        //    //    smtc.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
+        //    //    smtc.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
+        //    //    smtc.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
+        //    //    smtc.IsNextEnabled = true;
+        //    //    smtc.IsPreviousEnabled = true;
 
-            //    // Update the system media transport controls
-            //    smtc.DisplayUpdater.Update();
+        //    //    // Update the system media transport controls
+        //    //    smtc.DisplayUpdater.Update();
 
-            //    // LateUpdate??
-            //    //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
-            //    //MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Could not update SMTC display because song is null");
-            //}
+        //    //    // LateUpdate??
+        //    //    //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
+        //    //    //MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
+        //    //}
+        //    //else
+        //    //{
+        //    //    Console.WriteLine("Could not update SMTC display because song is null");
+        //    //}
 
-            if (CurrentSong != null)
-            {
-                // Set Other
-                //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
-                //MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
+        //    if (CurrentSong != null)
+        //    {
+        //        // Set Other
+        //        //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
+        //        //MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
 
-                // Set DisplayUpdater properties
-                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Type = MediaPlaybackType.Video;
-                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
-                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
-                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
+        //        // Set DisplayUpdater properties
+        //        MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Type = MediaPlaybackType.Video;
+        //        MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
+        //        MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
+        //        MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
 
-                // Update Display
-                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Update();
-            }
-        }
+        //        // Update Display
+        //        MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Update();
+        //    }
+        //}
 
         #endregion Private
 
@@ -278,6 +335,15 @@ namespace MusicPlayer.Classes
         public void SubtractTime(int amount)
         {
             Position = Position.Subtract(new TimeSpan(0, 0, amount));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="volume">Min 0.00, max 1.00</param>
+        public void SetVolume(double volume)
+        {
+            Volume = Math.Clamp(volume, 0.00, 1.00);
         }
     }
 }

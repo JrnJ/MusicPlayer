@@ -485,12 +485,51 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             if (args.Button == SystemMediaTransportControlsButton.Previous)
             {
-                PreviousSong();
+                // 0x11:    CTRL / VK_MENU
+                // 0x12:    ALT / VK_MENU
+                if (ExternalInputHelper.IsKeyDown(0x12))
+                {
+                    // MediaPlayer Volume Down
+                    if (ExternalInputHelper.IsKeyDown(0x11))
+                    {
+                        // By 1
+                        AudioPlayer.SetVolume(AppSettinggs.Volume - 0.01);
+                    }
+                    else
+                    {
+                        // By 10
+                        AudioPlayer.SetVolume(AppSettinggs.Volume - 0.10);
+                    }
+                }
+                else
+                {
+                    PreviousSong();
+                }
+                
             }
 
             if (args.Button == SystemMediaTransportControlsButton.Next)
             {
-                NextSong();
+                // 0x11:    CTRL / VK_MENU
+                // 0x12:    ALT / VK_MENU
+                if (ExternalInputHelper.IsKeyDown(0x12))
+                {
+                    // MediaPlayer Volume Up
+                    if (ExternalInputHelper.IsKeyDown(0x11))
+                    {
+                        // By 1
+                        AudioPlayer.SetVolume(AppSettinggs.Volume + 0.01);
+                    }
+                    else
+                    {
+                        // By 10
+                        AudioPlayer.SetVolume(AppSettinggs.Volume + 0.10);
+                    }
+                }
+                else
+                {
+                    NextSong();
+                }
             }
         }
 
