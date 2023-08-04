@@ -187,7 +187,7 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _discordGameSDKWrapper = value; }
         }
 
-        // public SystemVolumeChanger SystemVolumeChanger { get; set; }
+        public SystemVolumeChanger SystemVolumeChanger { get; set; }
 
         // TODO: caching breaks when a song is added to a Folder
         public GlobalViewModel()
@@ -198,9 +198,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Configuration
             Configure();
-            SystemVolumeChanger snlrf = new();
-            snlrf.SetSystemVolume(1.0f);
-
+            SystemVolumeChanger = new();
 
             // Set BoxModels :: This isnt mandatory btw
             ConfirmBox = new();
@@ -489,48 +487,37 @@ namespace MusicPlayer.MVVM.ViewModel
             {
                 // 0x11:    CTRL / VK_MENU
                 // 0x12:    ALT / VK_MENU
-                if (ExternalInputHelper.IsKeyDown(0x12))
+                float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
+
+                if (amount == 0.0f)
                 {
-                    // MediaPlayer Volume Down
                     if (ExternalInputHelper.IsKeyDown(0x11))
-                    {
-                        // By 1
-                        AudioPlayer.SetVolume(AppSettinggs.Volume - 0.01);
-                    }
+                        SystemVolumeChanger.DecreaseSystemVolume(0.01f);
                     else
-                    {
-                        // By 10
-                        AudioPlayer.SetVolume(AppSettinggs.Volume - 0.10);
-                    }
+                        PreviousSong();
                 }
                 else
                 {
-                    PreviousSong();
+                    AudioPlayer.SetVolume(AppSettinggs.Volume - amount);
                 }
-                
             }
 
             if (args.Button == SystemMediaTransportControlsButton.Next)
             {
                 // 0x11:    CTRL / VK_MENU
                 // 0x12:    ALT / VK_MENU
-                if (ExternalInputHelper.IsKeyDown(0x12))
+                float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
+
+                if (amount == 0.0f)
                 {
-                    // MediaPlayer Volume Up
                     if (ExternalInputHelper.IsKeyDown(0x11))
-                    {
-                        // By 1
-                        AudioPlayer.SetVolume(AppSettinggs.Volume + 0.01);
-                    }
+                        SystemVolumeChanger.IncreaseSystemVolume(0.01f);
                     else
-                    {
-                        // By 10
-                        AudioPlayer.SetVolume(AppSettinggs.Volume + 0.10);
-                    }
+                        NextSong();
                 }
                 else
                 {
-                    NextSong();
+                    AudioPlayer.SetVolume(AppSettinggs.Volume + amount);
                 }
             }
         }
