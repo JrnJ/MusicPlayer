@@ -4,24 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Media;
-using System.Windows.Threading;
-using System.Windows.Controls.Primitives;
-using System.ComponentModel;
-
-using System.Collections.ObjectModel;
-using System.Globalization;
-using Windows.Media;
-using MusicPlayer.Classes;
-using System.Runtime.CompilerServices;
 
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -30,20 +12,10 @@ using MusicPlayer.Core;
 using MusicPlayer.MVVM.ViewModel;
 using static System.Net.Mime.MediaTypeNames;
 
-// Resources
-// https://docs.microsoft.com/en-us/windows/apps/develop/title-bar?tabs=wasdk
-// https://docs.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-enhance
-// https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
-
-namespace MusicPlayer
+namespace MusicPlayer.Core
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    internal class AppWindowTitlebarManager : ObservableObject
     {
-        public static AppWindow AppWindow { get; private set; }
-
         [DllImport("Shcore.dll", SetLastError = true)]
         internal static extern int GetDpiForMonitor(IntPtr hmonitor, Monitor_DPI_Type dpiType, out uint dpiX, out uint dpiY);
 
@@ -55,26 +27,34 @@ namespace MusicPlayer
             MDT_Default = MDT_Effective_DPI
         }
 
-        //[DllImport("winmm.dll")]
-        //public static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
+        // Windowing
+        public static AppWindow AppWindow { get; private set; }
+        private MainWindow MainWindow { get; }
 
-        public MainWindow()
+        // Properties
+        private int _titlebarHeight;
+
+        public int TitlebarHeight
         {
-            InitializeComponent();
+            get { return _titlebarHeight; }
+            set { _titlebarHeight = value; OnPropertyChanged(); }
+        }
 
-            if (false) return;
-
+        public AppWindowTitlebarManager()
+        {
+            return;
             try
             {
-                AppWindow = AppWindowExtensions.GetAppWindowFromWPFWindow(AppWindowExtensions.GetMainWindow());
+                MainWindow = AppWindowExtensions.GetMainWindow();
+                AppWindow = AppWindowExtensions.GetAppWindowFromWPFWindow(MainWindow);
 
                 if (AppWindow != null)
                 {
                     if (AppWindowTitleBar.IsCustomizationSupported())
                     {
                         CustomizeTitleBar();
-                        AppWindowExtensions.GetMainWindow().Loaded += MainWindow_Loaded;
-                        AppWindowExtensions.GetMainWindow().SizeChanged += MainWindow_SizeChanged;
+                        MainWindow.Loaded += MainWindow_Loaded;
+                        MainWindow.SizeChanged += MainWindow_SizeChanged;
 
                         // Ensure first call to functions
                         MainWindow_Loaded(null, null);
@@ -91,7 +71,7 @@ namespace MusicPlayer
                 Console.WriteLine("ERROR: " + ex);
 
                 //MessageBox.Show("Could not load custom window!", "Error");
-                this.Title = "Custom Window Not Supported";
+                MainWindow.Title = "Custom Window Not Supported";
             }
         }
 
@@ -105,16 +85,16 @@ namespace MusicPlayer
             SetDragRegionForCustomTitleBar();
         }
 
-        private static void CustomizeTitleBar()
+        private void CustomizeTitleBar()
         {
             // AppWindowTitleBar
             AppWindowTitleBar titleBar = AppWindow.TitleBar;
             titleBar.ExtendsContentIntoTitleBar = true;
 
             // Size
-            titleBar.PreferredHeightOption = TitleBarHeightOption.Standard; // 32
+            //titleBar.PreferredHeightOption = TitleBarHeightOption.Standard; // 32
             titleBar.PreferredHeightOption = TitleBarHeightOption.Tall; // 46
-            GlobalViewModel.Instance.AppWindowTitlebarManager.TitlebarHeight = titleBar.Height;
+            TitlebarHeight = titleBar.Height;
 
             // Icon
             //titleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;)
@@ -142,7 +122,7 @@ namespace MusicPlayer
 
         private static double GetScaleAdjustment()
         {
-            DisplayArea displayArea = 
+            DisplayArea displayArea =
                 DisplayArea.GetFromWindowId(
                     AppWindowExtensions.GetAppWindowFromWPFWindow(AppWindowExtensions.GetMainWindow()).Id, DisplayAreaFallback.Primary);
 
@@ -159,26 +139,80 @@ namespace MusicPlayer
             return (uint)(((long)dpiX * 100 + (96 >> 1)) / 96) / 100.0;
         }
 
+        #region LeftPaddingColumn
+        private GridLength _leftPaddingColumnWidth;
+
+        public GridLength LeftPaddingColumnWidth
+        {
+            get { return _leftPaddingColumnWidth; }
+            set { _leftPaddingColumnWidth = value; OnPropertyChanged(); }
+        }
+
+        private double _leftPaddingColumnActualWidth;
+
+        public double LeftPaddingColumnActualWidth
+        {
+            get { return _leftPaddingColumnActualWidth; }
+            set { _leftPaddingColumnActualWidth = value; OnPropertyChanged(); }
+        }
+        #endregion LeftPaddingColumn
+
+        #region RightPaddingColumn
+        private GridLength _rightPaddingColumnWidth;
+
+        public GridLength RightPaddingColumnWidth
+        {
+            get { return _rightPaddingColumnWidth; }
+            set { _rightPaddingColumnWidth = value; OnPropertyChanged(); }
+        }
+
+        private double _rightPaddingColumnActualWidth;
+
+        public double RightPaddingColumnActualWidth
+        {
+            get { return _rightPaddingColumnActualWidth; }
+            set { _rightPaddingColumnActualWidth = value; OnPropertyChanged(); }
+        }
+        #endregion RightPaddingColumn
+
+        #region Extra Columns
+        private double _iconTitleColumnActualWidth;
+
+        public double IconTitleColumnActualWidth
+        {
+            get { return _iconTitleColumnActualWidth; }
+            set { _iconTitleColumnActualWidth = value; OnPropertyChanged(); }
+        }
+
+        private double _testColumnActualWidth;
+
+        public double TestColumnActualWidth
+        {
+            get { return _testColumnActualWidth; }
+            set { _testColumnActualWidth = value; OnPropertyChanged(); }
+        }
+        #endregion Extra Columns
+
         private void SetDragRegionForCustomTitleBar()
         {
             if (AppWindow.TitleBar.ExtendsContentIntoTitleBar)
             {
                 double scaleAdjustment = GetScaleAdjustment();
 
-                LeftPaddingColumn.Width = new GridLength(AppWindow.TitleBar.LeftInset / scaleAdjustment);
-                RightPaddingColumn.Width = new GridLength(AppWindow.TitleBar.RightInset / scaleAdjustment);
+                LeftPaddingColumnWidth = new GridLength(AppWindow.TitleBar.LeftInset / scaleAdjustment);
+                RightPaddingColumnWidth = new GridLength(AppWindow.TitleBar.RightInset / scaleAdjustment);
 
                 List<Windows.Graphics.RectInt32> dragRectsList = new();
 
                 Windows.Graphics.RectInt32 dragRectL;
-                dragRectL.X = (int)((LeftPaddingColumn.ActualWidth) * scaleAdjustment);
+                dragRectL.X = (int)((LeftPaddingColumnActualWidth) * scaleAdjustment);
                 dragRectL.Y = 0;
                 dragRectL.Height = (int)(AppWindow.TitleBar.Height * scaleAdjustment);
-                dragRectL.Width = (int)((IconTitleColumn.ActualWidth + Test1.ActualWidth) * scaleAdjustment);
+                dragRectL.Width = (int)((IconTitleColumnActualWidth + TestColumnActualWidth) * scaleAdjustment);
                 dragRectsList.Add(dragRectL);
 
                 Windows.Graphics.RectInt32 dragRectR;
-                dragRectR.X = (int)((LeftPaddingColumn.ActualWidth + IconTitleColumn.ActualWidth) * scaleAdjustment);
+                dragRectR.X = (int)((LeftPaddingColumnActualWidth + IconTitleColumnActualWidth) * scaleAdjustment);
                 dragRectR.Y = 0;
                 dragRectR.Height = (int)(AppWindow.TitleBar.Height * scaleAdjustment);
                 dragRectR.Width = 0/*(int)(RightDragColumn.ActualWidth * scaleAdjustment)*/;
@@ -187,84 +221,6 @@ namespace MusicPlayer
                 Windows.Graphics.RectInt32[] dragRects = dragRectsList.ToArray();
                 AppWindow.TitleBar.SetDragRectangles(dragRects);
             }
-        }
-
-        bool isMaximized = false;
-
-
-
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-
-                // Fullscreen Toggle
-                case Key.F11:
-                    isMaximized = !isMaximized;
-
-                    if (isMaximized)
-                    { // Fullscreen
-                        // Collapse Content
-                        this.AppTitleBar.Visibility = Visibility.Collapsed;
-
-                        // 
-                        this.WindowStyle = WindowStyle.None;
-                        this.WindowState = WindowState.Normal;
-                        this.WindowState = WindowState.Maximized;
-                    }
-                    else
-                    { // Normal
-                        // Collapse Content
-                        this.AppTitleBar.Visibility = Visibility.Visible;
-
-                        // 
-                        this.WindowStyle = WindowStyle.SingleBorderWindow;
-                        this.WindowState = WindowState.Maximized;
-                    }
-
-                    // this.UpdateLayout();
-
-                    break;
-
-                // Add | Remove
-                case Key.J:
-                    GlobalViewModel.Instance.AudioPlayer.SubtractTime(10000);
-                    break;
-
-                case Key.L:
-                    GlobalViewModel.Instance.AudioPlayer.AddTime(10000);
-                    break;
-            }
-        }
-
-        private void Window_KeyUp(object sender, KeyEventArgs e)
-        {
-
-        }
-
-        int mouseMoves = 0;
-        private void hello_MouseEnter(object sender, MouseEventArgs e)
-        {
-            test1.Text = "Mouse Entered";
-        }
-
-        private void hello_MouseLeave(object sender, MouseEventArgs e)
-        {
-            test1.Text = "Mouse Left";
-        }
-
-        private void hello_MouseMove(object sender, MouseEventArgs e)
-        {
-            mouseMoves++;
-            test2.Text = "Moves: " + mouseMoves;
-
-            double mouseX = e.GetPosition(hello).X;
-            double percentage = mouseX / hello.ActualWidth; // Calculate the percentage of mouse position
-            double newValue = hello.Minimum + (hello.Maximum - hello.Minimum) * percentage; // Calculate the value based on percentage
-            // hello.Value = newValue; // Update the Slider's value
-
-            test3.Text = percentage.ToString();
-            test4.Text = hello.Maximum.ToString();
-            trackbarHoverTime.Text = HelperMethods.MsToTime(newValue);
         }
     }
 }

@@ -5,6 +5,8 @@ using System.Windows.Media.Imaging;
 using System.IO;
 using Windows.Storage.FileProperties;
 using System.Text.Json.Serialization;
+using System.Runtime.CompilerServices;
+using Windows.Foundation.Metadata;
 
 namespace MusicPlayer.MVVM.Model
 {
@@ -45,7 +47,7 @@ namespace MusicPlayer.MVVM.Model
 
         private Microsoft.UI.Xaml.Media.Imaging.BitmapImage _bitmapImage;
 
-        [JsonIgnore]
+        [JsonIgnore, Deprecated("Use Image", DeprecationType.Deprecate, 1)]
         public Microsoft.UI.Xaml.Media.Imaging.BitmapImage BitmapImage
         {
             get { return _bitmapImage; }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
+using MusicPlayer.Core.Searching;
 using MusicPlayer.DiscordGameSDK;
 using MusicPlayer.MVVM.Model;
 using System;
@@ -25,9 +26,26 @@ namespace MusicPlayer.MVVM.ViewModel
 {
     internal class GlobalViewModel : ObservableObject
     {
+        private string _testText = "Hello!";
+
+        public string TestText
+        {
+            get { return _testText; }
+            set { _testText = value; OnPropertyChanged(); }
+        }
+
         #region Properties
         public static GlobalViewModel Instance { get; } = new();
         // Globals
+
+        // Titlebar
+        private AppWindowTitlebarManager _appWindowTitlebarManager;
+
+        public AppWindowTitlebarManager AppWindowTitlebarManager
+        {
+            get { return _appWindowTitlebarManager; }
+            set { _appWindowTitlebarManager = value; }
+        }
 
         // Current View
         private object _currentView;
@@ -189,9 +207,22 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public SystemVolumeChanger SystemVolumeChanger { get; set; }
 
+        private GlobalSearch _globalSearch;
+
+        public GlobalSearch GlobalSearch
+        {
+            get { return _globalSearch; }
+            set { _globalSearch = value; OnPropertyChanged(); }
+        }
+
         // TODO: caching breaks when a song is added to a Folder
+        // TODO: When a folder is added, and a song from that folder is played before
+        // the app restarted, it will crash
         public GlobalViewModel()
         {
+            // AppTitlebar
+            _appWindowTitlebarManager = new();
+
             // Create ViewModels
             PlaylistsVM = new();
             PlaylistVM = new();
@@ -199,6 +230,9 @@ namespace MusicPlayer.MVVM.ViewModel
             // Configuration
             Configure();
             SystemVolumeChanger = new();
+
+            // Search Bar
+            _globalSearch = new();
 
             // Set BoxModels :: This isnt mandatory btw
             ConfirmBox = new();

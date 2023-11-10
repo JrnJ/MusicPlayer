@@ -1,10 +1,15 @@
 ﻿using MusicPlayer.Core;
+using MusicPlayer.Core.Searching;
 using MusicPlayer.MVVM.Model;
+using MusicPlayer.MVVM.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Windows.Media;
 using Windows.Media.Playback;
@@ -21,7 +26,7 @@ namespace MusicPlayer.Classes
         Stopped = 5
     }
 
-    internal class AudioPlayer : ObservableObject
+    internal class AudioPlayer : ObservableObject, ISearchCommandAddon
     {
         // Unsure about accesibility here
         public SystemMediaTransportControls MediaControls { get; private set; }
@@ -73,6 +78,7 @@ namespace MusicPlayer.Classes
         {
             // Configuration
             ConfigureMediaPlayer();
+            ConfigureSearchOptions(GlobalViewModel.Instance.GlobalSearch);
 
             // Timer
             Timer = new()
@@ -151,11 +157,26 @@ namespace MusicPlayer.Classes
 
         private void UpdateSMTCDisplay()
         {
+            // Text
             MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Type = MediaPlaybackType.Video;
             MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
             MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
-            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Thumbnail = 
-                Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
+
+            // Image
+            if (CurrentSong.Image != null)
+            {
+                // TODO: async | CopyToAsync
+                MemoryStream memStream = new();
+                CurrentSong.Image.StreamSource.CopyTo(memStream);
+
+                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Thumbnail =
+                    Windows.Storage.Streams.RandomAccessStreamReference.CreateFromStream(memStream.AsRandomAccessStream());
+            }
+            else
+            {
+                MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Thumbnail = 
+                    Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri("C:/Users/jeroe/Downloads/SongImagePlaceholder.png"));
+            }
 
             MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Update();
         }
@@ -230,6 +251,41 @@ namespace MusicPlayer.Classes
         //}
 
         #endregion Private
+
+        #region SearchOptions
+        private SearchBarOption PlaySongSearchBarOption { get; set; }
+
+        public void ConfigureSearchOptions(GlobalSearch globalSearch)
+        {
+            PlaySongSearchBarOption = new()
+            {
+                Header = "Play Song: ",
+                Keywords = { "play", "start" },
+                Command = new(o =>
+                {
+                    string text = o != null ? o.ToString() : "";
+                    MessageBox.Show("Parameter: " + text);
+                }),
+            };
+            PlaySongSearchBarOption.BeforeSearchOptionShow += PlaySongSearchBarOption_BeforeSearchOptionShow;
+
+            globalSearch.AddSearchBarOption(PlaySongSearchBarOption);
+        }
+
+        private void PlaySongSearchBarOption_BeforeSearchOptionShow(object sender, string e)
+        {
+            foreach (AlbumSongModel song in GlobalViewModel.Instance.MyMusic.Songs)
+            {
+                if ((song.MusicProperties.Title.Contains(e)))
+                {
+                    PlaySongSearchBarOption.Header = "Play Song: " + song.MusicProperties.Title + " (" + song.MusicProperties.Artist + ")";
+                    break;
+                }
+            }
+
+            // Code to remove element
+        }
+        #endregion SearchOptions
 
         public void OpenMedia(AlbumSongModel song)
         {
@@ -320,21 +376,21 @@ namespace MusicPlayer.Classes
         }
 
         /// <summary>
-        /// Adds an amount of time in seconds to the song
+        /// Adds an amount of time in milliseconds to the song
         /// </summary>
-        /// <param name="amount">Time in seconds</param>
-        public void AddTime(int amount)
+        /// <param name="amount">Time in milliseconds</param>
+        public void AddTime(double amount)
         {
-            Position = Position.Add(new TimeSpan(0, 0, amount));
+            Position = Position.Add(TimeSpan.FromMilliseconds(amount));
         }
 
         /// <summary>
-        /// Subtracts an amount of time in seconds from the song
+        /// Subtracts an amount of time in milliseconds from the song
         /// </summary>
-        /// <param name="amount">Time in seconds</param>
-        public void SubtractTime(int amount)
+        /// <param name="amount">Time in milliseconds</param>
+        public void SubtractTime(double amount)
         {
-            Position = Position.Subtract(new TimeSpan(0, 0, amount));
+            Position = Position.Subtract(TimeSpan.FromMilliseconds(amount));
         }
 
         /// <summary>

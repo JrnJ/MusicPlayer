@@ -10,7 +10,8 @@
         
         Title="Jrn Music Player" WindowState="Maximized" Icon="/Images/Icons/logo_gold.png"
         Width="1280" Height="720" MinWidth="960" MinHeight="308"
-        Background="#0f0f0f" KeyDown="Window_KeyDown" WindowStyle="SingleBorderWindow"
+        Background="#0f0f0f" WindowStyle="SingleBorderWindow"
+        KeyDown="Window_KeyDown" KeyUp="Window_KeyUp"
         >
 
     <Window.DataContext>
@@ -58,21 +59,22 @@
             </Image>
         </Grid>-->
         <!-- </Image> -->
-
+        
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding Path=Global.AppWindowTitlebarManager.TitlebarHeight}" />
                 <RowDefinition />
                 <RowDefinition Height="110" />
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0">
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="340" />
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- SideBar -->
-                <Grid Grid.Column="0" Margin="8,32,4,0">
+                <Grid Grid.Column="0" Margin="8,0,4,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -140,7 +142,7 @@
                 <!-- /SideBar -->
 
                 <!-- Current View -->
-                <Grid Grid.Column="1" Margin="4,32,8,0">
+                <Grid Grid.Column="1" Margin="4,0,8,0">
                     <Border Background="#121212" CornerRadius="10" Padding="24,24,24,8">
                         <ContentControl Content="{Binding Global.CurrentView}"/>
                     </Border>
@@ -149,7 +151,7 @@
             </Grid>
 
             <!-- Single Song View? -->
-            <Grid Grid.Row="0" Background="#121212" Visibility="{Binding Global.SingleSongVisibility}">
+            <Grid Grid.Row="1" Background="#0f0f0f" Visibility="{Binding Global.SingleSongVisibility}">
                 <Image Source="./../../Images/logo.png" 
                        Margin="100" Opacity="0.25"
                        />
@@ -157,7 +159,7 @@
             <!-- /Single Song View? -->
 
             <!-- Controls -->
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="2">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -178,56 +180,80 @@
                     <Grid Grid.Column="1" 
                           HorizontalAlignment="Center"
                           >
-                        <StackPanel>
-                            <!-- AudioButtons -->
-                            <DockPanel Margin="0,15,0,0" HorizontalAlignment="Center">
-                                <Button Command="{Binding ShuffleCommand}"
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        
+                        <!-- AudioButtons -->
+                        <DockPanel 
+                            Grid.Row="0"
+                            Margin="0,15,0,0" HorizontalAlignment="Center">
+                            <Button Command="{Binding ShuffleCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/shuffle_icon.png"
                                             Height="40" Width="40" />
-                                <Button Command="{Binding PreviousSongCommand}"
+                            <Button Command="{Binding PreviousSongCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             Height="40" Width="40" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/previous_icon.png"
                                             Margin="10,0,10,0" />
-                                <Button Command="{Binding PausePlayCommand}"
+                            <Button Command="{Binding PausePlayCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/pause_icon.png"
                                             Height="40" Width="40" />
-                                <Button Command="{Binding NextSongCommand}"
+                            <Button Command="{Binding NextSongCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/next_icon.png"
                                             Height="40" Width="40" 
                                             Margin="10,0,10,0" />
-                                <Button Command="{Binding RepeatCommand}"
+                            <Button Command="{Binding RepeatCommand}"
                                             Style="{StaticResource ImageButton}" 
                                             extensions:CustomProperty.ImageSource="/Images/Icons/repeat_icon.png"
                                             Height="40" Width="40" />
-                            </DockPanel>
-                            <!-- /AudioButtons -->
+                        </DockPanel>
+                        <!-- /AudioButtons -->
 
-                            <!-- TrackBar -->
-                            <Grid HorizontalAlignment="Center" Width="500" Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                        <!-- TrackBar -->
+                        <Grid 
+                            Grid.Row="1"
+                            HorizontalAlignment="Center" Width="500" Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Column="0" Text="{Binding Global.CurrentTime}" HorizontalAlignment="Left" Foreground="#999999"/>
+                            <TextBlock Grid.Column="0" Text="{Binding Global.CurrentTime}" HorizontalAlignment="Left" Foreground="#999999"/>
 
-                                <extensions:CustomSlider Grid.Column="1" x:Name="hello" 
-                                                     Style="{StaticResource SongTime}" Margin="10, 0, 10, 0"
-                                                     IsMoveToPointEnabled="True" 
-                                                     ClickedInSlider="{Binding ClickedInSliderr, Mode=TwoWay}"
-                                                     Value="{Binding Global.SliderValue, Mode=TwoWay}" 
-                                                     Maximum="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Duration.TotalMilliseconds}" />
-                                <TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>
-                            </Grid>
-                            <!-- /TrackBar -->
-                        </StackPanel>
+                            <extensions:CustomSlider 
+                                    Grid.Column="1" 
+                                    x:Name="hello" 
+                                    Style="{StaticResource SongTime}" 
+                                    IsMoveToPointEnabled="True" 
+                                    ClickedInSlider="{Binding ClickedInSliderr, Mode=TwoWay}"
+                                    Value="{Binding Global.SliderValue, Mode=TwoWay}" 
+                                    Maximum="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Duration.TotalMilliseconds}" 
+                                    
+                                    MouseEnter="hello_MouseEnter"
+                                    MouseMove="hello_MouseMove"
+                                    MouseLeave="hello_MouseLeave"
+                                    />
+
+                            <TextBlock Grid.Column="2" Text="{Binding Global.FinalTime}" HorizontalAlignment="Right" Foreground="#999999"/>
+                        </Grid>
+                        <!-- /TrackBar -->
                     </Grid>
                     <!-- /Controls -->
+
+                    <!-- <TrackBar ToolTip> -->
+                    <Canvas Grid.Column="1" 
+                            Background="Transparent" IsHitTestVisible="False">
+                        <TextBlock 
+                            x:Name="trackbarHoverTime"
+                            Text="1:00" />
+                    </Canvas>
+                    <!-- </TrackBar ToolTip> -->
 
                     <!-- Volume -->
                     <Grid Grid.Column="2" 
@@ -249,45 +275,114 @@
 
         <!-- <Custom ToolTips> -->
         <Grid>
-            <!--<Grid Height="20" Width="40" Background="Red">
-                <TextBlock Text="20" />
-            </Grid>-->
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock x:Name="test1" />
+                <TextBlock x:Name="test2" />
+                <TextBlock x:Name="test3" />
+                <TextBlock x:Name="test4" />
+            </StackPanel>
         </Grid>
         <!-- </Custom ToolTips> -->
         
         <!-- <TitleBar> -->
-        <Grid x:Name="AppTitleBar" Height="32" 
+        <Grid x:Name="AppTitleBar" Height="{Binding Path=Global.AppWindowTitlebarManager.TitlebarHeight}" 
             VerticalAlignment="Top">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="LeftPaddingColumn"        Width="0" />
-                <ColumnDefinition x:Name="IconTitleColumn"          Width="*" />
-                <ColumnDefinition x:Name="TitleBarButtonsColumn"    Width="Auto" />
-                <ColumnDefinition x:Name="RightPaddingColumn"       Width="0" />
+                <ColumnDefinition x:Name="LeftPaddingColumn"        Width="{Binding Global.AppWindowTitlebarManager.LeftPaddingColumnWidth}" />    <!-- 0 -->
+                <ColumnDefinition x:Name="IconTitleColumn"          Width="Auto" />    <!-- 1 -->
+                
+                <ColumnDefinition x:Name="Test1"                    Width="*" />    <!-- 2 -->
+                
+                <ColumnDefinition x:Name="SearchBarColumn"          Width="Auto" />    <!-- 3 -->
+                
+                <ColumnDefinition x:Name="Test2"                    Width="*" />    <!-- 4 -->
+                
+                <ColumnDefinition x:Name="TitleBarButtonsColumn"    Width="Auto" />    <!-- 5 -->
+                <ColumnDefinition x:Name="RightPaddingColumn"       Width="{Binding Global.AppWindowTitlebarManager.RightPaddingColumnWidth}" />    <!-- 6 -->
             </Grid.ColumnDefinitions>
-            
+
+            <Grid Grid.Column="0" Background="Blue" HorizontalAlignment="Left" 
+                  
+                  />
+            <Grid Grid.Column="6" Background="Blue" HorizontalAlignment="Right" 
+                  
+                  />
+
+            <Grid Grid.Column="2" Background="Orange" HorizontalAlignment="Left">
+                
+            </Grid>
+            <Grid Grid.Column="4" Background="Orange" HorizontalAlignment="Right">
+
+            </Grid>
+
+            <!-- Title -->
             <Grid Grid.Column="1">
-                <DockPanel Height="32" >
+                <DockPanel Height="32">
                     <Image Source="/Images/Icons/logo_gold.png" Height="20" Margin="6,0,6,0" />
                     <TextBlock Text="MusicPlayer" VerticalAlignment="Center" />
                 </DockPanel>
             </Grid>
-            
+            <!-- Title -->
+
+            <!-- Search Bar -->
+            <Grid Grid.Column="3" HorizontalAlignment="Center">
+                <extensions:CustomTextBox 
+                    Width="260"
+                    Text="{Binding Path=Global.GlobalSearch.SearchBarInput, UpdateSourceTrigger=PropertyChanged}"       
+                    Placeholder="Search" 
+                    />
+            </Grid>
+            <!-- /Search Bar -->
 
             <!-- Window Control Buttons-->
-            <Grid Grid.Column="2">
+            <Grid Grid.Column="5" HorizontalAlignment="Right">
                 <!-- Extra Buttons -->
-                <Grid>
-                    <DockPanel Grid.Column="1" HorizontalAlignment="Right">
-                        <Button Style="{StaticResource TitleBarButton}" Command="{Binding SettingsViewCommand}"
-                            Width="46" Content="V" />
-                    </DockPanel>
-                </Grid>
+                <Button 
+                    Style="{StaticResource TitleBarButton}"
+                    Command="{Binding SettingsViewCommand}"
+                    Height="{Binding Path=Global.AppWindowTitlebarManager.TitlebarHeight}"
+                    Width="46" Content="V" 
+                    
+                    />
                 <!-- Extra Buttons -->
             </Grid>
             <!-- Window Control Buttons-->
         </Grid>
         <!-- </TitleBar> -->
+
+        <!-- Search Bar Popup -->
+        <Grid DataContext="{Binding Path=Global.GlobalSearch}">
+            <Border 
+                Visibility="{Binding Path=SearchPopupVisibility}"
+                Background="#101010"
+                BorderBrush="#323232" BorderThickness="1" CornerRadius="4"
+                Width="400"
+                Margin="0,52,0,0"
+                HorizontalAlignment="Center" VerticalAlignment="Top"
+                >
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="Black" Opacity="0.5" BlurRadius="30" />
+                </Border.Effect>
+                <Grid>
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding Path=SearchBarItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button 
+                                        Content="{Binding Path=Header}"
+                                        Style="{StaticResource SearchBarItem}"
+                                        Command="{Binding Path=Command}"
+                                        CommandParameter="{Binding Path=CommandParameter}"
+                                        />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+        <!-- /Search Bar Popup -->
 
         <!-- Popups -->
         <Grid Background="#25000000" Visibility="{Binding Global.PopupVisibility}">
@@ -341,8 +436,10 @@
             <!-- /Confirm -->
 
             <!-- Edit Playlist -->
-            <Border DataContext="{Binding Global.EditPlaylistBox}"
+            <Border 
+                DataContext="{Binding Global.EditPlaylistBox}"
                 Visibility="{Binding Visibility}"
+                MinWidth="320"
                 VerticalAlignment="Center" HorizontalAlignment="Center" 
                 CornerRadius="4" BorderThickness="1.5" BorderBrush="#242424">
                 <Grid>
@@ -354,23 +451,44 @@
                     <Border Grid.Row="0" 
                             Padding="20" CornerRadius="4,4,0,0"
                             Background="#121212">
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Edit Playlist" 
-                               FontSize="28" HorizontalAlignment="Center"/>
-                            <Button Style="{StaticResource EditPlaylistImageButton}" 
-                                    Command="{Binding ChangeImageCommand}"
-                                    CommandParameter="{Binding Playlist.Id}"
-                                    />
-                            <TextBox Margin="0,10,0,0" 
-                                     Style="{StaticResource TextBox}"
-                                     Width="300" 
-                                     Text="{Binding Playlist.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Tag="Title..." />
-                            <TextBox Margin="0,10,0,0" 
-                                     Style="{StaticResource TextBox}"
-                                     Text="{Binding Playlist.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Tag="Description..." />
-                        </StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock 
+                                Grid.Row="0"
+                                Text="Edit Playlist" 
+                                FontSize="28" 
+                                HorizontalAlignment="Center" />
+                            <Button 
+                                Grid.Row="1"
+                                Style="{StaticResource EditPlaylistImageButton}" 
+                                Command="{Binding ChangeImageCommand}"
+                                CommandParameter="{Binding Playlist.Id}" />
+                            
+                            <extensions:CustomTextBox
+                                Grid.Row="2"
+                                Text="{Binding Path=Playlist.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Placeholder="Title..."
+                                HorizontalAlignment="Left"
+                                Margin="0,16,0,16"
+                                />
+                            
+                            <extensions:CustomTextBox
+                                Grid.Row="3"
+                                Text="{Binding Path=Playlist.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Placeholder="Description..."
+                                HorizontalAlignment="Left"
+                                />
+
+                            <TextBox 
+                                Grid.Row="4"/>
+                        </Grid>
                     </Border>
 
                     <Border Grid.Row="1" 

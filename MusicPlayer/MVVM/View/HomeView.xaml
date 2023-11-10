@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:MusicPlayer.MVVM.View" 
              xmlns:viewmodel="clr-namespace:MusicPlayer.MVVM.ViewModel" 
              xmlns:converters="clr-namespace:MusicPlayer.Classes"
+             xmlns:extensions="clr-namespace:MusicPlayer.Core"
              mc:Ignorable="d">
 
     <UserControl.DataContext>
@@ -31,12 +32,14 @@
             <!-- /Info -->
 
             <!-- Search Bar -->
-            <TextBox Grid.Row="1"
-                     Style="{StaticResource TextBox}" Tag="Search..." 
-                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                     Height="40" Width="320" HorizontalAlignment="Left"
-                     Margin="0,0,0,12"
-                     FontSize="16" />
+            <extensions:CustomTextBox 
+                Grid.Row="1"
+                Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged}"
+                Placeholder="Search..."
+                Width="320"
+                HorizontalAlignment="Left"
+                Margin="0,0,0,12"
+                />
             <!-- /Search Bar -->
 
             <!-- Songs -->

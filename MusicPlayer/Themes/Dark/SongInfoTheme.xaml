@@ -24,8 +24,9 @@
                             <!-- /Image -->
                             <!-- Text -->
                             <StackPanel VerticalAlignment="Center" Margin="20,0,20,0">
-                                <TextBlock Text="{Binding MusicProperties.Title}" FontSize="24" />
+                                <TextBlock Text="{Binding MusicProperties.Title}" FontSize="24" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="{Binding MusicProperties.Artist}" 
+                                           TextTrimming="CharacterEllipsis" 
                                            FontSize="20" Foreground="#999999" />
                             </StackPanel>
                             <!-- /Text -->

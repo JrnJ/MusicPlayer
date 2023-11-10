@@ -24,6 +24,10 @@
         <ResourceDictionary Source="/Themes/Dark/TitleBarButtonTheme.xaml" />
         <!-- /General -->
 
+        <!-- Searchbar -->
+        <ResourceDictionary Source="/Themes/Dark/SearchBarItemTheme.xaml" />
+        <!-- Searchbar -->
+
         <!-- Navigation -->
         <ResourceDictionary Source="/Themes/Dark/PlaylistItemTheme.xaml" />
         <!-- /Navigation -->

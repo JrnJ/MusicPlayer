@@ -65,7 +65,7 @@ namespace MusicPlayer.MVVM.ViewModel
             { 
                 _clickedInSliderr = value;
                 Global.SliderMouseDownOrUpEvent(value);
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
 

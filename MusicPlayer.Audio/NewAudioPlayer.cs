@@ -23,7 +23,7 @@ namespace MusicPlayer.Audio
         // Constructor
         public NewAudioPlayer()
         {
-            MediaPlayer = new();
+            _mediaPlayer = new();
         }
 
         // Methods
