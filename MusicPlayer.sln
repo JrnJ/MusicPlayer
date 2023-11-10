@@ -9,7 +9,7 @@ Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "MusicPlayer (Package)", "Mu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicPlayer.Audio", "MusicPlayer.Audio\MusicPlayer.Audio.csproj", "{1D29D903-8E06-4043-9360-A7EA45BC03E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicPlayer.Shared", "MusicPlayer.Shared\MusicPlayer.Shared.csproj", "{483B37F1-786E-47BC-8FB4-99EACEB37825}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicPlayer.Shared", "MusicPlayer.Shared\MusicPlayer.Shared.csproj", "{483B37F1-786E-47BC-8FB4-99EACEB37825}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,8 +101,8 @@ Global
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Debug|ARM.Build.0 = Debug|Any CPU
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Debug|ARM64.ActiveCfg = Debug|Any CPU
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Debug|x64.Build.0 = Debug|Any CPU
+		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Debug|x64.ActiveCfg = Debug|x64
+		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Debug|x64.Build.0 = Debug|x64
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Debug|x86.Build.0 = Debug|Any CPU
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -111,8 +111,8 @@ Global
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|ARM.Build.0 = Release|Any CPU
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|ARM64.ActiveCfg = Release|Any CPU
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|ARM64.Build.0 = Release|Any CPU
-		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|x64.ActiveCfg = Release|Any CPU
-		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|x64.Build.0 = Release|Any CPU
+		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|x64.ActiveCfg = Release|x64
+		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|x64.Build.0 = Release|x64
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|x86.ActiveCfg = Release|Any CPU
 		{483B37F1-786E-47BC-8FB4-99EACEB37825}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
