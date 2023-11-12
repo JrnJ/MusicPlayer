@@ -10,16 +10,18 @@ namespace MusicPlayer.Shared.Models
         public DbSet<Artist> Artists { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<Genre> Genres { get; set; }
+        public DbSet<Settings> Settings { get; set; }
+        public DbSet<SongsFolder> SongsFolders { get; set; }
 
         // Junction Tables
         public DbSet<ArtistSong> ArtistSongs { get; set; }
         public DbSet<PlaylistSong> PlaylistSongs { get; set; }
         public DbSet<SongGenre> SongGenres { get; set; }
+        public DbSet<SettingsSongsFolder> SettingsSongsFolders { get; set; }
 
         // Db Path
         public string DbPath { get; private set; }
 
-        // https://stackoverflow.com/questions/59444014/entity-framework-tools-not-working-with-uwp-apps-c-sharp
         public DomainContext()
         {
             DbPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\MusicPlayer.db";
@@ -86,6 +88,20 @@ namespace MusicPlayer.Shared.Models
                 .HasOne(pt => pt.Genre)
                 .WithMany(p => p.Songs)
                 .HasForeignKey(pt => pt.GenreName);
+
+            // SettingsSongsFolder
+            modelBuilder.Entity<SettingsSongsFolder>()
+                .HasKey(x => new { x.SettingsId, x.SongsFolderId });
+
+            modelBuilder.Entity<SettingsSongsFolder>()
+                .HasOne(pt => pt.Settings)
+                .WithMany(p => p.SongsFolders)
+                .HasForeignKey(pt => pt.SettingsId);
+
+            modelBuilder.Entity<SettingsSongsFolder>()
+                .HasOne(pt => pt.SongsFolder)
+                .WithMany(p => p.Settings)
+                .HasForeignKey(pt => pt.SongsFolderId);
         }
     }
 }

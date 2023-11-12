@@ -235,7 +235,7 @@ namespace MusicPlayer.MVVM.ViewModel
             _globalSearch = new();
 
             // Configuration
-            LoadCache();
+            NewConfigure();
             // Configure();
             SystemVolumeChanger = new();
 
@@ -252,61 +252,84 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         #region NewConfiguration
-        public async void LoadCache()
+        public async void NewConfigure()
         {
             using (DomainContext context = new())
             {
-                // 1. Read Cache from Database
-                // 1.1 Read Artists
-                List<Artist> dbArtists = await context.Artists.ToListAsync();
-
-                // 1.2 Read Genres
-                List<Genre> dbGenres = await context.Genres.ToListAsync();
-
-                // 1.3 Read Songs
-                List<Song> dbSongs = await context.Songs
-                    .Include(s => s.Artists)
-                    .ThenInclude(a => a.Artist)
-                    .Include(g => g.Genres)
-                    .ToListAsync();
-
-                // 1.4 Read Playlists
-                List<Playlist> dbPlaylists = await context.Playlists
-                    .Include(p => p.Songs)
-                    .ToListAsync();
-
-                // 2. Fill Artists
-                ObservableCollection<ArtistModel> artists = new();
-                foreach (Artist artist in dbArtists)
-                {
-                    artists.Add(new(artist));
-                }
-
-                // 3. Fill Genres
-                ObservableCollection<GenreModel> genres = new();
-                foreach (Genre genre in dbGenres)
-                {
-                    genres.Add(new(genre));
-                }
-
-                // 4. Fill Songs
-                ObservableCollection<SongModel> songs = new();
-                foreach (Song song in dbSongs)
-                {
-                    songs.Add(new(song, artists, genres));
-                }
-
-                // 5. Fill Playlists
-                ObservableCollection<PlaylistModel> playlists = new();
-                foreach (Playlist playlist in dbPlaylists)
-                {
-                    playlists.Add(new(playlist, songs));
-                }
-
-                int bp = 0;
+                LoadSettings(context);
+                LoadCache(context);
             }
 
             ConfigureAudioPlayer();
+        }
+
+        public async void LoadCache(DomainContext context)
+        {
+            // 1. Read from Database
+            // 1.1 Read Artists
+            List<Artist> dbArtists = await context.Artists.ToListAsync();
+
+            // 1.2 Read Genres
+            List<Genre> dbGenres = await context.Genres.ToListAsync();
+
+            // 1.3 Read Songs
+            List<Song> dbSongs = await context.Songs
+                .Include(s => s.Artists)
+                .ThenInclude(a => a.Artist)
+                .Include(g => g.Genres)
+                .ToListAsync();
+
+            // 1.4 Read Playlists
+            List<Playlist> dbPlaylists = await context.Playlists
+                .Include(p => p.Songs)
+                .ToListAsync();
+
+            // 2. Fill Artists
+            ObservableCollection<ArtistModel> artists = new();
+            foreach (Artist artist in dbArtists)
+            {
+                artists.Add(new(artist));
+            }
+
+            // 3. Fill Genres
+            ObservableCollection<GenreModel> genres = new();
+            foreach (Genre genre in dbGenres)
+            {
+                genres.Add(new(genre));
+            }
+
+            // 4. Fill Songs
+            ObservableCollection<SongModel> songs = new();
+            foreach (Song song in dbSongs)
+            {
+                songs.Add(new(song, artists, genres));
+            }
+
+            // 5. Fill Playlists
+            ObservableCollection<PlaylistModel> playlists = new();
+            foreach (Playlist playlist in dbPlaylists)
+            {
+                playlists.Add(new(playlist, songs));
+            }
+        }
+
+        public async void LoadSettings(DomainContext context)
+        {
+            // 1. Read from Database
+            List<Settings> dbSettings = await context.Settings
+                .Include(s => s.SongsFolders)
+                .ToListAsync();
+            List<SongsFolder> dbSongsFolders = await context.SongsFolders
+                .ToListAsync();
+
+            // 2. Fill Models
+            ObservableCollection<SongsFolderModel> songsFolders = new();
+            foreach (SongsFolder songsFolder in dbSongsFolders)
+            {
+                songsFolders.Add(new(songsFolder));
+            }
+
+            SettingsModel settings = new(dbSettings[0], songsFolders);
         }
         #endregion NewConfiguration
 

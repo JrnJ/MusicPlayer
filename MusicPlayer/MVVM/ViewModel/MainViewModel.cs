@@ -218,6 +218,27 @@ namespace MusicPlayer.MVVM.ViewModel
             playlist.Songs.Add(playlistSong);
             song.Playlists.Add(playlistSong);
 
+            // Settings
+            Settings settings = new()
+            {
+                Volume = 0.33,
+                SongsFolders = new List<SettingsSongsFolder>()
+            };
+
+            SongsFolder songsFolder = new()
+            {
+                Path = "D:\\Music\\Feelgood",
+                Settings = new List<SettingsSongsFolder>()
+            };
+
+            SettingsSongsFolder settingsSongsFolder = new()
+            {
+                SettingsId = settings.Id,
+                SongsFolderId = songsFolder.Id,
+            };
+            settings.SongsFolders.Add(settingsSongsFolder);
+            songsFolder.Settings.Add(settingsSongsFolder);
+
             using (DomainContext context = new())
             {
                 // Remove if already exists
@@ -227,6 +248,9 @@ namespace MusicPlayer.MVVM.ViewModel
                 context.Genres.Add(genre);
                 context.Songs.Add(song);
                 context.Playlists.Add(playlist);
+
+                context.Settings.Add(settings);
+                context.SongsFolders.Add(songsFolder);
 
                 context.SaveChanges();
             }
