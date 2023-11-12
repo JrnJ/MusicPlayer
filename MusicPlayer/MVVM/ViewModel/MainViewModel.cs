@@ -171,22 +171,39 @@ namespace MusicPlayer.MVVM.ViewModel
             {
                 Path = "None",
                 Title = "Jeroen's Song!",
-                Artists = new List<ArtistSong>()
+                Artists = new List<ArtistSong>(),
+                Playlists = new List<PlaylistSong>()
             };
 
             ArtistSong artistSong = new()
             {
                 ArtistId = artist.Id,
-                SongId = song.Id
+                SongId = song.Id,
             };
-
             artist.Songs.Add(artistSong);
             song.Artists.Add(artistSong);
+
+            // Playlist
+            Playlist playlist = new()
+            {
+                Name = "Jeroen's Playlist",
+                Description = "Playlist made by Jeroen",
+                Songs = new List<PlaylistSong>()
+            };
+
+            PlaylistSong playlistSong = new()
+            {
+                PlaylistId = playlist.Id,
+                SongId = song.Id
+            };
+            playlist.Songs.Add(playlistSong);
+            song.Playlists.Add(playlistSong);
 
             using (DomainContext context = new())
             {
                 context.Artists.Add(artist);
                 context.Songs.Add(song);
+                context.Playlists.Add(playlist);
 
                 context.SaveChanges();
             }

@@ -1,9 +1,11 @@
-﻿using Microsoft.UI.Xaml.Media.Imaging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.UI.Xaml.Media.Imaging;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
 using MusicPlayer.Core.Searching;
 using MusicPlayer.DiscordGameSDK;
 using MusicPlayer.MVVM.Model;
+using MusicPlayer.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,6 +23,8 @@ using Windows.Media;
 using Windows.Media.Playlists;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
+
+using Playlist = MusicPlayer.Shared.Models.Playlist;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
@@ -78,17 +82,17 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         // Playlists
-        private ObservableCollection<PlaylistModel> _playlists;
+        private ObservableCollection<PlaylistSongsModel> _playlists;
 
-        public ObservableCollection<PlaylistModel> Playlists
+        public ObservableCollection<PlaylistSongsModel> Playlists
         {
             get => _playlists;
             set { _playlists = value; OnPropertyChanged(); }
         }
 
-        private PlaylistModel _playlistViewing;
+        private PlaylistSongsModel _playlistViewing;
 
-        public PlaylistModel PlaylistViewing
+        public PlaylistSongsModel PlaylistViewing
         {
             get => _playlistViewing;
             set 
@@ -98,9 +102,9 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        private PlaylistModel _playlistPlaying;
+        private PlaylistSongsModel _playlistPlaying;
 
-        public PlaylistModel PlaylistPlaying
+        public PlaylistSongsModel PlaylistPlaying
         {
             get => _playlistPlaying; 
             set 
@@ -110,17 +114,17 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        private PlaylistModel _myMusic;
+        private PlaylistSongsModel _myMusic;
 
-        public PlaylistModel MyMusic
+        public PlaylistSongsModel MyMusic
         {
             get => _myMusic;
             set { _myMusic = value; OnPropertyChanged(); }
         }
 
-        private PlaylistModel _searchingPlaylist;
+        private PlaylistSongsModel _searchingPlaylist;
 
-        public PlaylistModel SearchingPlaylist
+        public PlaylistSongsModel SearchingPlaylist
         {
             get { return _searchingPlaylist; }
             set { _searchingPlaylist = value; OnPropertyChanged(); }
@@ -227,12 +231,13 @@ namespace MusicPlayer.MVVM.ViewModel
             PlaylistsVM = new();
             PlaylistVM = new();
 
-            // Configuration
-            Configure();
-            SystemVolumeChanger = new();
-
             // Search Bar
             _globalSearch = new();
+
+            // Configuration
+            LoadCache();
+            // Configure();
+            SystemVolumeChanger = new();
 
             // Set BoxModels :: This isnt mandatory btw
             ConfirmBox = new();
@@ -245,6 +250,44 @@ namespace MusicPlayer.MVVM.ViewModel
 
             //DiscordGameSDKWrapper = new("1035920401445957722");
         }
+
+        #region NewConfiguration
+        public async void LoadCache()
+        {
+            using (DomainContext context = new())
+            {
+                // 1. Read Cache from Database
+                // 1.1 Read Songs
+                List<Song> dbSongs = await context.Songs
+                    .Include(s => s.Artists)
+                    .ThenInclude(a => a.Artist)
+                    .ToListAsync();
+
+                // 1.2 Read Playlists
+                List<Playlist> dbPlaylists = await context.Playlists
+                    .Include(p => p.Songs)
+                    .ToListAsync();
+
+                // 2. Fill Songs
+                ObservableCollection<SongModel> songs = new();
+                foreach (Song song in dbSongs)
+                {
+                    songs.Add(new(song));
+                }
+
+                // 3. Fill Playlists
+                ObservableCollection<PlaylistModel> playlists = new();
+                foreach (Playlist playlist in dbPlaylists)
+                {
+                    playlists.Add(new(playlist, songs));
+                }
+
+                int bp = 0;
+            }
+
+            ConfigureAudioPlayer();
+        }
+        #endregion NewConfiguration
 
         #region Configuration
         public async void Configure()
@@ -468,7 +511,7 @@ namespace MusicPlayer.MVVM.ViewModel
             Playlists = new();
 
             // Get all Playlists and make new if none exists
-            ObservableCollection<PlaylistModel> playlists = await FileHandler<ObservableCollection<PlaylistModel>>.GetJSON(PlaylistsFilePath);
+            ObservableCollection<PlaylistSongsModel> playlists = await FileHandler<ObservableCollection<PlaylistSongsModel>>.GetJSON(PlaylistsFilePath);
             playlists ??= new();
 
             for (int i = 0; i < playlists.Count; i++)
@@ -497,7 +540,7 @@ namespace MusicPlayer.MVVM.ViewModel
             // AudioPlayer
             AudioPlayer = new()
             {
-                Volume = AppSettinggs.Volume
+                // Volume = AppSettinggs.Volume
             };
 
             AudioPlayer.MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
@@ -706,7 +749,7 @@ namespace MusicPlayer.MVVM.ViewModel
             OpenMedia(PlaylistPlaying.Songs[rndIndex]);
         }
 
-        public PlaylistModel CreatePlaylist()
+        public PlaylistSongsModel CreatePlaylist()
         {
             // Create an id 
             int id = 0;
@@ -716,7 +759,7 @@ namespace MusicPlayer.MVVM.ViewModel
                     id = Playlists[i].Id;
             }
 
-            PlaylistModel playlist = new() { Id = id + 1 };
+            PlaylistSongsModel playlist = new() { Id = id + 1 };
             Playlists.Add(playlist);
 
             SavePlaylists();
@@ -742,7 +785,7 @@ namespace MusicPlayer.MVVM.ViewModel
             CurrentView = PlaylistVM;
         }
 
-        public void UpdatePlaylist(int playlistId, PlaylistModel playlist)
+        public void UpdatePlaylist(int playlistId, PlaylistSongsModel playlist)
         {
             Playlists[Playlists.IndexOf(Playlists.Where(x => x.Id == playlistId).FirstOrDefault())] = new()
             {
@@ -757,10 +800,10 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public async void SavePlaylists()
         {
-            await FileHandler<ObservableCollection<PlaylistModel>>.SaveJSON(PlaylistsFilePath, Playlists);
+            await FileHandler<ObservableCollection<PlaylistSongsModel>>.SaveJSON(PlaylistsFilePath, Playlists);
         }
 
-        public void AddSongToPlaylist(AlbumSongModel song, PlaylistModel playlist)
+        public void AddSongToPlaylist(AlbumSongModel song, PlaylistSongsModel playlist)
         {
             // Add Song to Playlist
             Playlists[Playlists.IndexOf(playlist)].Songs.Add(song);
@@ -769,7 +812,7 @@ namespace MusicPlayer.MVVM.ViewModel
             SavePlaylists();
         }
 
-        public void RemoveSongFromPlaylist(AlbumSongModel song, PlaylistModel playlist)
+        public void RemoveSongFromPlaylist(AlbumSongModel song, PlaylistSongsModel playlist)
         {
             // Remove song from Playlist
             Playlists[Playlists.IndexOf(playlist)].Songs.Remove(song);

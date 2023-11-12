@@ -78,7 +78,8 @@ namespace MusicPlayer.Classes
         {
             // Configuration
             ConfigureMediaPlayer();
-            ConfigureSearchOptions(GlobalViewModel.Instance.GlobalSearch);
+            // TODO
+            //ConfigureSearchOptions(GlobalViewModel.Instance.GlobalSearch);
 
             // Timer
             Timer = new()
