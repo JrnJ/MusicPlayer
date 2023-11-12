@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Media;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
 using MusicPlayer.MVVM.Model;
+using MusicPlayer.Shared.Models;
 
 namespace MusicPlayer.MVVM.ViewModel
 {
@@ -156,6 +158,38 @@ namespace MusicPlayer.MVVM.ViewModel
                 }
             });
             #endregion ManagerCommands
+
+            // Enable for test data
+            if (true) return;
+            Artist artist = new()
+            {
+                Name = "Jeroen",
+                Songs = new List<ArtistSong>()
+            };
+
+            Song song = new()
+            {
+                Path = "None",
+                Title = "Jeroen's Song!",
+                Artists = new List<ArtistSong>()
+            };
+
+            ArtistSong artistSong = new()
+            {
+                ArtistId = artist.Id,
+                SongId = song.Id
+            };
+
+            artist.Songs.Add(artistSong);
+            song.Artists.Add(artistSong);
+
+            using (DomainContext context = new())
+            {
+                context.Artists.Add(artist);
+                context.Songs.Add(song);
+
+                context.SaveChanges();
+            }
         }
     }
 }

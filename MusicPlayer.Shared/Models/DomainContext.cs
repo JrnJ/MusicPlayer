@@ -9,7 +9,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicPlayer.MVVM.Model
+namespace MusicPlayer.Shared.Models
 {
     public class DomainContext : DbContext
     {
@@ -25,8 +25,8 @@ namespace MusicPlayer.MVVM.Model
         // Db Path
         public string DbPath { get; private set; }
 
-        public DomainContext(DbContextOptions<DomainContext> options) 
-            : base(options)
+        // https://stackoverflow.com/questions/59444014/entity-framework-tools-not-working-with-uwp-apps-c-sharp
+        public DomainContext()
         {
             DbPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\MusicPlayer.db";
         }
