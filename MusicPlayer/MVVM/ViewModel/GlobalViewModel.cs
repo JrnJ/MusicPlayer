@@ -257,25 +257,46 @@ namespace MusicPlayer.MVVM.ViewModel
             using (DomainContext context = new())
             {
                 // 1. Read Cache from Database
-                // 1.1 Read Songs
+                // 1.1 Read Artists
+                List<Artist> dbArtists = await context.Artists.ToListAsync();
+
+                // 1.2 Read Genres
+                List<Genre> dbGenres = await context.Genres.ToListAsync();
+
+                // 1.3 Read Songs
                 List<Song> dbSongs = await context.Songs
                     .Include(s => s.Artists)
                     .ThenInclude(a => a.Artist)
+                    .Include(g => g.Genres)
                     .ToListAsync();
 
-                // 1.2 Read Playlists
+                // 1.4 Read Playlists
                 List<Playlist> dbPlaylists = await context.Playlists
                     .Include(p => p.Songs)
                     .ToListAsync();
 
-                // 2. Fill Songs
+                // 2. Fill Artists
+                ObservableCollection<ArtistModel> artists = new();
+                foreach (Artist artist in dbArtists)
+                {
+                    artists.Add(new(artist));
+                }
+
+                // 3. Fill Genres
+                ObservableCollection<GenreModel> genres = new();
+                foreach (Genre genre in dbGenres)
+                {
+                    genres.Add(new(genre));
+                }
+
+                // 4. Fill Songs
                 ObservableCollection<SongModel> songs = new();
                 foreach (Song song in dbSongs)
                 {
-                    songs.Add(new(song));
+                    songs.Add(new(song, artists, genres));
                 }
 
-                // 3. Fill Playlists
+                // 5. Fill Playlists
                 ObservableCollection<PlaylistModel> playlists = new();
                 foreach (Playlist playlist in dbPlaylists)
                 {

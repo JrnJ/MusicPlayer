@@ -9,10 +9,12 @@ namespace MusicPlayer.Shared.Models
         public DbSet<Song> Songs { get; set; }
         public DbSet<Artist> Artists { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
+        public DbSet<Genre> Genres { get; set; }
 
         // Junction Tables
         public DbSet<ArtistSong> ArtistSongs { get; set; }
         public DbSet<PlaylistSong> PlaylistSongs { get; set; }
+        public DbSet<SongGenre> SongGenres { get; set; }
 
         // Db Path
         public string DbPath { get; private set; }
@@ -70,6 +72,20 @@ namespace MusicPlayer.Shared.Models
                 .HasOne(pt => pt.Song)
                 .WithMany(p => p.Playlists)
                 .HasForeignKey(pt => pt.SongId);
+
+            // SongGenre
+            modelBuilder.Entity<SongGenre>()
+                .HasKey(x => new { x.SongId, x.GenreName });
+
+            modelBuilder.Entity<SongGenre>()
+                .HasOne(pt => pt.Song)
+                .WithMany(p => p.Genres)
+                .HasForeignKey(pt => pt.SongId);
+
+            modelBuilder.Entity<SongGenre>()
+                .HasOne(pt => pt.Genre)
+                .WithMany(p => p.Songs)
+                .HasForeignKey(pt => pt.GenreName);
         }
     }
 }

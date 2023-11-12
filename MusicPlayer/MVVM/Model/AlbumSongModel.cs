@@ -107,11 +107,6 @@ namespace MusicPlayer.MVVM.Model
             }
         }
 
-        public void SetId(int id)
-        {
-            Id = id;
-        }
-
         // https://stackoverflow.com/questions/18843315/how-to-store-save-thumbnail-image-in-device-in-windows-8-metro-apps-c-sharp/18844387#18844387
     }
 }

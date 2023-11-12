@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Documents;
 using System.Windows.Media;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
@@ -159,21 +161,46 @@ namespace MusicPlayer.MVVM.ViewModel
             });
             #endregion ManagerCommands
 
-            // Enable for test data
-            if (true) return;
+            // TODO:
+            // remove test data
             Artist artist = new()
             {
                 Name = "Jeroen",
                 Songs = new List<ArtistSong>()
             };
 
+            Genre genre = new()
+            {
+                Name = "Jeroenium",
+                Songs = new List<SongGenre>()
+            };
+
+            Playlist playlist = new()
+            {
+                Name = "Jeroen's Playlist",
+                Description = "Playlist made by Jeroen",
+                ImagePath = "D:\\Music\\Images\\K-ON.png",
+                Songs = new List<PlaylistSong>()
+            };
+
             Song song = new()
             {
-                Path = "None",
+                Path = "D:\\Music\\Feelgood\\Earth Wind  Fire - September.mp3",
                 Title = "Jeroen's Song!",
+                Year = 2002,
+                Duration = new TimeSpan(0, 3, 21),
                 Artists = new List<ArtistSong>(),
-                Playlists = new List<PlaylistSong>()
+                Playlists = new List<PlaylistSong>(),
+                Genres = new List<SongGenre>()
             };
+
+            SongGenre songGenre = new()
+            {
+                SongId = song.Id,
+                GenreName = genre.Name
+            };
+            song.Genres.Add(songGenre);
+            genre.Songs.Add(songGenre);
 
             ArtistSong artistSong = new()
             {
@@ -182,14 +209,6 @@ namespace MusicPlayer.MVVM.ViewModel
             };
             artist.Songs.Add(artistSong);
             song.Artists.Add(artistSong);
-
-            // Playlist
-            Playlist playlist = new()
-            {
-                Name = "Jeroen's Playlist",
-                Description = "Playlist made by Jeroen",
-                Songs = new List<PlaylistSong>()
-            };
 
             PlaylistSong playlistSong = new()
             {
@@ -201,7 +220,11 @@ namespace MusicPlayer.MVVM.ViewModel
 
             using (DomainContext context = new())
             {
+                // Remove if already exists
+                if (context.Songs.ToList().Count > 0) return; 
+
                 context.Artists.Add(artist);
+                context.Genres.Add(genre);
                 context.Songs.Add(song);
                 context.Playlists.Add(playlist);
 

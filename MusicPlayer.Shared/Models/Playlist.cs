@@ -20,6 +20,9 @@ namespace MusicPlayer.Shared.Models
         [MaxLength(255)]
         public string Description { get; set; }
 
+        [MaxLength(255)]
+        public string ImagePath { get; set; }
+
         // Junction Tables
         public virtual ICollection<PlaylistSong> Songs { get; set; }
     }

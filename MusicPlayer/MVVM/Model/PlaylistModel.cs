@@ -1,11 +1,6 @@
 ﻿using MusicPlayer.Core;
 using MusicPlayer.Shared.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MusicPlayer.MVVM.Model
 {
@@ -35,6 +30,15 @@ namespace MusicPlayer.MVVM.Model
             set { _description = value; OnPropertyChanged(); }
         }
 
+        private string _imagePath;
+
+        public string ImagePath
+        {
+            get => _imagePath;
+            set { _imagePath = value; OnPropertyChanged(); }
+        }
+
+        // Not present in Database
         private ObservableCollection<SongModel> _songs;
 
         public ObservableCollection<SongModel> Songs
@@ -43,6 +47,15 @@ namespace MusicPlayer.MVVM.Model
             set { _songs = value; OnPropertyChanged(); }
         }
 
+        private bool _isSelected;
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
+
+
         public PlaylistModel() { }
 
         public PlaylistModel(Playlist playlist, ObservableCollection<SongModel> allSongs)
@@ -50,6 +63,7 @@ namespace MusicPlayer.MVVM.Model
             _id = playlist.Id;
             _name = playlist.Name;
             _description = playlist.Description;
+            _imagePath = playlist.ImagePath;
 
             //
             _songs = new();
@@ -62,6 +76,7 @@ namespace MusicPlayer.MVVM.Model
                     if (playlistSong.SongId == song.Id)
                     {
                         Songs.Add(song);
+                        break;
                     }
                 }
             }
@@ -73,7 +88,8 @@ namespace MusicPlayer.MVVM.Model
             {
                 Id = _id,
                 Name = _name,
-                Description = _description
+                Description = _description,
+                ImagePath = _imagePath,
             };
         }
     }
