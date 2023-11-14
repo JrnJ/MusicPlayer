@@ -31,6 +31,7 @@ namespace MusicPlayer.MVVM.Model
         public ArtistModel(Artist artist)
         {
             _id = artist.Id;
+            _name = artist.Name;
         }
 
         public Artist ToArtist()

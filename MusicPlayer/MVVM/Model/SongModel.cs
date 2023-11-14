@@ -54,8 +54,16 @@ namespace MusicPlayer.MVVM.Model
             set { _duration = value; OnPropertyChanged(); }
         }
 
+        private int _songsFolderId;
+
+        public int SongsFolderId
+        {
+            get { return _songsFolderId; }
+            set { _songsFolderId = value; OnPropertyChanged(); }
+        }
+
         // Not present in Database
-        private ObservableCollection<ArtistModel> _artists;
+        private ObservableCollection<ArtistModel> _artists = new();
 
         public ObservableCollection<ArtistModel> Artists
         {
@@ -63,20 +71,12 @@ namespace MusicPlayer.MVVM.Model
             set 
             { 
                 _artists = value;
-
-                // Alter Artists Text
-                string newArtistsText = "";
-                foreach (ArtistModel artist in _artists)
-                {
-                    newArtistsText += artist.Name;
-                }
-                ArtistsText = newArtistsText;
-
+                TextualizeArtists();
                 OnPropertyChanged(); 
             }
         }
 
-        private ObservableCollection<GenreModel> _genres;
+        private ObservableCollection<GenreModel> _genres = new();
 
         public ObservableCollection<GenreModel> Genres
         {
@@ -84,11 +84,11 @@ namespace MusicPlayer.MVVM.Model
             set  {  _genres = value; OnPropertyChanged(); }
         }
 
-        private string _artistsText;
+        private string _artistsText = "Unknown Artist";
 
         public string ArtistsText
         {
-            get { return _artistsText; }
+            get => _artistsText;
             set { _artistsText = value; OnPropertyChanged(); }
         }
 
@@ -117,9 +117,7 @@ namespace MusicPlayer.MVVM.Model
             _title = song.Title;
             _year = song.Year;
             _duration = song.Duration;
-
-            _artists = new();
-            _genres = new();
+            _songsFolderId = song.SongsFolderId;
 
             // Reference based!
             foreach (ArtistSong artistSong in song.Artists)
@@ -145,6 +143,8 @@ namespace MusicPlayer.MVVM.Model
                     }
                 }
             }
+
+            TextualizeArtists();
         }
 
         public Song ToSong()
@@ -156,7 +156,19 @@ namespace MusicPlayer.MVVM.Model
                 Title = _title,
                 Year = _year,
                 Duration = _duration,
+                SongsFolderId = _songsFolderId
             };
+        }
+
+        private void TextualizeArtists()
+        {
+            // Alter Artists Text
+            string newArtistsText = "";
+            foreach (ArtistModel artist in _artists)
+            {
+                newArtistsText += artist.Name;
+            }
+            ArtistsText = newArtistsText;
         }
     }
 }

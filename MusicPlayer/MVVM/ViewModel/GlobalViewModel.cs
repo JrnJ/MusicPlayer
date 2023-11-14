@@ -263,19 +263,19 @@ namespace MusicPlayer.MVVM.ViewModel
         // TODO2:
         public async void AddSongsFolder(StorageFolder folder)
         {
+            SongsFolder songsFolder = new()
+            {
+                Path = folder.Path,
+                // TODO2: we also need to add the link to the Settings
+                // and possibly the other way around too
+                Settings = new List<SettingsSongsFolder>()
+                {
+
+                }
+            };
+
             using (DomainContext context = new())
             {
-                SongsFolder songsFolder = new()
-                {
-                    Path = folder.Path,
-                    // TODO1: we also need to add the link to the Settings
-                    // and possibly the other way around too
-                    Settings = new List<SettingsSongsFolder>()
-                    {
-
-                    }
-                };
-
                 // Update Database
                 context.SongsFolders.Add(songsFolder);
                 await context.SaveChangesAsync();
@@ -293,7 +293,7 @@ namespace MusicPlayer.MVVM.ViewModel
             foreach (StorageFile file in files)
             {
                 // 1. Is file music
-                if (HelperMethods.IsMusicFile(file.Path))
+                if (!HelperMethods.IsMusicFile(file.Path))
                     continue;
 
                 // 2. Set Song data
@@ -303,12 +303,17 @@ namespace MusicPlayer.MVVM.ViewModel
                     Path = file.Path,
                     Title = musicProperties.Title,
                     Year = unchecked((int)musicProperties.Year),
-                    Duration = musicProperties.Duration
+                    Duration = musicProperties.Duration,
+                    SongsFolderId = songsFolder.Id, 
+
+                    Artists = new List<ArtistSong>(),
+                    Genres = new List<SongGenre>(),
+                    Playlists = new List<PlaylistSong>()
                 };
                 folderSongs.Add(song);
 
                 // 3. Handle Artists
-                // TODO1
+                // TODO2
                 Artist artist = new()
                 {
                     Name = musicProperties.Artist
@@ -316,7 +321,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 artists.Add(artist);
 
                 // 4. Handle Genres
-                // TODO1
+                // TODO2
                 foreach (string genre in musicProperties.Genre)
                 {
                     genres.Add(new Genre() { Name = genre });
@@ -361,7 +366,7 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        // TODO1:
+        // TODO2: after AddSongsFolder is finished properly
         public async void RemoveSongsFolder(int songsFolderId)
         {
             // Update Database
@@ -391,6 +396,17 @@ namespace MusicPlayer.MVVM.ViewModel
             }
 
             ConfigureAudioPlayer();
+            AudioPlayer.Volume = Settings.Volume;
+            // TODO3
+            // Method for reading all files to check if they still exist
+            // and to check if the data is still correct
+            // only do this for Songs that are on screen
+            // if a song is clicked and the path is not found
+            // you can for now throw an error
+
+            PopupVisibility = Visibility.Collapsed;
+            SingleSongVisibility = Visibility.Collapsed;
+            PlaylistViewing = MyMusic;
         }
 
         public async void LoadCache(DomainContext context)
@@ -415,29 +431,31 @@ namespace MusicPlayer.MVVM.ViewModel
                 .ToListAsync();
 
             // 2. Fill Artists
+            _artists = new();
             foreach (Artist artist in dbArtists)
             {
                 _artists.Add(new(artist));
             }
 
             // 3. Fill Genres
+            _genres = new();
             foreach (Genre genre in dbGenres)
             {
                 _genres.Add(new(genre));
             }
 
             // 4. Fill Songs
-            ObservableCollection<SongModel> songs = new();
+            _myMusic = new();
             foreach (Song song in dbSongs)
             {
-                songs.Add(new(song, _artists, _genres));
+                _myMusic.Songs.Add(new(song, _artists, _genres));
             }
 
             // 5. Fill Playlists
-            ObservableCollection<PlaylistModel> playlists = new();
+            _playlists = new();
             foreach (Playlist playlist in dbPlaylists)
             {
-                playlists.Add(new(playlist, songs));
+                _playlists.Add(new(playlist, _myMusic.Songs));
             }
         }
 
@@ -451,6 +469,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 .ToListAsync();
 
             // 2. Fill Models
+            _songsFolders = new();
             foreach (SongsFolder songsFolder in dbSongsFolders)
             {
                 _songsFolders.Add(new(songsFolder));
@@ -1019,24 +1038,46 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        // TODO1
-        public void AddSongToPlaylist(SongModel song, PlaylistModel playlist)
+        // TODO2
+        public async void AddSongToPlaylist(SongModel song, PlaylistModel playlist)
         {
-            //// Add Song to Playlist
-            //Playlists[Playlists.IndexOf(playlist)].Songs.Add(song);
+            // Update Database
+            using (DomainContext context = new())
+            {
+                PlaylistSong playlistSong = new()
+                {
+                    SongId = song.Id,
+                    PlaylistId = playlist.Id,
+                };
 
-            //// Save Playlists
-            ////SavePlaylists();
+                context.PlaylistSongs.Add(playlistSong);
+                await context.SaveChangesAsync();
+            }
+
+            // Update Client
+            playlist.Songs.Add(song);
         }
 
-        // TODO1
-        public void RemoveSongFromPlaylist(SongModel song, PlaylistModel playlist)
+        // TODO2
+        public async void RemoveSongFromPlaylist(SongModel song, PlaylistModel playlist)
         {
-            //// Remove song from Playlist
-            //Playlists[Playlists.IndexOf(playlist)].Songs.Remove(song);
+            // Update Database
+            using (DomainContext context = new())
+            {
+                PlaylistSong playlistSong = await context.PlaylistSongs
+                    .Where(p => p.PlaylistId == playlist.Id)
+                    .Where(s => s.SongId == song.Id)
+                    .FirstOrDefaultAsync();
 
-            //// Save Playlists
-            //SavePlaylists();
+                if (playlistSong == null) return;
+
+                context.PlaylistSongs.Remove(playlistSong);
+                
+                await context.SaveChangesAsync();
+            }
+
+            // Update Client
+            playlist.Songs.Remove(song);
         }
 
         /// <summary>

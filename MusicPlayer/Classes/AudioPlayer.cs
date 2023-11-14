@@ -78,6 +78,7 @@ namespace MusicPlayer.Classes
         {
             // Configuration
             ConfigureMediaPlayer();
+
             // TODO
             //ConfigureSearchOptions(GlobalViewModel.Instance.GlobalSearch);
 

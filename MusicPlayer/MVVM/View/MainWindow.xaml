@@ -22,7 +22,7 @@
     <!-- https://learn.microsoft.com/en-us/dotnet/api/system.windows.shell.taskbariteminfo?view=windowsdesktop-6.0 -->
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo x:Name="taskBarItemInfo"
-                         Description="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Title, StringFormat='{}Playing: {0}'}">
+                         Description="{Binding Path=Global.AudioPlayer.CurrentSong.Title, StringFormat='{}Playing: {0}'}">
             <TaskbarItemInfo.ThumbButtonInfos>
                 <ThumbButtonInfoCollection>
                     <ThumbButtonInfo
@@ -233,7 +233,7 @@
                                     IsMoveToPointEnabled="True" 
                                     ClickedInSlider="{Binding ClickedInSliderr, Mode=TwoWay}"
                                     Value="{Binding Global.SliderValue, Mode=TwoWay}" 
-                                    Maximum="{Binding Global.AudioPlayer.CurrentSong.MusicProperties.Duration.TotalMilliseconds}" 
+                                    Maximum="{Binding Global.AudioPlayer.CurrentSong.Duration.TotalMilliseconds}" 
                                     
                                     MouseEnter="hello_MouseEnter"
                                     MouseMove="hello_MouseMove"

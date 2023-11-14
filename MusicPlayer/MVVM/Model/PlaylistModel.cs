@@ -1,4 +1,5 @@
-﻿using MusicPlayer.Core;
+﻿using MusicPlayer.Classes;
+using MusicPlayer.Core;
 using MusicPlayer.Shared.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,12 +42,32 @@ namespace MusicPlayer.MVVM.Model
         }
 
         // Not present in Database
-        private ObservableCollection<SongModel> _songs;
+        private ObservableCollection<SongModel> _songs = new();
 
         public ObservableCollection<SongModel> Songs
         {
             get => _songs;
-            set { _songs = value; OnPropertyChanged(); }
+            set 
+            { 
+                _songs = value;
+
+                int totalMs = 0;
+                foreach (SongModel song in _songs)
+                {
+                    totalMs += song.Duration.Milliseconds;
+                }
+                PlaylistDuration = HelperMethods.MsToTime(totalMs);
+
+                OnPropertyChanged(); 
+            }
+        }
+
+        private string _playlistDuration;
+
+        public string PlaylistDuration
+        {
+            get => _playlistDuration;
+            set {  _playlistDuration = value; OnPropertyChanged(); }
         }
 
         private bool _isSelected;
@@ -56,7 +77,6 @@ namespace MusicPlayer.MVVM.Model
             get => _isSelected;
             set { _isSelected = value; OnPropertyChanged(); }
         }
-
 
         public PlaylistModel() { }
 

@@ -45,12 +45,12 @@
             <!-- Songs -->
             <Grid Grid.Row="2" >
                 <ScrollViewer>
-                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.PlaylistViewing.Songs}" Margin="0, 0, 8, 0">
+                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Path=Global.PlaylistViewing.Songs}" Margin="0, 0, 8, 0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
                                          Command="{Binding ElementName=Songs, Path=DataContext.SelectSongCommand}"
-                                         CommandParameter="{Binding Id}" IsChecked="{Binding IsPlaying}"
+                                         CommandParameter="{Binding Id}" IsChecked="{Binding Path=IsPlaying}"
                                          Tag="{Binding ElementName=Songs, Path=DataContext}">
                                     <RadioButton.ContextMenu>
                                         <ContextMenu>

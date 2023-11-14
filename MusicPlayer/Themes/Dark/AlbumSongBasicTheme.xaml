@@ -36,13 +36,13 @@
 
                             <DockPanel>
                                 <StackPanel VerticalAlignment="Center" Margin="16,0,0,0">
-                                    <TextBlock Text="{Binding MusicProperties.Title}" />
-                                    <TextBlock Text="{Binding MusicProperties.Artist}" Foreground="#777777" FontSize="14"/>
+                                    <TextBlock Text="{Binding Path=Title}" />
+                                    <TextBlock Text="{Binding Path=ArtistsText}" Foreground="#777777" FontSize="14"/>
                                 </StackPanel>
                             </DockPanel>
 
                             <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0">
-                                <TextBlock Text="{Binding Path=MusicProperties.Duration.TotalMilliseconds, Converter={StaticResource MillisecondConverter}}" Foreground="#999999" />
+                                <TextBlock Text="{Binding Path=Duration.TotalMilliseconds, Converter={StaticResource MillisecondConverter}}" Foreground="#999999" />
                             </DockPanel>
                         </DockPanel>
                     </Border>

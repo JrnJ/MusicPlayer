@@ -97,7 +97,7 @@ namespace MusicPlayer.Shared.Models
                 // Remove if already exists
                 if (context.Songs.ToList().Count > 0) return;
                 Console.WriteLine("Created Test Data because DataBase was empty! MusicPlayer.Shared.Models.DbMain::Main");
-
+                
                 context.Artists.Add(artist);
                 context.Genres.Add(genre);
                 context.Songs.Add(song);

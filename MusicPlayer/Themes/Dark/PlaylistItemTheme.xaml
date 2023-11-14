@@ -14,7 +14,7 @@
                             <TextBlock Text="{Binding Name}" FontSize="18"/>
                             <DockPanel>
                                 <TextBlock Text="{Binding Songs.Count, StringFormat='{}{0} Songs, '}"/>
-                                <TextBlock Text="{Binding PlaylistDuration}"/>
+                                <TextBlock Text="{Binding Path=PlaylistDuration}" />
                             </DockPanel>
                         </StackPanel>
                     </Border>

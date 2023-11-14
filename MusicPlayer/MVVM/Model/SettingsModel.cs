@@ -19,7 +19,7 @@ namespace MusicPlayer.MVVM.Model
             set { _volume = value; OnPropertyChanged(); }
         }
 
-        private ObservableCollection<SongsFolderModel> _songsFolders;
+        private ObservableCollection<SongsFolderModel> _songsFolders = new();
 
         public ObservableCollection<SongsFolderModel> SongsFolders
         {
@@ -32,8 +32,6 @@ namespace MusicPlayer.MVVM.Model
         public SettingsModel(Settings settings, ObservableCollection<SongsFolderModel> allSongsFolders)
         {
             _volume = settings.Volume;
-
-            _songsFolders = new();
 
             // Reference based!
             foreach (SettingsSongsFolder settingsSongsFolder in settings.SongsFolders)

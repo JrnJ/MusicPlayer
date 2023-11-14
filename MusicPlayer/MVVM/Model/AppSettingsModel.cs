@@ -1,115 +1,115 @@
-﻿using MusicPlayer.Classes;
-using MusicPlayer.Core;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿//using MusicPlayer.Classes;
+//using MusicPlayer.Core;
+//using System;
+//using System.Collections.Generic;
+//using System.Collections.ObjectModel;
+//using System.IO;
+//using System.Linq;
+//using System.Text;
+//using System.Text.Json.Serialization;
+//using System.Threading.Tasks;
 
-namespace MusicPlayer.MVVM.Model
-{
-    internal class AppSettingsModel : ObservableObject
-    {
-        [JsonIgnore]
-        public static string SettingsFilePath => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\settings.json";
+//namespace MusicPlayer.MVVM.Model
+//{
+//    internal class AppSettingsModel : ObservableObject
+//    {
+//        [JsonIgnore]
+//        public static string SettingsFilePath => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\settings.json";
 
-        private double _volume;
+//        private double _volume;
 
-        [JsonPropertyName("Volume")]
-        public double Volume
-        {
-            get { return _volume; }
-            set { _volume = value; }
-        }
+//        [JsonPropertyName("Volume")]
+//        public double Volume
+//        {
+//            get { return _volume; }
+//            set { _volume = value; }
+//        }
 
-        private ObservableCollection<MusicFolder> _musicFolders;
+//        private ObservableCollection<MusicFolder> _musicFolders;
 
-        [JsonPropertyName("MusicFolders")]
-        public ObservableCollection<MusicFolder> MusicFolders
-        {
-            get { return _musicFolders; }
-            set { _musicFolders = value; OnPropertyChanged(); }
-        }
+//        [JsonPropertyName("MusicFolders")]
+//        public ObservableCollection<MusicFolder> MusicFolders
+//        {
+//            get { return _musicFolders; }
+//            set { _musicFolders = value; OnPropertyChanged(); }
+//        }
 
-        private ObservableCollection<CachedSong> _cachedSongs;
+//        private ObservableCollection<CachedSong> _cachedSongs;
 
-        [JsonIgnore]
-        public ObservableCollection<CachedSong> CachedSongs
-        {
-            get { return _cachedSongs; }
-            set { _cachedSongs = value; OnPropertyChanged(); }
-        }
+//        [JsonIgnore]
+//        public ObservableCollection<CachedSong> CachedSongs
+//        {
+//            get { return _cachedSongs; }
+//            set { _cachedSongs = value; OnPropertyChanged(); }
+//        }
 
-        /// <summary>
-        /// Adds a new MusicFolder to the MusicFolders
-        /// </summary>
-        /// <param name="path">Path of folder</param>
-        /// <param name="saveSettings">If settings should be saved</param>
-        /// <returns>False if folder is already added</returns>
-        public bool AddMusicFolder(string path, bool saveSettings = true)
-        {
-            // Check if folder already exists (and create an id meanwhile)
-            int id = 0;
-            for (int i = 0; i < MusicFolders.Count; i++)
-            {
-                if (MusicFolders[i].Path == path)
-                    return false;
+//        /// <summary>
+//        /// Adds a new MusicFolder to the MusicFolders
+//        /// </summary>
+//        /// <param name="path">Path of folder</param>
+//        /// <param name="saveSettings">If settings should be saved</param>
+//        /// <returns>False if folder is already added</returns>
+//        public bool AddMusicFolder(string path, bool saveSettings = true)
+//        {
+//            // Check if folder already exists (and create an id meanwhile)
+//            int id = 0;
+//            for (int i = 0; i < MusicFolders.Count; i++)
+//            {
+//                if (MusicFolders[i].Path == path)
+//                    return false;
 
-                if (MusicFolders[i].Id > id)
-                    id = MusicFolders[i].Id;
-            }
+//                if (MusicFolders[i].Id > id)
+//                    id = MusicFolders[i].Id;
+//            }
 
-            MusicFolders.Add(new()
-            {
-                Id = id + 1,
-                Path = path
-            });
+//            MusicFolders.Add(new()
+//            {
+//                Id = id + 1,
+//                Path = path
+//            });
 
-            if (saveSettings)
-                SaveSettingsToFile();
+//            if (saveSettings)
+//                SaveSettingsToFile();
 
-            return true;
-        }
+//            return true;
+//        }
 
-        public bool RemoveMusicFolder(int id, bool saveSettings = true)
-        {
-            try
-            {
-                MusicFolders.Remove(MusicFolders.Where(x => x.Id == id).FirstOrDefault());
-                if (saveSettings)
-                    SaveSettingsToFile();
+//        public bool RemoveMusicFolder(int id, bool saveSettings = true)
+//        {
+//            try
+//            {
+//                MusicFolders.Remove(MusicFolders.Where(x => x.Id == id).FirstOrDefault());
+//                if (saveSettings)
+//                    SaveSettingsToFile();
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ERROR: " + ex);
-                return false;
-            }
-        }
+//                return true;
+//            }
+//            catch (Exception ex)
+//            {
+//                Console.WriteLine("ERROR: " + ex);
+//                return false;
+//            }
+//        }
 
-        public async Task GetSettingsFromFile()
-        {
-            AppSettingsModel appSettings = await FileHandler<AppSettingsModel>.GetJSON(SettingsFilePath);
+//        public async Task GetSettingsFromFile()
+//        {
+//            AppSettingsModel appSettings = await FileHandler<AppSettingsModel>.GetJSON(SettingsFilePath);
 
-            appSettings ??= new()
-            {
-                Volume = 0.5,
-                MusicFolders = new()
-            };
-            this.Volume = appSettings.Volume;
-            this.MusicFolders = appSettings.MusicFolders;
-        }
+//            appSettings ??= new()
+//            {
+//                Volume = 0.5,
+//                MusicFolders = new()
+//            };
+//            this.Volume = appSettings.Volume;
+//            this.MusicFolders = appSettings.MusicFolders;
+//        }
 
-        public async void SaveSettingsToFile()
-        {
-            // trycatch?
-            // return bool?
-            // something plz
-            await FileHandler<AppSettingsModel>.SaveJSON(SettingsFilePath, this);
-        }
-    }
-}
+//        public async void SaveSettingsToFile()
+//        {
+//            // trycatch?
+//            // return bool?
+//            // something plz
+//            await FileHandler<AppSettingsModel>.SaveJSON(SettingsFilePath, this);
+//        }
+//    }
+//}
