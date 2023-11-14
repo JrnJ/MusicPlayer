@@ -47,7 +47,7 @@ namespace MusicPlayer.Shared.Models
             base.OnModelCreating(modelBuilder);
 
             // Relations
-            // ArtistSong
+            // n:m ArtistSong
             modelBuilder.Entity<ArtistSong>()
                 .HasKey(x => new { x.ArtistId, x.SongId });
 
@@ -61,7 +61,7 @@ namespace MusicPlayer.Shared.Models
                 .WithMany(p => p.Artists)
                 .HasForeignKey(pt => pt.SongId);
 
-            // PlaylistSong
+            // n:m PlaylistSong
             modelBuilder.Entity<PlaylistSong>()
                 .HasKey(x => new { x.PlaylistId, x.SongId });
 
@@ -75,7 +75,7 @@ namespace MusicPlayer.Shared.Models
                 .WithMany(p => p.Playlists)
                 .HasForeignKey(pt => pt.SongId);
 
-            // SongGenre
+            // n:m SongGenre
             modelBuilder.Entity<SongGenre>()
                 .HasKey(x => new { x.SongId, x.GenreName });
 
@@ -89,7 +89,7 @@ namespace MusicPlayer.Shared.Models
                 .WithMany(p => p.Songs)
                 .HasForeignKey(pt => pt.GenreName);
 
-            // SettingsSongsFolder
+            // n:m SettingsSongsFolder
             modelBuilder.Entity<SettingsSongsFolder>()
                 .HasKey(x => new { x.SettingsId, x.SongsFolderId });
 
@@ -102,6 +102,12 @@ namespace MusicPlayer.Shared.Models
                 .HasOne(pt => pt.SongsFolder)
                 .WithMany(p => p.Settings)
                 .HasForeignKey(pt => pt.SongsFolderId);
+
+            // 1:n SongsFolder has Songs
+            modelBuilder.Entity<Song>()
+                .HasOne(s => s.SongsFolder)
+                .WithMany(f => f.Songs)
+                .HasForeignKey(s => s.SongsFolderId);
         }
     }
 }

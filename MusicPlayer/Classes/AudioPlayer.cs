@@ -34,9 +34,9 @@ namespace MusicPlayer.Classes
         public MediaPlayer MediaPlayer { get; private set; }
 
         // Stoopid props
-        private AlbumSongModel _currentSong;
+        private SongModel _currentSong;
 
-        public AlbumSongModel CurrentSong
+        public SongModel CurrentSong
         {
             get =>_currentSong;
             set { _currentSong = value; OnPropertyChanged(); }
@@ -160,8 +160,8 @@ namespace MusicPlayer.Classes
         {
             // Text
             MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Type = MediaPlaybackType.Video;
-            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Title = CurrentSong.MusicProperties.Title;
-            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.MusicProperties.Artist;
+            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Title = CurrentSong.Title;
+            MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Subtitle = CurrentSong.ArtistsText;
 
             // Image
             if (CurrentSong.Image != null)
@@ -275,11 +275,11 @@ namespace MusicPlayer.Classes
 
         private void PlaySongSearchBarOption_BeforeSearchOptionShow(object sender, string e)
         {
-            foreach (AlbumSongModel song in GlobalViewModel.Instance.MyMusic.Songs)
+            foreach (SongModel song in GlobalViewModel.Instance.MyMusic.Songs)
             {
-                if ((song.MusicProperties.Title.Contains(e)))
+                if ((song.Title.Contains(e)))
                 {
-                    PlaySongSearchBarOption.Header = "Play Song: " + song.MusicProperties.Title + " (" + song.MusicProperties.Artist + ")";
+                    PlaySongSearchBarOption.Header = "Play Song: " + song.Title + " (" + song.ArtistsText + ")";
                     break;
                 }
             }
@@ -288,7 +288,7 @@ namespace MusicPlayer.Classes
         }
         #endregion SearchOptions
 
-        public void OpenMedia(AlbumSongModel song)
+        public void OpenMedia(SongModel song)
         {
             if (CurrentSong != null)
             {

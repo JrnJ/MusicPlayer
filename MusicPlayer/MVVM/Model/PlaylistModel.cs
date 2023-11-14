@@ -1,6 +1,8 @@
 ﻿using MusicPlayer.Core;
 using MusicPlayer.Shared.Models;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Documents;
 
 namespace MusicPlayer.MVVM.Model
 {
@@ -84,13 +86,16 @@ namespace MusicPlayer.MVVM.Model
 
         public Playlist ToPlaylist()
         {
-            return new()
+            Playlist playlist = new()
             {
                 Id = _id,
                 Name = _name,
                 Description = _description,
                 ImagePath = _imagePath,
+                Songs = new List<PlaylistSong>()
             };
+
+            return playlist;
         }
     }
 }

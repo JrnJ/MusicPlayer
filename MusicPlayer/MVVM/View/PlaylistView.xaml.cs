@@ -78,7 +78,7 @@ namespace MusicPlayer.MVVM.View
                 Timer.Stop();
 
                 // Get+Set song
-                AlbumSongModel song = GlobalViewModel.Instance.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == SongId);
+                SongModel song = GlobalViewModel.Instance.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == SongId);
                 meow.DataContext = song;
                 PreviousMoveIndex = GlobalViewModel.Instance.PlaylistViewing.Songs.IndexOf(song);
 

@@ -76,14 +76,14 @@ namespace MusicPlayer.MVVM.ViewModel
 
             SelectSongCommand = new(o =>
             {
-                AlbumSongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == (int)o);
+                SongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == (int)o);
                 //AlbumSongModel song = Global.MyMusic.Songs.FirstOrDefault(x => x.Id == (int)o);
                 Global.OpenMedia(song);
             });
 
             RemoveSongCommand = new(o =>
             {
-                AlbumSongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == (int)o);
+                SongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == (int)o);
 
                 Global.RemoveSongFromPlaylist(song, Global.PlaylistViewing);
             });
@@ -91,8 +91,8 @@ namespace MusicPlayer.MVVM.ViewModel
             AddSongToPlaylistCommand = new(o =>
             {
                 string[] ids = o.ToString().Split(","); // 0 = playlistId, 1 = songId
-                AlbumSongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == int.Parse(ids[1]));
-                PlaylistSongsModel playlist = Global.Playlists.FirstOrDefault(x => x.Id == int.Parse(ids[0]));
+                SongModel song = Global.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == int.Parse(ids[1]));
+                PlaylistModel playlist = Global.Playlists.FirstOrDefault(x => x.Id == int.Parse(ids[0]));
 
                 Global.AddSongToPlaylist(song, playlist);
             });
@@ -123,10 +123,19 @@ namespace MusicPlayer.MVVM.ViewModel
 
             EditPlaylistCommand = new(o =>
             {
+                // 
+                PlaylistModel playlistToCopy = Global.PlaylistViewing;
+
                 // Create EditPlaylistBox
                 Global.EditPlaylistBox = new()
                 {
-                    Playlist = Global.PlaylistViewing,
+                    Playlist = new()
+                    {
+                        Name = playlistToCopy.Name,
+                        Description = playlistToCopy.Description,
+                        ImagePath = playlistToCopy.ImagePath,
+                        Songs = playlistToCopy.Songs,
+                    },
                     Visibility = System.Windows.Visibility.Visible,
 
                     ConfirmCommand = new(o =>

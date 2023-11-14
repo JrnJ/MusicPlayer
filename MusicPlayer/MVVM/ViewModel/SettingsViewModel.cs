@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
 using MusicPlayer.MVVM.Model;
+using MusicPlayer.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -45,11 +46,7 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             AddFolderCommand = new(o =>
             {
-                // We have to do this with a custom property or a custom element(preffered I think)
-
-                AddMusicFolder();
-                //double heightPerItem = scroller.ActualHeight / itemscontrol.Items.Count;
-                //ScrollViewer.ScrollToVerticalOffset(ScrollViewer.ActualHeight / 2);
+                AddSongsFolder();
             });
 
             RemoveFolderCommand = new(o =>
@@ -58,7 +55,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 Global.ConfirmBox = new()
                 {
                     Title = "Remove Folder?",
-                    Description = $"Are you sure you want to remove {Global.AppSettinggs.MusicFolders.FirstOrDefault(x => x.Id == (int)o).Path}?",
+                    Description = $"Are you sure you want to remove {Global.Settings.SongsFolders.FirstOrDefault(x => x.Id == (int)o).Path}?",
                     ConfirmText = "Cancel",
                     CancelText = "Delete",
                     Visibility = Visibility.Visible,
@@ -74,7 +71,7 @@ namespace MusicPlayer.MVVM.ViewModel
                         Global.ConfirmBox.Visibility = Visibility.Collapsed;
 
                         // Remove Folder
-                        RemoveMusicFolder((int)o);
+                        Global.RemoveSongsFolder((int)o);
                     })
                 };
 
@@ -93,63 +90,16 @@ namespace MusicPlayer.MVVM.ViewModel
             });
         }
 
-        public async void AddMusicFolder()
+        // TODO2
+        public async void AddSongsFolder()
         {
             StorageFolder folder = await AppWindowExtensions.OpenFolderPicker();
+            if (folder == null) return;
 
-            if (folder != null)
+            using (DomainContext context = new())
             {
-                Global.AppSettinggs.AddMusicFolder(folder.Path);
-
-                // Add to Cache
-                IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
-
-                foreach (StorageFile file in files)
-                {
-                    if (HelperMethods.IsMusicFile(file.Path))
-                    {
-                        // Add to MyMusic
-                        Global.MyMusic.AddSong(file);
-                        await Global.MyMusic.Songs[^1].Init(file);
-
-                        // Add to Cache
-                        AlbumSongModel song = Global.MyMusic.Songs[^1];
-                        Global.AppSettinggs.CachedSongs.Add(new()
-                        {
-                            Id = song.Id,
-                            Title = song.MusicProperties.Title,
-                            Artist = song.MusicProperties.Artist,
-                            Path = song.Path
-                        });
-                    }
-                }
-
-                // Save Cache
-                await FileHandler<ObservableCollection<CachedSong>>.SaveJSON(Global.CachedSongsFilePath, Global.AppSettinggs.CachedSongs);
+                Global.AddSongsFolder(folder);
             }
-        }
-
-        public async void RemoveMusicFolder(int folderId)
-        {
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(Global.AppSettinggs.MusicFolders.FirstOrDefault(x => x.Id == folderId).Path);
-            IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
-
-            foreach (StorageFile file in files)
-            {
-                if (HelperMethods.IsMusicFile(file.Path))
-                {
-                    // TODO: this will return 0 for anything not found, change it bc it will delete different songs
-                    int songId = Global.MyMusic.Songs.FirstOrDefault(x => x.Path == file.Path).Id;
-
-                    Global.MyMusic.RemoveSong(songId);
-                    Global.AppSettinggs.CachedSongs.Remove(Global.AppSettinggs.CachedSongs.FirstOrDefault(x => x.Id == songId));
-                }
-            }
-
-            Global.AppSettinggs.RemoveMusicFolder(folderId);
-
-            // Save Cache
-            await FileHandler<ObservableCollection<CachedSong>>.SaveJSON(Global.CachedSongsFilePath, Global.AppSettinggs.CachedSongs);
         }
     }
 }

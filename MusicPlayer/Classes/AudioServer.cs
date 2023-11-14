@@ -69,7 +69,7 @@ namespace MusicPlayer.Classes
             }
         }
 
-        public void Play(AlbumSongModel song)
+        public void Play(SongModel song)
         {
             try
             {

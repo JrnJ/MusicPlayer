@@ -5,9 +5,9 @@ namespace MusicPlayer.MVVM.Model
     internal class EditBoxModel : BoxModel
     {
         // Properties
-        private PlaylistSongsModel _playlist;
+        private PlaylistModel _playlist;
 
-        public PlaylistSongsModel Playlist
+        public PlaylistModel Playlist
         {
             get { return _playlist; }
             set { _playlist = value; OnPropertyChanged(); }

@@ -10,6 +10,7 @@ using Windows.Foundation.Metadata;
 
 namespace MusicPlayer.MVVM.Model
 {
+    // Can have 6 references before deletion
     internal class AlbumSongModel : ObservableObject
     {
         // Other

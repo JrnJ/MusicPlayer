@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,13 @@ namespace MusicPlayer.Shared.Models
         public int Year { get; set; }
 
         public TimeSpan Duration { get; set; }
+
+        // Foreign Key
+        [ForeignKey(nameof(SongsFolder))]
+        [Required]
+        public int SongsFolderId { get; set; }
+
+        public virtual SongsFolder SongsFolder { get; set; }
 
         // Junction Tables
         public virtual ICollection<ArtistSong> Artists { get; set; } // Artists Song has

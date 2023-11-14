@@ -14,7 +14,7 @@ namespace MusicPlayer.Classes
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            ObservableCollection<AlbumSongModel> list = (ObservableCollection<AlbumSongModel>)values[1];
+            ObservableCollection<SongModel> list = (ObservableCollection<SongModel>)values[1];
             for (int i = 0; i < list.Count; i++)
             {
                 if (list[i].Id == (int)values[0])

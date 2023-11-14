@@ -38,13 +38,42 @@ namespace MusicPlayer.MVVM.Model
             set { _title = value; OnPropertyChanged(); }
         }
 
+        private int _year;
+
+        public int Year
+        {
+            get { return _year; }
+            set { _year = value; OnPropertyChanged(); }
+        }
+
+        private TimeSpan _duration;
+
+        public TimeSpan Duration
+        {
+            get { return _duration; }
+            set { _duration = value; OnPropertyChanged(); }
+        }
+
         // Not present in Database
         private ObservableCollection<ArtistModel> _artists;
 
         public ObservableCollection<ArtistModel> Artists
         {
             get => _artists;
-            set { _artists = value; OnPropertyChanged(); }
+            set 
+            { 
+                _artists = value;
+
+                // Alter Artists Text
+                string newArtistsText = "";
+                foreach (ArtistModel artist in _artists)
+                {
+                    newArtistsText += artist.Name;
+                }
+                ArtistsText = newArtistsText;
+
+                OnPropertyChanged(); 
+            }
         }
 
         private ObservableCollection<GenreModel> _genres;
@@ -52,7 +81,15 @@ namespace MusicPlayer.MVVM.Model
         public ObservableCollection<GenreModel> Genres
         {
             get => _genres;
-            set { _genres = value; OnPropertyChanged(); }
+            set  {  _genres = value; OnPropertyChanged(); }
+        }
+
+        private string _artistsText;
+
+        public string ArtistsText
+        {
+            get { return _artistsText; }
+            set { _artistsText = value; OnPropertyChanged(); }
         }
 
         private bool _isPlaying;
@@ -78,6 +115,8 @@ namespace MusicPlayer.MVVM.Model
             _id = song.Id;
             _path = song.Path;
             _title = song.Title;
+            _year = song.Year;
+            _duration = song.Duration;
 
             _artists = new();
             _genres = new();
@@ -115,6 +154,8 @@ namespace MusicPlayer.MVVM.Model
                 Id = _id,
                 Path = _path,
                 Title = _title,
+                Year = _year,
+                Duration = _duration,
             };
         }
     }

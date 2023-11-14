@@ -17,7 +17,10 @@ namespace MusicPlayer.Shared.Models
         [MaxLength(255)]
         public string Path { get; set; }
 
+        // 1:n with Song
+        public virtual ICollection<Song> Songs { get; set; } // Songs Songsfolder has
+
         // Junction Tables
-        public virtual ICollection<SettingsSongsFolder> Settings { get; set; } // SongsFolder Songs has
+        public virtual ICollection<SettingsSongsFolder> Settings { get; set; } // Settings SongsFolder has
     }
 }

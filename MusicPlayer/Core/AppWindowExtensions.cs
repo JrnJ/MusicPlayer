@@ -31,7 +31,7 @@ namespace MusicPlayer.Core
         /// Does what it says
         /// </summary>
         /// <returns>The MainWindow</returns>
-        public static MainWindow GetMainWindow() => (MusicPlayer.MainWindow) App.Current.MainWindow;
+        public static MainWindow GetMainWindow() => (MusicPlayer.MainWindow)App.Current.MainWindow;
 
         /// <summary>
         /// Opens a native Windows FolderPicker
@@ -42,7 +42,7 @@ namespace MusicPlayer.Core
         {
             folderPicker ??= new();
 
-            MainWindow window = (MusicPlayer.MainWindow)App.Current.MainWindow;
+            MainWindow window = GetMainWindow();
             IntPtr hwnd = new WindowInteropHelper(window).EnsureHandle();
             InitializeWithWindow.Initialize(folderPicker, hwnd);
 
@@ -59,7 +59,7 @@ namespace MusicPlayer.Core
         {
             filePicker ??= new();
 
-            MainWindow window = (MusicPlayer.MainWindow)App.Current.MainWindow;
+            MainWindow window = GetMainWindow();
             IntPtr hwnd = new WindowInteropHelper(window).EnsureHandle();
             InitializeWithWindow.Initialize(filePicker, hwnd);
 
