@@ -241,7 +241,8 @@ namespace MusicPlayer.MVVM.View
                 ElementSelected = null;
                 meow.Visibility = Visibility.Hidden;
 
-                GlobalViewModel.Instance.SavePlaylists();
+                // TODO2: order doesnt exist
+                //GlobalViewModel.Instance.SavePlaylists();
             }
         }
     }

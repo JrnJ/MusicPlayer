@@ -81,8 +81,8 @@ namespace MusicPlayer.Shared.Models
                 Settings = new List<SettingsSongsFolder>(),
                 Songs = new List<Song>()
             };
-            //song.SongsFolder = songsFolder;
-            //songsFolder.Songs.Add(song);
+            song.SongsFolder = songsFolder;
+            songsFolder.Songs.Add(song);
 
             SettingsSongsFolder settingsSongsFolder = new()
             {

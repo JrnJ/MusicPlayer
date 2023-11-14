@@ -104,8 +104,9 @@ namespace MusicPlayer.MVVM.ViewModel
 
                 if (songIndex != 0)
                 {
+                    // TODO2: order doesnt exist
                     Global.PlaylistViewing.Songs.Move(songIndex, songIndex - 1);
-                    Global.SavePlaylists();
+                    //Global.SavePlaylists();
                 }
             });
 
@@ -116,8 +117,9 @@ namespace MusicPlayer.MVVM.ViewModel
 
                 if (songIndex != Global.PlaylistViewing.Songs.Count - 1)
                 {
+                    // TODO2: order doesnt exist
                     Global.PlaylistViewing.Songs.Move(songIndex, songIndex + 1);
-                    Global.SavePlaylists();
+                    //Global.SavePlaylists();
                 }
             });
 
