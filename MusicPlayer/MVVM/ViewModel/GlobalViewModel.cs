@@ -11,16 +11,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
-using System.Text;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Threading;
-using Windows.ApplicationModel.Activation;
+using TagLib;
 using Windows.Media;
-using Windows.Media.Playlists;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
 
@@ -287,68 +282,121 @@ namespace MusicPlayer.MVVM.ViewModel
             }
 
             List<Song> folderSongs = new();
-            List<Artist> artists = new();
-            List<Genre> genres = new();
-            IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
-            foreach (StorageFile file in files)
-            {
-                // 1. Is file music
-                if (!HelperMethods.IsMusicFile(file.Path))
-                    continue;
 
-                // 2. Set Song data
-                MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
-                Song song = new()
-                {
-                    Path = file.Path,
-                    Title = musicProperties.Title,
-                    Year = unchecked((int)musicProperties.Year),
-                    Duration = musicProperties.Duration,
-                    SongsFolderId = songsFolder.Id, 
-
-                    Artists = new List<ArtistSong>(),
-                    Genres = new List<SongGenre>(),
-                    Playlists = new List<PlaylistSong>()
-                };
-                folderSongs.Add(song);
-
-                // 3. Handle Artists
-                // TODO2
-                Artist artist = new()
-                {
-                    Name = musicProperties.Artist
-                };
-                artists.Add(artist);
-
-                // 4. Handle Genres
-                // TODO2
-                foreach (string genre in musicProperties.Genre)
-                {
-                    genres.Add(new Genre() { Name = genre });
-                }
-            }
-
-            // Update Songs to Database
             using (DomainContext context = new())
             {
-                // 1. Set Artists
+                // Db Things
+                List<Artist> dbArtists = await context.Artists
+                    .Include(a => a.Songs)
+                    .ToListAsync();
 
+                List<Genre> dbGenres = await context.Genres
+                    .Include(g => g.Songs)
+                    .ToListAsync();
 
-                // 2. Set Genres
-
-
-                // 3. Set Songs
-                foreach (Song folderSong in folderSongs)
+                IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
+                foreach (StorageFile file in files)
                 {
-                    context.Songs.Add(folderSong);
+                    // 1. Is file music
+                    if (!HelperMethods.IsMusicFile(file.Path))
+                        continue;
+
+                    // 2. Set Song data
+                    MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
+                    Song song = new()
+                    {
+                        Path = file.Path,
+                        Title = musicProperties.Title,
+                        Year = unchecked((int)musicProperties.Year),
+                        Duration = musicProperties.Duration,
+                        SongsFolderId = songsFolder.Id,
+
+                        Artists = new List<ArtistSong>(),
+                        Genres = new List<SongGenre>(),
+                        Playlists = new List<PlaylistSong>()
+                    };
+
+                    // 3. Handle Artists
+                    ArtistSong artistSong = new()
+                    {
+                        SongId = song.Id
+                    };
+
+                    foreach (Artist dbArtist in dbArtists)
+                    {
+                        // FK
+                        if (musicProperties.Artist == dbArtist.Name)
+                        {
+                            //
+                            artistSong.ArtistId = dbArtist.Id;
+                            dbArtist.Songs ??= new List<ArtistSong>();
+                            dbArtist.Songs.Add(artistSong);
+                            break;
+                        }
+
+                        // Avoid duplicates
+                        if (dbArtists.Where(a => a.Name == musicProperties.Artist).FirstOrDefault() != null)
+                            continue;
+
+                        Artist artist = new()
+                        {
+                            Name = musicProperties.Artist,
+                            Songs = new List<ArtistSong>()
+                        };
+                        context.Artists.Add(artist);
+                        dbArtists.Add(artist);
+
+                        //
+                        artistSong.ArtistId = artist.Id;
+                        artist.Songs.Add(artistSong);
+                        break;
+                    }
+                    song.Artists.Add(artistSong);
+
+                    // 4. Handle Genres
+                    foreach (string genreName in musicProperties.Genre)
+                    {
+                        SongGenre songGenre = new()
+                        {
+                            SongId = song.Id
+                        };
+
+                        foreach (Genre dbGenre in dbGenres)
+                        {
+                            // Junction Table
+                            if (genreName == dbGenre.Name)
+                            {
+                                //
+                                songGenre.GenreName = dbGenre.Name;
+                                dbGenre.Songs ??= new List<SongGenre>();
+                                dbGenre.Songs.Add(songGenre);
+                                break;
+                            }
+
+                            // Avoid duplicates
+                            if (dbGenres.Where(g => g.Name == genreName).FirstOrDefault() != null)
+                                continue;
+
+                            Genre genre = new() 
+                            { 
+                                Name = genreName,
+                                Songs = new List<SongGenre>()
+                            };
+                            context.Genres.Add(genre);
+                            dbGenres.Add(genre);
+
+                            // 
+                            songGenre.GenreName = genre.Name;
+                            genre.Songs.Add(songGenre);
+                            break;
+                        }
+                        song.Genres.Add(songGenre);
+                    }
+
+                    // 
+                    context.Songs.Add(song);
+                    folderSongs.Add(song);
                 }
-                await context.SaveChangesAsync();
-
-                // 4. Set ArtistSongs
-
-
-                // 5. Set SongGenres
-
 
                 await context.SaveChangesAsync();
             }
@@ -386,7 +434,7 @@ namespace MusicPlayer.MVVM.ViewModel
         }
         #endregion SortThis
 
-        #region NewConfiguration
+        #region Configuration
         public async void NewConfigure()
         {
             using (DomainContext context = new())
@@ -477,9 +525,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             _settings = new(dbSettings[0], SongsFolders);
         }
-        #endregion NewConfiguration
 
-        #region Configuration
         //public async void Configure()
         //{
         //    // Validate
@@ -555,174 +601,6 @@ namespace MusicPlayer.MVVM.ViewModel
 
             }
         }
-
-        //private async Task ConfigureSettings()
-        //{
-        //    // Load Settings
-        //    AppSettinggs = new();
-        //    await AppSettinggs.GetSettingsFromFile();
-        //}
-
-        private async void ConfigureMusic()
-        {
-            //// Create Home Playlist
-            //MyMusic = new();
-
-            //// Create Temporary collections
-            //List<StorageFile> storageFiles = new();
-            //List<StorageFile> nonCachedSongs = new();
-
-            //// Load Cached Music
-            //ObservableCollection<CachedSong> cachedSongs = await FileHandler<ObservableCollection<CachedSong>>.GetJSON(CachedSongsFilePath);
-            //cachedSongs ??= new();
-
-            //AppSettinggs.CachedSongs = cachedSongs;
-
-            //// Load UI
-            //// Get All Files in All Folders
-            //for (int i = 0; i < AppSettinggs.MusicFolders.Count; i++)
-            //{
-            //    StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettinggs.MusicFolders[i].Path);
-            //    IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
-            //    ObservableCollection<StorageFile> musicFiles = new();
-            //    foreach (StorageFile file in files)
-            //    {
-            //        if (HelperMethods.IsMusicFile(file.Path))
-            //        {
-            //            musicFiles.Add(file);
-            //        }
-            //    }
-
-            //    // Loop over Files in Folder
-            //    //foreach (StorageFile file in files)
-            //    //{
-            //    //    // Check if File is Music
-            //    //    if (HelperMethods.IsMusicFile(file.Path))
-            //    //    {
-            //    //        bool isFileInCache = false;
-
-            //    //        // Check if File exists in the cache
-            //    //        for (int j = 0; j < cachedSongs.Count; j++)
-            //    //        {
-            //    //            if (cachedSongs[j].Path == file.Path)
-            //    //            {
-            //    //                // Add to MyMusic
-            //    //                storageFiles.Add(file);
-            //    //                MyMusic.AddSong(file);
-
-            //    //                // Remove and Break
-            //    //                cachedSongs.RemoveAt(j);
-            //    //                isFileInCache = true;
-            //    //                j--;
-            //    //                break;
-            //    //            }
-            //    //        }
-
-            //    //        if (!isFileInCache)
-            //    //        {
-            //    //            // Do Something
-            //    //            nonCachedSongs.Add(file);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    // Loop over Songs in Cache
-            //    for (int j = 0; j < cachedSongs.Count; j++)
-            //    {
-            //        // Check if File in Cache exists in Folder
-            //        for (int k = 0; k < musicFiles.Count; k++)
-            //        {
-            //            if (cachedSongs[j].Path == musicFiles[k].Path)
-            //            {
-            //                storageFiles.Add(musicFiles[k]);
-            //                MyMusic.AddSong(musicFiles[k], cachedSongs[j].Id);
-
-            //                // Remove and break
-            //                musicFiles.RemoveAt(k);
-            //                k--;
-            //                break;
-            //            }
-            //        }
-            //    }
-
-            //    // Add remaining files to nonCachedSongs
-            //    for (int j = 0; j < musicFiles.Count; j++)
-            //    {
-            //        nonCachedSongs.Add(musicFiles[j]);
-            //    }
-            //}
-
-            // Load Playlists
-            //GetPlaylists();
-
-            //await ConfigureFullSongs(nonCachedSongs);
-
-            //await CreateNewCache();
-        }
-
-        //private async Task ConfigureFullSongs(List<StorageFile> nonCachedSongs)
-        //{
-        //    // Load Full Songs
-        //    for (int i = 0; i < MyMusic.Songs.Count; i++)
-        //    {
-        //        await MyMusic.Songs[i].Init(await StorageFile.GetFileFromPathAsync(MyMusic.Songs[i].Path));
-        //    }
-
-        //    // Load Non Cached Songs
-        //    for (int i = 0; i < nonCachedSongs.Count; i++)
-        //    {
-        //        await MyMusic.AddSong(nonCachedSongs[i]).Init(await StorageFile.GetFileFromPathAsync(nonCachedSongs[i].Path));
-        //    }
-        //}
-
-        //private async Task CreateNewCache()
-        //{
-        //    // Create new Cache
-        //    ObservableCollection<CachedSong> newCache = new();
-        //    for (int i = 0; i < MyMusic.Songs.Count; i++)
-        //    {
-        //        newCache.Add(new()
-        //        {
-        //            Id = MyMusic.Songs[i].Id,
-        //            Path = MyMusic.Songs[i].Path,
-        //            Title = MyMusic.Songs[i].MusicProperties.Title,
-        //            Artist = MyMusic.Songs[i].MusicProperties.Artist
-        //        });
-        //    }
-
-        //    // Save new cache if something changed
-        //    if (newCache != AppSettinggs.CachedSongs)
-        //        await FileHandler<ObservableCollection<CachedSong>>.SaveJSON(CachedSongsFilePath, newCache);
-        //}
-
-        //public async void GetPlaylists()
-        //{
-        //    Playlists = new();
-
-        //    // Get all Playlists and make new if none exists
-        //    ObservableCollection<PlaylistSongsModel> playlists = await FileHandler<ObservableCollection<PlaylistSongsModel>>.GetJSON(PlaylistsFilePath);
-        //    playlists ??= new();
-
-        //    for (int i = 0; i < playlists.Count; i++)
-        //    {
-        //        // Add Songs
-        //        for (int j = 0; j < playlists[i].Songs.Count; j++)
-        //        {
-        //            if (MyMusic.Songs.FirstOrDefault(x => x.Id == playlists[i].Songs[j].Id) != null)
-        //            {
-        //                playlists[i].Songs[j] = MyMusic.Songs.FirstOrDefault(x => x.Id == playlists[i].Songs[j].Id);
-        //            }
-        //            else
-        //            {
-        //                playlists[i].Songs.RemoveAt(j);
-        //                j--;
-        //            }
-        //        }
-
-        //        // Add Playlist
-        //        Playlists.Add(playlists[i]);
-        //    }
-        //}
 
         private void ConfigureAudioPlayer()
         {
