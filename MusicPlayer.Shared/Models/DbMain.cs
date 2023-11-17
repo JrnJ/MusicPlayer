@@ -98,7 +98,6 @@ namespace MusicPlayer.Shared.Models
                 settings.SongsFolders.Add(settingsSongsFolder);
                 songsFolder.Settings.Add(settingsSongsFolder);
 
-
                 // Remove if already exists
                 if (context.Songs.ToList().Count > 0) return;
                 Console.WriteLine("Created Test Data because DataBase was empty! MusicPlayer.Shared.Models.DbMain::Main");

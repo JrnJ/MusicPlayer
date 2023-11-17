@@ -42,7 +42,7 @@
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
     <EntryPointProjectUniqueName>..\MusicPlayer\MusicPlayer.csproj</EntryPointProjectUniqueName>
-    <PackageCertificateThumbprint>2FFFA5C11F90C104346CBCC374B37915F6F9847F</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>200D2F74D48C713A38E827FA89FE7EB5F1D24197</PackageCertificateThumbprint>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>

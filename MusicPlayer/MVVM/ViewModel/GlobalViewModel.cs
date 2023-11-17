@@ -264,13 +264,24 @@ namespace MusicPlayer.MVVM.ViewModel
                 // TODO2: we also need to add the link to the Settings
                 // and possibly the other way around too
                 Settings = new List<SettingsSongsFolder>()
-                {
+            };
 
-                }
+            SettingsSongsFolder settingsSongsFolder = new()
+            {
+                SettingsId = Settings.Id,
+                SongsFolderId = songsFolder.Id
             };
 
             using (DomainContext context = new())
             {
+                Settings settings = context.Settings
+                    .Where(s => s.Id == Settings.Id)
+                    .Include(s => s.SongsFolders)
+                    .FirstOrDefault();
+
+                settings.SongsFolders.Add(settingsSongsFolder);
+                songsFolder.Settings.Add(settingsSongsFolder);
+
                 // Update Database
                 context.SongsFolders.Add(songsFolder);
                 await context.SaveChangesAsync();
@@ -401,6 +412,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 await context.SaveChangesAsync();
             }
 
+            // TODO3
             // Update Artists to Client
 
 
@@ -425,7 +437,16 @@ namespace MusicPlayer.MVVM.ViewModel
                 if (songsFolder == null) 
                     return;
 
-                
+                // Remove Songs in Folder
+                foreach (Song song in context.Songs.Where(s => s.SongsFolderId == songsFolder.Id))
+                {
+                    context.Remove(song);
+                }
+
+                // Remove Folder
+                context.SongsFolders.Remove(songsFolder);
+
+                await context.SaveChangesAsync();
             }
 
             // Update Client
@@ -455,6 +476,19 @@ namespace MusicPlayer.MVVM.ViewModel
             PopupVisibility = Visibility.Collapsed;
             SingleSongVisibility = Visibility.Collapsed;
             PlaylistViewing = MyMusic;
+
+            // CLA
+            string[] cmdLine = Environment.GetCommandLineArgs();
+            if (cmdLine.Length > 1)
+            {
+                Song song = new()
+                {
+                    Id = 0,
+                    Path = cmdLine[1]
+                };
+                StorageFile storageFile = await StorageFile.GetFileFromPathAsync(cmdLine[1]);
+                OpenMedia(new(song, _artists, _genres), true);
+            }
         }
 
         public async void LoadCache(DomainContext context)
@@ -525,36 +559,6 @@ namespace MusicPlayer.MVVM.ViewModel
 
             _settings = new(dbSettings[0], SongsFolders);
         }
-
-        //public async void Configure()
-        //{
-        //    // Validate
-        //    await Validate();
-
-        //    // Configure
-        //    //await ConfigureSettings();
-        //    ConfigureMusic();
-
-        //    ConfigureAudioPlayer();
-        //    PopupVisibility = Visibility.Collapsed;
-        //    SingleSongVisibility = Visibility.Collapsed;
-        //    PlaylistViewing = MyMusic;
-
-        //    // CLA
-        //    string[] cmdLine = Environment.GetCommandLineArgs();
-        //    if (cmdLine.Length > 1)
-        //    {
-        //        AlbumSongModel song = new()
-        //        {
-        //            Id = 0,
-        //            Path = cmdLine[1]
-        //        };
-        //        StorageFile storageFile = await StorageFile.GetFileFromPathAsync(cmdLine[1]);
-        //        await song.Init(storageFile);
-
-        //        OpenMedia(song, true);
-        //    }
-        //}
 
         public async Task Validate()
         {

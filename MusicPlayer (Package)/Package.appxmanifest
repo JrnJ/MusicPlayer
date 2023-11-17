@@ -8,8 +8,8 @@
 
   <Identity
     Name="a4eaeccf-d7b5-4f24-8ff8-39f91f776ab3"
-    Publisher="CN=JeroenJ"
-    Version="1.0.8.0" />
+    Publisher="CN=jeroe"
+    Version="1.0.9.0" />
 
   <Properties>
     <DisplayName>MusicPlayer</DisplayName>

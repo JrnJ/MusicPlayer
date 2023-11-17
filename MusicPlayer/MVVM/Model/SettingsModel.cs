@@ -11,6 +11,15 @@ namespace MusicPlayer.MVVM.Model
 {
     internal class SettingsModel : ObservableObject
     {
+        private int _id;
+
+        public int Id
+        {
+            get => _id;
+            set { _id = value; OnPropertyChanged(); }
+        }
+
+
         private double _volume;
 
         public double Volume
@@ -31,6 +40,7 @@ namespace MusicPlayer.MVVM.Model
 
         public SettingsModel(Settings settings, ObservableCollection<SongsFolderModel> allSongsFolders)
         {
+            _id = settings.Id;
             _volume = settings.Volume;
 
             // Reference based!
@@ -38,7 +48,7 @@ namespace MusicPlayer.MVVM.Model
             {
                 foreach (SongsFolderModel songsFolder in allSongsFolders)
                 {
-                    if (settingsSongsFolder.SettingsId == songsFolder.Id)
+                    if (settingsSongsFolder.SongsFolderId == songsFolder.Id)
                     {
                         SongsFolders.Add(songsFolder);
                         break;
