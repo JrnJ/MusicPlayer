@@ -819,24 +819,20 @@ namespace MusicPlayer.MVVM.ViewModel
             OpenMedia(PlaylistPlaying.Songs[rndIndex]);
         }
 
-        // TODO2
+        public void ShowPlaylist(int playlistId)
+        {
+            if (PlaylistViewing != null)
+            {
+                PlaylistViewing.IsSelected = false;
+            }
+
+            PlaylistViewing = Playlists.FirstOrDefault(x => x.Id == playlistId);
+            PlaylistViewing.IsSelected = true;
+            CurrentView = PlaylistVM;
+        }
+
         public PlaylistModel CreatePlaylist(string name = "New Playlist", string description = "")
         {
-            //// Create an id 
-            //int id = 0;
-            //for (int i = 0; i < Playlists.Count; i++)
-            //{
-            //    if (Playlists[i].Id > id)
-            //        id = Playlists[i].Id;
-            //}
-
-            //PlaylistModel playlist = new() { Id = id + 1 };
-            ////Playlists.Add(playlist);
-
-            //SavePlaylists();
-
-            //return playlist;
-
             Playlist playlist = new()
             {
                 Name = name,
@@ -860,7 +856,6 @@ namespace MusicPlayer.MVVM.ViewModel
             return playlistModel;
         }
 
-        // TODO2
         public void DeletePlaylist(int playlistId)
         {
             using (DomainContext context = new())
@@ -881,22 +876,9 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        public void ShowPlaylist(int playlistId)
-        {
-            if (PlaylistViewing != null)
-            {
-                PlaylistViewing.IsSelected = false;
-            }
-
-            PlaylistViewing = Playlists.FirstOrDefault(x => x.Id == playlistId);
-            PlaylistViewing.IsSelected = true;
-            CurrentView = PlaylistVM;
-        }
-
-        // TODO2
         public async void UpdatePlaylist(int playlistId, PlaylistModel playlist)
         {
-            // Does not Update songs releated
+            // Intended: Does not Update songs releated to Playist
             using (DomainContext context = new())
             {
                 Playlist playlistToUpdate = await context.Playlists.Where(p => p.Id == playlistId).FirstOrDefaultAsync();
@@ -920,7 +902,6 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        // TODO2
         public async void AddSongToPlaylist(SongModel song, PlaylistModel playlist)
         {
             // Update Database
@@ -930,6 +911,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 {
                     SongId = song.Id,
                     PlaylistId = playlist.Id,
+                    Index = playlist.Songs.Count
                 };
 
                 context.PlaylistSongs.Add(playlistSong);
@@ -940,26 +922,70 @@ namespace MusicPlayer.MVVM.ViewModel
             playlist.Songs.Add(song);
         }
 
-        // TODO2
         public async void RemoveSongFromPlaylist(SongModel song, PlaylistModel playlist)
         {
             // Update Database
             using (DomainContext context = new())
             {
-                PlaylistSong playlistSong = await context.PlaylistSongs
+                PlaylistSong newPlaylistSong = await context.PlaylistSongs
                     .Where(p => p.PlaylistId == playlist.Id)
                     .Where(s => s.SongId == song.Id)
                     .FirstOrDefaultAsync();
 
-                if (playlistSong == null) return;
+                if (newPlaylistSong == null) return;
 
-                context.PlaylistSongs.Remove(playlistSong);
-                
+                context.PlaylistSongs.Remove(newPlaylistSong);
+
+                // Update PlaylistSong Indexes
+                List<PlaylistSong> playlistSongs = await context.PlaylistSongs
+                    .Where(ps => ps.PlaylistId == playlist.Id)
+                    .ToListAsync();
+
+                foreach (PlaylistSong playlistSong in playlistSongs)
+                {
+                    if (playlistSong.Index > newPlaylistSong.Index)
+                    {
+                        // If we add a delete many we can decrease more here
+                        // If we add a delete random selection this wont work
+                        playlistSong.Index -= 1;
+                    }
+                }
+
                 await context.SaveChangesAsync();
             }
 
             // Update Client
             playlist.Songs.Remove(song);
+        }
+
+        public void SwapSongInPlaylistClient(PlaylistModel playlist, int oldIndex, int newIndex)
+        {
+            playlist.Songs.Move(oldIndex, newIndex);
+        }
+
+        public async void SwapSongInPlaylistDatabase(PlaylistModel playlist, int oldIndex, int newIndex)
+        {
+            // Update Database
+            using (DomainContext context = new())
+            {
+                SongModel songDragging = playlist.Songs[oldIndex];
+                SongModel songToSwapWith = playlist.Songs[newIndex];
+
+                context.PlaylistSongs
+                    .Where(ps => ps.SongId == songDragging.Id)
+                    .Where(ps => ps.PlaylistId == playlist.Id)
+                    .FirstOrDefault().Index = oldIndex;
+
+                context.PlaylistSongs
+                    .Where(ps => ps.SongId == songToSwapWith.Id)
+                    .Where(ps => ps.PlaylistId == playlist.Id)
+                    .FirstOrDefault().Index = newIndex;
+
+                await context.SaveChangesAsync();
+            }
+            
+            // Update Client
+            //SwapSongInPlaylistClient(playlist, oldIndex, newIndex);
         }
 
         /// <summary>

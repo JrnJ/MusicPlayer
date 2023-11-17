@@ -44,6 +44,9 @@ namespace MusicPlayer.MVVM.View
         private bool IsDragging { get; set; } = false;
         private RadioButton ElementSelected { get; set; }
         private int SongId { get; set; }
+
+        // Indexes
+        private int FirstMoveIndex { get; set; }
         private int PreviousMoveIndex { get; set; } = 0;
 
         // AutoScrolling
@@ -51,6 +54,9 @@ namespace MusicPlayer.MVVM.View
         private bool AutoScrollUp { get; set; }
         private double UnClamppedVisualY { get; set; }
         private double MaxCanvasY { get; set; }
+
+        // 
+        private int ElementsPassed { get; set; }
 
         public PlaylistView()
         {
@@ -101,6 +107,8 @@ namespace MusicPlayer.MVVM.View
             LastPoint = p;
             ElementSelected = (sender as RadioButton);
             SongId = (int)ElementSelected.CommandParameter;
+            FirstMoveIndex = GlobalViewModel.Instance.PlaylistViewing.Songs
+                .IndexOf(GlobalViewModel.Instance.PlaylistViewing.Songs.Where(s => s.Id == SongId).FirstOrDefault());
             Timer.Start();
 
             AppWindowExtensions.GetMainWindow().MouseMove += WindowMouseMove;
@@ -177,14 +185,6 @@ namespace MusicPlayer.MVVM.View
                 double visualY = Math.Clamp(UnClamppedVisualY, 0.0, MaxCanvasY);
                 double actualY = Math.Clamp(mousePos.Y + songsScroller.VerticalOffset, 0.0, songsScroller.ScrollableHeight + MaxCanvasY);
 
-                //removeThis.Text = "ActualY: " + actualY +
-                //    " CanvasScrollableHeight: " + songsScroller.ScrollableHeight +
-                //    " CanvasActualHeight: " + canvas.ActualHeight +
-                //    " MaxCanvasY: " + MaxCanvasY + 
-                //    " VisualY: " + visualY + 
-                //    " UnClampedVisualY: " + UnClamppedVisualY
-                //    ;
-
                 // Scroll Up
                 if (UnClamppedVisualY < 0.0)
                 {
@@ -213,15 +213,15 @@ namespace MusicPlayer.MVVM.View
                     AutoScrollTimer.Stop();
                 }
 
-                int elementsPassed = int.Parse(Math.Floor(actualY / (toMove.ActualHeight + marginBetweenElements)).ToString());
+                ElementsPassed = int.Parse(Math.Floor(actualY / (toMove.ActualHeight + marginBetweenElements)).ToString());
 
-                if (PreviousMoveIndex != elementsPassed)
+                if (PreviousMoveIndex != ElementsPassed)
                 {
                     // Move Songs
-                    GlobalViewModel.Instance.PlaylistViewing.Songs.Move(PreviousMoveIndex, elementsPassed);
+                    GlobalViewModel.Instance.SwapSongInPlaylistClient(GlobalViewModel.Instance.PlaylistViewing, PreviousMoveIndex, ElementsPassed);
 
                     // Reset
-                    PreviousMoveIndex = elementsPassed;
+                    PreviousMoveIndex = ElementsPassed;
                 }
 
                 // Move in Canvas
@@ -241,8 +241,8 @@ namespace MusicPlayer.MVVM.View
                 ElementSelected = null;
                 meow.Visibility = Visibility.Hidden;
 
-                // TODO2: order doesnt exist
-                //GlobalViewModel.Instance.SavePlaylists();
+                // TODO2
+                GlobalViewModel.Instance.SwapSongInPlaylistDatabase(GlobalViewModel.Instance.PlaylistViewing, FirstMoveIndex, ElementsPassed);
             }
         }
     }
