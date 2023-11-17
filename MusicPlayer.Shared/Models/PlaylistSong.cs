@@ -18,5 +18,8 @@ namespace MusicPlayer.Shared.Models
         // Objects
         public Playlist Playlist { get; set; }
         public Song Song { get; set; }
+
+        // 
+        public int Index { get; set; }
     }
 }

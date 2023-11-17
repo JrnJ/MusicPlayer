@@ -69,7 +69,8 @@ namespace MusicPlayer.Shared.Models
                 PlaylistSong playlistSong = new()
                 {
                     PlaylistId = playlist.Id,
-                    SongId = song.Id
+                    SongId = song.Id,
+                    Index = 0
                 };
                 playlist.Songs.Add(playlistSong);
                 song.Playlists.Add(playlistSong);
