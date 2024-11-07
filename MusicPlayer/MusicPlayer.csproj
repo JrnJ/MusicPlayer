@@ -17,8 +17,11 @@
     <Content Remove="Images\Icons\logo_gold.png" />
     <Content Remove="Images\Icons\next_icon.png" />
     <Content Remove="Images\Icons\pause_icon.png" />
+    <Content Remove="Images\Icons\play_icon.png" />
     <Content Remove="Images\Icons\previous_icon.png" />
+    <Content Remove="Images\Icons\repeat_all_icon.png" />
     <Content Remove="Images\Icons\repeat_icon.png" />
+    <Content Remove="Images\Icons\repeat_single_icon.png" />
     <Content Remove="Images\Icons\shuffle_icon.png" />
     <Content Remove="Images\logo.png" />
     <Content Remove="Images\next_track.png" />
@@ -34,6 +37,13 @@
 
   <ItemGroup>
     <None Remove="Fonts\NotoSans-Regular.ttf" />
+    <None Remove="Images\Icons\next.svg" />
+    <None Remove="Images\Icons\pause.svg" />
+    <None Remove="Images\Icons\play.svg" />
+    <None Remove="Images\Icons\previous.svg" />
+    <None Remove="Images\Icons\repeat_all.svg" />
+    <None Remove="Images\Icons\repeat_single.svg" />
+    <None Remove="Images\Icons\shuffle.svg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,16 +77,43 @@
     <Resource Include="Images\Icons\logo_gold.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Images\Icons\next.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\Icons\next_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Icons\pause.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\Icons\pause_icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Images\Icons\play.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Icons\play_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Icons\previous.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\Icons\previous_icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Images\Icons\repeat_icon.png">
+    <Resource Include="Images\Icons\repeat_all.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Icons\repeat_all_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Icons\repeat_single.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Icons\repeat_single_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Icons\shuffle.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\Icons\shuffle_icon.png">

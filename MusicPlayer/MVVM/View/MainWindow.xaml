@@ -202,7 +202,7 @@
                                             Margin="10,0,10,0" />
                             <Button Command="{Binding PausePlayCommand}"
                                             Style="{StaticResource ImageButton}" 
-                                            extensions:CustomProperty.ImageSource="/Images/Icons/pause_icon.png"
+                                            extensions:CustomProperty.ImageSource="{Binding PlayPauseButton.ImageSource}"
                                             Height="40" Width="40" />
                             <Button Command="{Binding NextSongCommand}"
                                             Style="{StaticResource ImageButton}" 

@@ -62,6 +62,8 @@ namespace MusicPlayer.Classes
 
         public AudioPlayerState CurrentState => (AudioPlayerState)MediaPlayer.CurrentState;
 
+        public event EventHandler<AudioPlayerState>? OnStateChanged;
+
         // Discord Integration
         private AudioServer _audioServer;
 
@@ -76,8 +78,15 @@ namespace MusicPlayer.Classes
         // Constructor
         public AudioPlayer()
         {
+            // Mediaplayer
+            MediaPlayer = new();
+
             // Configuration
             ConfigureMediaPlayer();
+            MediaPlayer.CurrentStateChanged += (MediaPlayer sender, object args) =>
+            {
+                OnStateChanged?.Invoke(this, CurrentState);
+            };
 
             // TODO
             //ConfigureSearchOptions(GlobalViewModel.Instance.GlobalSearch);
@@ -92,9 +101,6 @@ namespace MusicPlayer.Classes
         #region Private
         private void ConfigureMediaPlayer()
         {
-            // Mediaplayer
-            MediaPlayer = new();
-
             SMTC();
 
             //MediaPlayer.SystemMediaTransportControls.IsPlayEnabled = false;

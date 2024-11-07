@@ -73,9 +73,24 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
+        private MultiImageButton _playPauseButton;
+
+        public MultiImageButton PlayPauseButton
+        {
+            get { return _playPauseButton; }
+            set { _playPauseButton = value; }
+        }
+
         // Constructor
         public MainViewModel()
         {
+            //
+            _playPauseButton = new(
+            [
+                new("play", "/Images/Icons/play_icon.png"),
+                new("pause", "/Images/Icons/pause_icon.png")
+            ]);
+
             // Create ViewModels
             HomeVM = new();
             DiscordVM = new();
@@ -127,6 +142,19 @@ namespace MusicPlayer.MVVM.ViewModel
             {
                 Global.AudioPlayer.PausePlay();
             });
+            Global.AudioPlayer.OnStateChanged += (object? sender, AudioPlayerState state) =>
+            {
+                switch (state)
+                {
+                    case AudioPlayerState.Playing:
+                        PlayPauseButton.Alter("play");
+                        break;
+
+                    default:
+                        PlayPauseButton.Alter("pause");
+                        break;
+                }
+            };
 
             PreviousSongCommand = new(o =>
             {
