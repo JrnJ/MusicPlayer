@@ -1,20 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.UI.Xaml.Media.Imaging;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
 using MusicPlayer.Core.Searching;
 using MusicPlayer.Database;
 using MusicPlayer.DiscordGameSDK;
 using MusicPlayer.MVVM.Model;
+using MusicPlayer.Popups;
 using MusicPlayer.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 using Windows.Media;
@@ -30,7 +29,6 @@ namespace MusicPlayer.MVVM.ViewModel
     {
         #region Properties
         public static GlobalViewModel Instance { get; } = new();
-        // Globals
 
         // Titlebar
         private AppWindowTitlebarManager _appWindowTitlebarManager;
@@ -176,7 +174,6 @@ namespace MusicPlayer.MVVM.ViewModel
             get { return _singleSongVisibility; }
             set { _singleSongVisibility = value; OnPropertyChanged(); }
         }
-        #endregion Properties
 
         private DiscordGameSDKWrapper _discordGameSDKWrapper;
 
@@ -194,6 +191,16 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             get { return _globalSearch; }
             set { _globalSearch = value; OnPropertyChanged(); }
+        }
+        #endregion Properties
+
+        // Popups
+        private SongEditorPopup _songEditorPopup = new();
+
+        public SongEditorPopup SongEditorPopup
+        {
+            get { return _songEditorPopup; }
+            set { _songEditorPopup = value; }
         }
 
         public GlobalViewModel()
@@ -232,62 +239,25 @@ namespace MusicPlayer.MVVM.ViewModel
         // TODO2:
         public async void AddSongsFolder(StorageFolder folder)
         {
-            SongsFolder songsFolder = new()
-            {
-                Path = folder.Path,
-                // TODO2: we also need to add the link to the Settings
-                // and possibly the other way around too
-                Settings = new List<SettingsSongsFolder>()
-            };
+            SongsFolder songsFolder = await DbHelper.CreateSongsFolder(folder.Path, Settings.Id);
 
-            SettingsSongsFolder settingsSongsFolder = new()
-            {
-                SettingsId = Settings.Id,
-                SongsFolderId = songsFolder.Id
-            };
+            // Update Client
+            SongsFolderModel songsFolderModel = new(songsFolder);
+            SongsFolders.Add(songsFolderModel);
+            Settings.SongsFolders.Add(songsFolderModel);
+
+            List<Song> folderSongs = [];
 
             using (DomainContext context = new())
             {
-                Settings settings = context.Settings
-                    .Where(s => s.Id == Settings.Id)
-                    .Include(s => s.SongsFolders)
-                    .FirstOrDefault();
-
-                settings.SongsFolders.Add(settingsSongsFolder);
-                songsFolder.Settings.Add(settingsSongsFolder);
-
-                // Update Database
-                context.SongsFolders.Add(songsFolder);
-                await context.SaveChangesAsync();
-
-                // Update Client
-                SongsFolderModel songsFolderModel = new(songsFolder);
-                SongsFolders.Add(songsFolderModel);
-                Settings.SongsFolders.Add(songsFolderModel);
-            }
-
-            List<Song> folderSongs = new();
-
-            using (DomainContext context = new())
-            {
-                // Db Things
-                List<Artist> dbArtists = await context.Artists
-                    .Include(a => a.Songs)
-                    .ToListAsync();
-
-                List<Genre> dbGenres = await context.Genres
-                    .Include(g => g.Songs)
-                    .ToListAsync();
-
                 IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
                 foreach (StorageFile file in files)
                 {
-                    // 1. Is file music
-                    if (!HelperMethods.IsMusicFile(file.Path))
-                        continue;
+                    // If file is not music, continue
+                    if (!HelperMethods.IsMusicFile(file.Path)) continue;
 
-                    // 2. Set Song data
-                    MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
+                    // Create a Song
+                    Windows.Storage.FileProperties.MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
                     Song song = new()
                     {
                         Path = file.Path,
@@ -296,86 +266,48 @@ namespace MusicPlayer.MVVM.ViewModel
                         Duration = musicProperties.Duration,
                         SongsFolderId = songsFolder.Id,
 
-                        Artists = new List<ArtistSong>(),
-                        Genres = new List<SongGenre>(),
-                        Playlists = new List<PlaylistSong>()
+                        Artists = [],
+                        Genres = [],
+                        Playlists = []
                     };
 
-                    // 3. Handle Artists
-                    ArtistSong artistSong = new()
+                    // Set Song artists
+                    Artist? artist = context.Artists.FirstOrDefault(a => a.Name == musicProperties.Artist);
+                    if (artist == null)
                     {
-                        SongId = song.Id
-                    };
-
-                    foreach (Artist dbArtist in dbArtists)
-                    {
-                        // FK
-                        if (musicProperties.Artist == dbArtist.Name)
+                        if (string.IsNullOrEmpty(musicProperties.Artist))
                         {
-                            //
-                            artistSong.ArtistId = dbArtist.Id;
-                            dbArtist.Songs ??= new List<ArtistSong>();
-                            dbArtist.Songs.Add(artistSong);
-                            break;
+                            await DbHelper.CreateArtist(musicProperties.Artist, context);
                         }
-
-                        // Avoid duplicates
-                        if (dbArtists.Where(a => a.Name == musicProperties.Artist).FirstOrDefault() != null)
-                            continue;
-
-                        Artist artist = new()
-                        {
-                            Name = musicProperties.Artist,
-                            Songs = new List<ArtistSong>()
-                        };
-                        context.Artists.Add(artist);
-                        dbArtists.Add(artist);
-
-                        //
-                        artistSong.ArtistId = artist.Id;
-                        artist.Songs.Add(artistSong);
-                        break;
                     }
-                    song.Artists.Add(artistSong);
+                    else
+                    {
+                        song.Artists.Add(new()
+                        {
+                            ArtistId = artist.Id,
+                            SongId = song.Id
+                        });
+                    }
 
-                    // 4. Handle Genres
+                    // Set Song Genres
                     foreach (string genreName in musicProperties.Genre)
                     {
-                        SongGenre songGenre = new()
+                        Genre? genre = context.Genres.FirstOrDefault(g => g.Name == genreName);
+                        if (genre == null)
                         {
-                            SongId = song.Id
-                        };
-
-                        foreach (Genre dbGenre in dbGenres)
-                        {
-                            // Junction Table
-                            if (genreName == dbGenre.Name)
+                            if (string.IsNullOrEmpty(genreName))
                             {
-                                //
-                                songGenre.GenreName = dbGenre.Name;
-                                dbGenre.Songs ??= new List<SongGenre>();
-                                dbGenre.Songs.Add(songGenre);
-                                break;
+                                await DbHelper.CreateGenre(genreName, context);
                             }
-
-                            // Avoid duplicates
-                            if (dbGenres.Where(g => g.Name == genreName).FirstOrDefault() != null)
-                                continue;
-
-                            Genre genre = new() 
-                            { 
-                                Name = genreName,
-                                Songs = new List<SongGenre>()
-                            };
-                            context.Genres.Add(genre);
-                            dbGenres.Add(genre);
-
-                            // 
-                            songGenre.GenreName = genre.Name;
-                            genre.Songs.Add(songGenre);
-                            break;
                         }
-                        song.Genres.Add(songGenre);
+                        else
+                        {
+                            song.Genres.Add(new()
+                            {
+                                SongId = song.Id,
+                                GenreName = genreName,
+                            });
+                        }
                     }
 
                     // 
@@ -736,21 +668,6 @@ namespace MusicPlayer.MVVM.ViewModel
         }
         #endregion Slider
 
-        #region Volume
-        // TODO: move this
-        public async void SaveVolumeToDatabase()
-        {
-            using (DomainContext context = new())
-            {
-                Settings settings = context.Settings.FirstOrDefault(s => s.Id == Settings.Id);
-
-                // Update Database
-                settings.Volume = AudioPlayer.Volume;
-                await context.SaveChangesAsync();
-            }
-        }
-        #endregion Volume
-
         public void OpenMedia(SongModel song, bool singleSongMode = false)
         {
             AudioPlayer.OpenMedia(song);
@@ -817,6 +734,7 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
+        // TODO: what?
         public void AutoPlayNextSong()
         {
             AudioPlayer.Pause();
@@ -829,57 +747,39 @@ namespace MusicPlayer.MVVM.ViewModel
 
         public void ShowPlaylist(int playlistId)
         {
-            if (PlaylistsManager.PlaylistViewing != null)
-            {
-                PlaylistsManager.PlaylistViewing.IsSelected = false;
-            }
+            PlaylistModel? playlist = PlaylistsManager.GetPlaylist(playlistId);
+            if (playlist == null) return;
 
-            PlaylistsManager.SetViewingPlaylist(PlaylistsManager.Playlists.FirstOrDefault(x => x.Id == playlistId));
-            PlaylistsManager.PlaylistViewing.IsSelected = true;
+            // Select Playlist with Id playlistId
+            PlaylistsManager.SetViewingPlaylist(playlist);
             CurrentView = PlaylistVM;
         }
 
-        public PlaylistModel CreatePlaylist(string name = "New Playlist", string description = "")
+        #region Volume CRUD
+        public async void SaveVolumeToDatabase()
         {
-            Playlist playlist = new()
-            {
-                Name = name,
-                Description = description,
-                ImagePath = "",
-                Songs = [],
-                // Id = ... SaveChanges adds this
-            };
+            await DbHelper.SetVolume(AudioPlayer.Volume, Settings.Id);
+        }
+        #endregion Volume CRUD
 
-            using (DomainContext context = new())
-            {
-                // Add to Database
-                context.Playlists.Add(playlist);
-                context.SaveChangesAsync();
-            }
+        #region Playlist CRUD
+        public async void CreatePlaylist(string name = "New Playlist", string description = "")
+        {
+            // Update Database
+            Playlist playlist = await DbHelper.CreatePlaylist(name, description);
 
-            // Add to Memory
-            PlaylistModel playlistModel = new(playlist, MyMusic.Songs);
+            // Update Client
+            PlaylistModel playlistModel = new(playlist);
             PlaylistsManager.Add(playlistModel);
-
-            return playlistModel;
         }
 
-        public void DeletePlaylist(int playlistId)
+        public async void DeletePlaylist(int playlistId)
         {
-            using (DomainContext context = new())
-            {
-                Playlist? playlistToDelete = context.Playlists.FirstOrDefault(p => p.Id == playlistId);
+            // Update Database
+            await DbHelper.DeletePlaylist(playlistId);
 
-                if (playlistToDelete != null)
-                {
-                    // Delete from Database
-                    context.Playlists.Remove(playlistToDelete);
-                    context.SaveChanges();
-
-                    // Delete from Memory
-                    PlaylistsManager.Remove(playlistId);
-                }
-            }
+            // Update Client
+            PlaylistsManager.Remove(playlistId);
         }
 
         public async void UpdatePlaylist(int playlistId, PlaylistModel playlist)
@@ -911,21 +811,7 @@ namespace MusicPlayer.MVVM.ViewModel
         public async void AddSongToPlaylist(SongModel song, PlaylistModel playlist)
         {
             // Update Database
-            using (DomainContext context = new())
-            {
-                // Only add if it doesnt exist
-                if (await context.PlaylistSongs.AnyAsync(ps => ps.SongId == song.Id && ps.PlaylistId == playlist.Id)) return;
-
-                PlaylistSong playlistSong = new()
-                {
-                    SongId = song.Id,
-                    PlaylistId = playlist.Id,
-                    Index = playlist.Songs.Count
-                };
-
-                context.PlaylistSongs.Add(playlistSong);
-                await context.SaveChangesAsync();
-            }
+            await DbHelper.AddSongToPlaylist(song.Id, playlist.Id, playlist.Songs.Count);
 
             // Update Client
             playlist.Songs.Add(song);
@@ -934,68 +820,23 @@ namespace MusicPlayer.MVVM.ViewModel
         public async void RemoveSongFromPlaylist(SongModel song, PlaylistModel playlist)
         {
             // Update Database
-            using (DomainContext context = new())
-            {
-                PlaylistSong? newPlaylistSong = await context.PlaylistSongs
-                    .Where(ps => ps.PlaylistId == playlist.Id && ps.SongId == song.Id)
-                    .FirstOrDefaultAsync();
-
-                if (newPlaylistSong == null) return;
-
-                context.PlaylistSongs.Remove(newPlaylistSong);
-
-                // Update PlaylistSong Indexes
-                List<PlaylistSong> playlistSongs = await context.PlaylistSongs
-                    .Where(ps => ps.PlaylistId == playlist.Id)
-                    .ToListAsync();
-
-                foreach (PlaylistSong playlistSong in playlistSongs)
-                {
-                    if (playlistSong.Index > newPlaylistSong.Index)
-                    {
-                        // If we add a delete many we can decrease more here
-                        // If we add a delete random selection this wont work
-                        playlistSong.Index -= 1;
-                    }
-                }
-
-                await context.SaveChangesAsync();
-            }
+            await DbHelper.RemoveSongFromPlaylist(song.Id, playlist.Id);
 
             // Update Client
             playlist.Songs.Remove(song);
         }
 
-        public void SwapSongInPlaylistClient(PlaylistModel playlist, int oldIndex, int newIndex)
-        {
-            playlist.Songs.Move(oldIndex, newIndex);
-        }
-
-        public async void SwapSongInPlaylistDatabase(PlaylistModel playlist, int oldIndex, int newIndex)
+        public async void SwapSongInPlaylist(PlaylistModel playlist, int oldIndex, int newIndex)
         {
             // Update Database
-            using (DomainContext context = new())
-            {
-                SongModel songDragging = playlist.Songs[oldIndex];
-                SongModel songToSwapWith = playlist.Songs[newIndex];
+            await DbHelper.SwapSongInPlaylist(playlist.Id, oldIndex, newIndex);
 
-                context.PlaylistSongs
-                    .Where(ps => ps.SongId == songDragging.Id)
-                    .Where(ps => ps.PlaylistId == playlist.Id)
-                    .FirstOrDefault().Index = oldIndex;
-
-                context.PlaylistSongs
-                    .Where(ps => ps.SongId == songToSwapWith.Id)
-                    .Where(ps => ps.PlaylistId == playlist.Id)
-                    .FirstOrDefault().Index = newIndex;
-
-                await context.SaveChangesAsync();
-            }
-            
             // Update Client
-            //SwapSongInPlaylistClient(playlist, oldIndex, newIndex);
+            playlist.Songs.Move(oldIndex, newIndex);
         }
+        #endregion Playlist CRUD
 
+        #region Searching
         /// <summary>
         /// Uses PlaylistViewing to look for a song
         /// </summary>
@@ -1067,5 +908,8 @@ namespace MusicPlayer.MVVM.ViewModel
                 PlaylistsManager.SetViewingPlaylist(MyMusic);
             }
         }
+        #endregion Searching
     }
 }
+
+// used to be 1083

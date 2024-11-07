@@ -9,13 +9,7 @@ namespace MusicPlayer.MVVM.Model
 {
     internal class PlaylistModel : ObservableObject
     {
-        private int _id;
-
-        public int Id
-        {
-            get => _id;
-            set { _id = value; OnPropertyChanged(); }
-        }
+        public int Id { get; init; }
 
         private string _name;
 
@@ -42,7 +36,7 @@ namespace MusicPlayer.MVVM.Model
         }
 
         // Not present in Database
-        private ObservableCollection<SongModel> _songs = new();
+        private ObservableCollection<SongModel> _songs = [];
 
         public ObservableCollection<SongModel> Songs
         {
@@ -80,15 +74,20 @@ namespace MusicPlayer.MVVM.Model
 
         public PlaylistModel() { }
 
-        public PlaylistModel(Playlist playlist, ObservableCollection<SongModel> allSongs)
+        public PlaylistModel(Playlist playlist)
         {
-            _id = playlist.Id;
+            Id = playlist.Id;
             _name = playlist.Name;
             _description = playlist.Description;
             _imagePath = playlist.ImagePath;
+        }
 
-            //
-            _songs = new();
+        public PlaylistModel(Playlist playlist, ObservableCollection<SongModel> allSongs)
+        {
+            Id = playlist.Id;
+            _name = playlist.Name;
+            _description = playlist.Description;
+            _imagePath = playlist.ImagePath;
 
             // Reference based!
             foreach (PlaylistSong playlistSong in playlist.Songs)
@@ -102,20 +101,6 @@ namespace MusicPlayer.MVVM.Model
                     }
                 }
             }
-        }
-
-        public Playlist ToPlaylist()
-        {
-            Playlist playlist = new()
-            {
-                Id = _id,
-                Name = _name,
-                Description = _description,
-                ImagePath = _imagePath,
-                Songs = new List<PlaylistSong>()
-            };
-
-            return playlist;
         }
     }
 }

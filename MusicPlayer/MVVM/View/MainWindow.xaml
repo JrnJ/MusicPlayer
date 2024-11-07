@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:MusicPlayer"
         xmlns:viewModel="clr-namespace:MusicPlayer.MVVM.ViewModel"
         xmlns:extensions="clr-namespace:MusicPlayer.Core"
+        xmlns:controls="clr-namespace:MusicPlayer.Controls"
         mc:Ignorable="d"
         
         Title="Jrn Music Player" WindowState="Maximized" Icon="/Images/Icons/logo_gold.png"
@@ -210,7 +211,7 @@
                                             Margin="10,0,10,0" />
                             <Button Command="{Binding RepeatCommand}"
                                             Style="{StaticResource ImageButton}" 
-                                            extensions:CustomProperty.ImageSource="/Images/Icons/repeat_icon.png"
+                                            extensions:CustomProperty.ImageSource="/Images/Icons/repeat_all_icon.png"
                                             Height="40" Width="40" />
                         </DockPanel>
                         <!-- /AudioButtons -->
@@ -388,6 +389,7 @@
         <!-- /Search Bar Popup -->
 
         <!-- Popups -->
+        <!--{Binding Global.PopupVisibility}-->
         <Grid Background="#25000000" Visibility="{Binding Global.PopupVisibility}">
             <!--<Grid Background="#25000000" Visibility="Visible">-->
             <!-- Confirm -->
@@ -444,7 +446,7 @@
                 Visibility="{Binding Visibility}"
                 MinWidth="320"
                 VerticalAlignment="Center" HorizontalAlignment="Center" 
-                CornerRadius="4" BorderThickness="1.5" BorderBrush="#242424">
+                CornerRadius="4" BorderThickness="1" BorderBrush="#242424">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition />
@@ -518,6 +520,43 @@
                 </Grid>
             </Border>
             <!-- /Edit Playlist -->
+
+            <!--- Edit Song -->
+            <controls:Popup 
+                DataContext="{Binding Global.SongEditorPopup}"
+                Visibility="{Binding Visible}">
+                <controls:Popup.MyContent>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                    </Grid>
+                </controls:Popup.MyContent>
+                
+                <controls:Popup.Actions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <Button 
+                            Grid.Column="0"
+                            Content="Save"
+                            Command="{Binding ConfirmCommand}"
+                            Height="30" 
+                            Margin="0,0,6,0" />
+                        <Button 
+                            Grid.Column="1"
+                            Content="Cancel"
+                            Command="{Binding CancelCommand}"
+                            Height="30" 
+                            Margin="6,0,0,0" />
+                    </Grid>
+                </controls:Popup.Actions>
+            </controls:Popup>
+            <!--- /Edit Song -->
         </Grid>
         <!-- /Popups -->
     </Grid>

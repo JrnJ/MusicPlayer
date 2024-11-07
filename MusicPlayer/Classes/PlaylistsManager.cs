@@ -55,7 +55,9 @@ namespace MusicPlayer.Classes
 
         public void SetViewingPlaylist(PlaylistModel playlist)
         {
+            if (PlaylistViewing != null) PlaylistViewing.IsSelected = false;
             PlaylistViewing = playlist;
+            playlist.IsSelected = true;
         }
 
         public void SetPlayingPlaylist(PlaylistModel playlist)
@@ -85,6 +87,11 @@ namespace MusicPlayer.Classes
             {
                 Playlists.Remove(playlistModelToDelete);
             }
+        }
+
+        public PlaylistModel? GetPlaylist(int playlistId)
+        {
+            return Playlists.FirstOrDefault(p => p.Id == playlistId);
         }
     }
 }

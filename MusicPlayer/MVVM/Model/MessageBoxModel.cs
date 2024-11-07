@@ -45,10 +45,10 @@ namespace MusicPlayer.MVVM.Model
 
         public MessageBoxModel()
         {
-            Title = "Title";
-            Description = "Description";
-            ConfirmText = "Yes";
-            CancelText = "No";
+            _title = "Title";
+            _description = "Description";
+            _confirmText = "Yes";
+            _cancelText = "No";
         }
 
         // Commands
