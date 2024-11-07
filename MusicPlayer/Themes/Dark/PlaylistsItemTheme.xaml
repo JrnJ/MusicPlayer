@@ -25,23 +25,27 @@
                                         BorderThickness="1" BorderBrush="#353535" Margin="6" />
                                 <Border CornerRadius="4" Margin="6">
                                     <Border.Background>
-                                        <ImageBrush Stretch="Fill" 
+                                        <ImageBrush 
+                                            Stretch="Fill" 
                                             ImageSource="{Binding ImagePath}"
-                                            RenderOptions.BitmapScalingMode="Linear" />
+                                            RenderOptions.BitmapScalingMode="Linear"/>
                                     </Border.Background>
                                 </Border>
                             </Grid>
 
                             <Grid Grid.Row="1" VerticalAlignment="Top" Margin="6,-6,6,6">
                                 <StackPanel>
-                                    <TextBlock Text="{Binding Name}" FontSize="16"
-                                       HorizontalAlignment="Left" />
-                                    <TextBlock Text="{Binding Songs.Count, StringFormat='{}{0} Songs'}" 
-                                       Foreground="LightGray"
-                                       HorizontalAlignment="Left" />
-                                    <TextBlock Text="{Binding PlaylistDuration}" 
-                                       Foreground="LightGray"
-                                       HorizontalAlignment="Left" />
+                                    <TextBlock 
+                                        Text="{Binding Name}" FontSize="16"
+                                        HorizontalAlignment="Left" />
+                                    <TextBlock 
+                                        Text="{Binding Songs.Count, StringFormat='{}{0} Songs'}" 
+                                        Foreground="LightGray"
+                                        HorizontalAlignment="Left" />
+                                    <TextBlock 
+                                        Text="{Binding PlaylistDuration}" 
+                                        Foreground="LightGray"
+                                        HorizontalAlignment="Left" />
                                 </StackPanel>
                             </Grid>
                         </Grid>

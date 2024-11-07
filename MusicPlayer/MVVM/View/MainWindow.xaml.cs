@@ -95,6 +95,7 @@ namespace MusicPlayer
             }
         }
 
+        #region Titlebar
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             SetDragRegionForCustomTitleBar();
@@ -188,10 +189,9 @@ namespace MusicPlayer
                 AppWindow.TitleBar.SetDragRectangles(dragRects);
             }
         }
+        #endregion Titlebar
 
         bool isMaximized = false;
-
-
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
@@ -265,6 +265,11 @@ namespace MusicPlayer
             test3.Text = percentage.ToString();
             test4.Text = hello.Maximum.ToString();
             trackbarHoverTime.Text = HelperMethods.MsToTime(newValue);
+        }
+
+        private void VolumeSliderLeftMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            GlobalViewModel.Instance.SaveVolumeToDatabase();
         }
     }
 }

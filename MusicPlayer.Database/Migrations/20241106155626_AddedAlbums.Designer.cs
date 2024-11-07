@@ -4,21 +4,37 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MusicPlayer.Shared.Models;
+using MusicPlayer.Database;
 
 #nullable disable
 
-namespace MusicPlayer.Shared.Migrations
+namespace MusicPlayer.Database.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    [Migration("20231117101657_playlistIndexes")]
-    partial class playlistIndexes
+    [Migration("20241106155626_AddedAlbums")]
+    partial class AddedAlbums
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
+
+            modelBuilder.Entity("MusicPlayer.Shared.Models.Album", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Albums");
+                });
 
             modelBuilder.Entity("MusicPlayer.Shared.Models.Artist", b =>
                 {
@@ -141,6 +157,9 @@ namespace MusicPlayer.Shared.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("AlbumId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("TEXT");
 
@@ -159,6 +178,8 @@ namespace MusicPlayer.Shared.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AlbumId");
 
                     b.HasIndex("SongsFolderId");
 
@@ -255,11 +276,17 @@ namespace MusicPlayer.Shared.Migrations
 
             modelBuilder.Entity("MusicPlayer.Shared.Models.Song", b =>
                 {
+                    b.HasOne("MusicPlayer.Shared.Models.Album", "Album")
+                        .WithMany("Songs")
+                        .HasForeignKey("AlbumId");
+
                     b.HasOne("MusicPlayer.Shared.Models.SongsFolder", "SongsFolder")
                         .WithMany("Songs")
                         .HasForeignKey("SongsFolderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Album");
 
                     b.Navigation("SongsFolder");
                 });
@@ -281,6 +308,11 @@ namespace MusicPlayer.Shared.Migrations
                     b.Navigation("Genre");
 
                     b.Navigation("Song");
+                });
+
+            modelBuilder.Entity("MusicPlayer.Shared.Models.Album", b =>
+                {
+                    b.Navigation("Songs");
                 });
 
             modelBuilder.Entity("MusicPlayer.Shared.Models.Artist", b =>

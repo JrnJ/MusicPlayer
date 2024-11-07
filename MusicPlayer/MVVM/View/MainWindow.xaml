@@ -60,6 +60,7 @@
         </Grid>-->
         <!-- </Image> -->
         
+        <!-- Main -->
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="{Binding Path=Global.AppWindowTitlebarManager.TitlebarHeight}" />
@@ -115,7 +116,7 @@
                             <!-- Playlists -->
                             <Grid Grid.Row="0" Margin="6">
                                 <ScrollViewer>
-                                    <ItemsControl x:Name="PlaylistItems" ItemsSource="{Binding Global.Playlists}">
+                                    <ItemsControl x:Name="PlaylistItems" ItemsSource="{Binding Global.PlaylistsManager.Playlists}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <RadioButton GroupName="PageTabs" Style="{StaticResource PlaylistItem}" 
@@ -259,11 +260,12 @@
                     <Grid Grid.Column="2" 
                           HorizontalAlignment="Right">
                         <DockPanel Margin="0,0,20,0" VerticalAlignment="Center">
-                            <Slider x:Name="volumeSlider"
+                            <Slider 
+                                x:Name="volumeSlider"
                                 Width="100" Style="{StaticResource SongTime}" 
                                 Value="{Binding Global.AudioPlayer.Volume, Mode=TwoWay}"
+                                PreviewMouseLeftButtonUp="VolumeSliderLeftMouseUp"
                                 Minimum="0" Maximum="1" />
-                            <!--PreviewMouseLeftButtonUp="VolumeSliderPreviewMouseLeftButtonUp"-->
                             <TextBlock Text="{Binding ElementName=volumeSlider, Path=Value, StringFormat=N2}" />
                         </DockPanel>
                     </Grid>
@@ -272,6 +274,7 @@
             </Grid>
             <!-- /Controls -->
         </Grid>
+        <!-- /Main -->
 
         <!-- <Custom ToolTips> -->
         <Grid>

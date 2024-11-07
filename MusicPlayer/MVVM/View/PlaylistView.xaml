@@ -33,7 +33,7 @@
                 <!-- Image -->
                 <Grid Grid.Column="0"
                       Height="250" Margin="0,0,24,0">
-                    <Image Source="{Binding Global.PlaylistViewing.ImagePath}">
+                    <Image Source="{Binding Global.PlaylistsManager.PlaylistViewing.ImagePath}">
                         <Image.Effect>
                             <DropShadowEffect ShadowDepth="0"
                                                       Color="#303030"
@@ -47,15 +47,15 @@
                 <Grid Grid.Column="1">
                     <StackPanel>
                         <TextBlock x:Name="removeThis" />
-                        <TextBlock Text="{Binding Global.PlaylistViewing.Name}" 
+                        <TextBlock Text="{Binding Global.PlaylistsManager.PlaylistViewing.Name}" 
                                Style="{StaticResource PageTitle}" />
-                        <TextBlock Text="{Binding Global.PlaylistViewing.Description}" 
+                        <TextBlock Text="{Binding Global.PlaylistsManager.PlaylistViewing.Description}" 
                                Foreground="LightGray" />
                         <TextBlock Foreground="LightGray" Margin="0, 0, 0, 16">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0} Songs, {1}">
-                                    <Binding Path="Global.PlaylistViewing.Songs.Count" />
-                                    <Binding Path="Global.PlaylistViewing.PlaylistDuration" />
+                                    <Binding Path="Global.PlaylistsManager.PlaylistViewing.Songs.Count" />
+                                    <Binding Path="Global.PlaylistsManager.PlaylistViewing.PlaylistDuration" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
@@ -96,7 +96,7 @@
             <!-- Songs -->
             <Grid Grid.Row="1">
                 <ScrollViewer x:Name="songsScroller">
-                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.PlaylistViewing.Songs}" Margin="0, 0, 4, 0">
+                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Global.PlaylistsManager.PlaylistViewing.Songs}" Margin="0, 0, 4, 0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
@@ -113,7 +113,7 @@
                                             <MenuItem Header="Remove" 
                                                   Command="{Binding PlacementTarget.Tag.RemoveSongCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                   CommandParameter="{Binding Id}" />
-                                            <MenuItem Header="Add to" ItemsSource="{Binding PlacementTarget.Tag.Global.Playlists, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                            <MenuItem Header="Add to" ItemsSource="{Binding PlacementTarget.Tag.Global.PlaylistsManager.Playlists, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                                 <MenuItem.ItemTemplate>
                                                     <DataTemplate>
                                                         <MenuItem Header="{Binding Name}"

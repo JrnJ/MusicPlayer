@@ -50,7 +50,7 @@
             <!-- Songs -->
             <Grid Grid.Row="2">
                 <ScrollViewer>
-                    <ItemsControl x:Name="Playlists" ItemsSource="{Binding Global.Playlists}" 
+                    <ItemsControl x:Name="Playlists" ItemsSource="{Binding Global.PlaylistsManager.Playlists}" 
                               IsEnabled="True"
                               HorizontalAlignment="Left">
                         <ItemsControl.ItemsPanel>

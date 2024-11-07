@@ -1,13 +1,18 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using MusicPlayer.Shared;
+using MusicPlayer.Shared.Models;
+using System.Collections.Generic;
+using System.Reflection.Emit;
 
-namespace MusicPlayer.Shared.Models
+namespace MusicPlayer.Database
 {
     public class DomainContext : DbContext
     {
         // Tables
         public DbSet<Song> Songs { get; set; }
         public DbSet<Artist> Artists { get; set; }
+        public DbSet<Album> Albums { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Settings> Settings { get; set; }
@@ -24,7 +29,7 @@ namespace MusicPlayer.Shared.Models
 
         public DomainContext()
         {
-            DbPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\MusicPlayer.db";
+            DbPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\JeroenJ\\MusicPlayer\\" + Constants.DatabaseName + ".db";
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
@@ -106,8 +111,14 @@ namespace MusicPlayer.Shared.Models
             // 1:n SongsFolder has Songs
             modelBuilder.Entity<Song>()
                 .HasOne(s => s.SongsFolder)
-                .WithMany(f => f.Songs)
+                .WithMany(sf => sf.Songs)
                 .HasForeignKey(s => s.SongsFolderId);
+
+            // Album has Songs
+            modelBuilder.Entity<Song>()
+                .HasOne(s => s.Album)
+                .WithMany(a => a.Songs)
+                .HasForeignKey(s => s.AlbumId);
         }
     }
 }

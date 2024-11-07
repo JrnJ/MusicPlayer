@@ -5,6 +5,7 @@
              xmlns:viewModel="clr-namespace:MusicPlayer.MVVM.ViewModel"
              xmlns:view="clr-namespace:MusicPlayer.MVVM.View"
              StartupUri="MVVM/View/MainWindow.xaml">
+    
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -38,8 +39,8 @@
             </DataTemplate>
 
             <!--<Color x:Key="Colors.Main.TrackBarColor">#FFDBA531</Color>
-            <SolidColorBrush x:Key="TrackBarColor" Color="{StaticResource Colors.Main.TrackBarColor}" />-->
-            
+        <SolidColorBrush x:Key="TrackBarColor" Color="{StaticResource Colors.Main.TrackBarColor}" />-->
+
             <!-- Colors -->
             <Color x:Key="Colors.Main.Grey">#292929</Color>
             <!-- /Colors -->

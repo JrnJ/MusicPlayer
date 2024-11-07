@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
+using MusicPlayer.Database;
 using MusicPlayer.MVVM.Model;
 using MusicPlayer.Shared.Models;
 using System;

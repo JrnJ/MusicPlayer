@@ -1,39 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net7.0-windows10.0.22000.0</TargetFramework>
-		<TargetPlatformMinVersion>10.0.22000.0</TargetPlatformMinVersion>
-		<Platforms>x64</Platforms>
-		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-		<UseWPF>true</UseWPF>
-	</PropertyGroup>
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+	<TargetFramework>net8.0-windows10.0.22621</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+	<WindowsPackageType>None</WindowsPackageType>
+    <RuntimeIdentifiers>win-x64;win-x86;win-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
 
-	<ItemGroup>
-	  <Content Remove="Images\1080p.png" />
-	  <Content Remove="Images\Icons\External\Discord-Logo-White.png" />
-	  <Content Remove="Images\Icons\External\Spotify_Icon_RGB_White.png" />
-	  <Content Remove="Images\Icons\logo_gold.png" />
-	  <Content Remove="Images\Icons\next_icon.png" />
-	  <Content Remove="Images\Icons\pause_icon.png" />
-	  <Content Remove="Images\Icons\previous_icon.png" />
-	  <Content Remove="Images\Icons\repeat_icon.png" />
-	  <Content Remove="Images\Icons\shuffle_icon.png" />
-	  <Content Remove="Images\logo.png" />
-	  <Content Remove="Images\next_track.png" />
-	  <Content Remove="Images\pause.png" />
-	  <Content Remove="Images\play.png" />
-	  <Content Remove="Images\previous_track.png" />
-	  <Content Remove="Images\repeat.png" />
-	  <Content Remove="Images\shuffle.png" />
-	  <Content Remove="Images\SongImagePlaceholder.png" />
-	  <Content Remove="Images\TreeTest.png" />
-	  <Content Remove="Images\Triangle_Filled.png" />
-	</ItemGroup>
+  <ItemGroup>
+    <Content Remove="Images\1080p.png" />
+    <Content Remove="Images\Icons\External\Discord-Logo-White.png" />
+    <Content Remove="Images\Icons\External\Spotify_Icon_RGB_White.png" />
+    <Content Remove="Images\Icons\logo_gold.png" />
+    <Content Remove="Images\Icons\next_icon.png" />
+    <Content Remove="Images\Icons\pause_icon.png" />
+    <Content Remove="Images\Icons\previous_icon.png" />
+    <Content Remove="Images\Icons\repeat_icon.png" />
+    <Content Remove="Images\Icons\shuffle_icon.png" />
+    <Content Remove="Images\logo.png" />
+    <Content Remove="Images\next_track.png" />
+    <Content Remove="Images\pause.png" />
+    <Content Remove="Images\play.png" />
+    <Content Remove="Images\previous_track.png" />
+    <Content Remove="Images\repeat.png" />
+    <Content Remove="Images\shuffle.png" />
+    <Content Remove="Images\SongImagePlaceholder.png" />
+    <Content Remove="Images\TreeTest.png" />
+    <Content Remove="Images\Triangle_Filled.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Fonts\NotoSans-Regular.ttf" />
-    <None Remove="MainWindow.xaml.cs~RFaa61997.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240802000" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Themes\Pink\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicPlayer.Database\MusicPlayer.Database.csproj" />
+    <ProjectReference Include="..\MusicPlayer.Shared\MusicPlayer.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -99,18 +113,4 @@
     </Resource>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25151-preview" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.2" />
-    <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\MusicPlayer.Audio\MusicPlayer.Audio.csproj" />
-    <ProjectReference Include="..\MusicPlayer.Shared\MusicPlayer.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Themes\Pink\" />
-  </ItemGroup>
 </Project>

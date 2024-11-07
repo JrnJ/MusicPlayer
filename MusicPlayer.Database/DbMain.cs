@@ -1,14 +1,28 @@
-﻿using System;
+﻿using MusicPlayer.Shared.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicPlayer.Shared.Models
+namespace MusicPlayer.Database
 {
-    public class DbMain
+    /*
+        To run this code:
+        1. Select MusicPlayer.Database as project to run
+
+        2. Open the "Tools/NuGet Package Manager/Package Manager Console"
+        Package source: All
+        Default Project: MusicPlayer.Database
+        
+        3. Delete existing Database
+        4. Package Manager Console: Update-Database
+        5. Run the MusicPlayer.Database project
+    */
+
+    internal class DbMain
     {
-        public static void Main(string[] args)
+        internal static void Main(string[] args)
         {
             using (DomainContext context = new())
             {
@@ -17,23 +31,29 @@ namespace MusicPlayer.Shared.Models
                 Artist artist = new()
                 {
                     Name = "Jeroen",
-                    Songs = new List<ArtistSong>()
+                    Songs = []
                 };
                 context.Artists.Add(artist);
 
                 Genre genre = new()
                 {
                     Name = "Jeroenium",
-                    Songs = new List<SongGenre>()
+                    Songs = []
                 };
                 context.Genres.Add(genre);
+
+                Album album = new()
+                {
+                    Name = "Jeroen's Album v1"
+                };
+                context.Albums.Add(album);
 
                 Playlist playlist = new()
                 {
                     Name = "Jeroen's Playlist",
                     Description = "Playlist made by Jeroen",
                     ImagePath = "D:\\Music\\Images\\K-ON.png",
-                    Songs = new List<PlaylistSong>()
+                    Songs = []
                 };
 
                 Song song = new()
@@ -42,11 +62,12 @@ namespace MusicPlayer.Shared.Models
                     Title = "Jeroen's Song!",
                     Year = 2002,
                     Duration = new TimeSpan(0, 3, 21),
-                    Artists = new List<ArtistSong>(),
-                    Playlists = new List<PlaylistSong>(),
-                    Genres = new List<SongGenre>(),
+                    Artists = [],
+                    Playlists = [],
+                    Genres = [],
                     SongsFolder = new()
                 };
+                song.Album = album;
 
                 SongGenre songGenre = new()
                 {
@@ -79,14 +100,14 @@ namespace MusicPlayer.Shared.Models
                 Settings settings = new()
                 {
                     Volume = 0.33,
-                    SongsFolders = new List<SettingsSongsFolder>()
+                    SongsFolders = []
                 };
 
                 SongsFolder songsFolder = new()
                 {
                     Path = "D:\\Music\\Feelgood",
-                    Settings = new List<SettingsSongsFolder>(),
-                    Songs = new List<Song>()
+                    Settings = [],
+                    Songs = []
                 };
                 song.SongsFolder = songsFolder;
                 songsFolder.Songs.Add(song);
@@ -101,7 +122,7 @@ namespace MusicPlayer.Shared.Models
 
                 // Remove if already exists
                 if (context.Songs.ToList().Count > 0) return;
-                Console.WriteLine("Created Test Data because DataBase was empty! MusicPlayer.Shared.Models.DbMain::Main");
+                Console.WriteLine("Created Test Data because Database was empty! MusicPlayer.Shared.Models.DbMain::Main");
 
                 context.Songs.Add(song);
 

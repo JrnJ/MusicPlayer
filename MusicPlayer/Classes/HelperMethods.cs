@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
-using MusicPlayer.Audio;
 
 namespace MusicPlayer.Classes
 {

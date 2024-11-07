@@ -46,7 +46,7 @@ namespace MusicPlayer.MVVM.ViewModel
             {
                 string[] ids = o.ToString().Split(","); // 0 = playlistId, 1 = songId
                 SongModel song = Global.MyMusic.Songs.FirstOrDefault(x => x.Id == int.Parse(ids[1]));
-                PlaylistModel playlist = Global.Playlists.FirstOrDefault(x => x.Id == int.Parse(ids[0]));
+                PlaylistModel playlist = Global.PlaylistsManager.Playlists.FirstOrDefault(x => x.Id == int.Parse(ids[0]));
 
                 Global.AddSongToPlaylist(song, playlist);
             });

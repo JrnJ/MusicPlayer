@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using MusicPlayer.Classes;
 using MusicPlayer.Core;
 using MusicPlayer.Core.Searching;
+using MusicPlayer.Database;
 using MusicPlayer.DiscordGameSDK;
 using MusicPlayer.MVVM.Model;
 using MusicPlayer.Shared.Models;
@@ -14,8 +15,10 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Windows;
-using TagLib;
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Enumeration;
 using Windows.Media;
+using Windows.Media.Playlists;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
 
@@ -103,44 +106,12 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _myMusic = value; OnPropertyChanged(); }
         }
 
-        private ObservableCollection<PlaylistModel> _playlists;
+        private PlaylistsManager _playlistsManager;
 
-        public ObservableCollection<PlaylistModel> Playlists
+        public PlaylistsManager PlaylistsManager
         {
-            get => _playlists;
-            set { _playlists = value; OnPropertyChanged(); }
-        }
-
-        private PlaylistModel _playlistViewing;
-
-        public PlaylistModel PlaylistViewing
-        {
-            get => _playlistViewing;
-            set
-            {
-                _playlistViewing = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private PlaylistModel _playlistPlaying;
-
-        public PlaylistModel PlaylistPlaying
-        {
-            get => _playlistPlaying;
-            set
-            {
-                _playlistPlaying = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private PlaylistModel _searchingPlaylist;
-
-        public PlaylistModel SearchingPlaylist
-        {
-            get { return _searchingPlaylist; }
-            set { _searchingPlaylist = value; OnPropertyChanged(); }
+            get { return _playlistsManager; }
+            set { _playlistsManager = value; }
         }
 
         // Stupidity
@@ -229,6 +200,9 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             // AppTitlebar
             _appWindowTitlebarManager = new();
+
+            // Before Others
+            _playlistsManager = new();
 
             // Create ViewModels
             PlaylistsVM = new();
@@ -446,12 +420,20 @@ namespace MusicPlayer.MVVM.ViewModel
                 // Remove Folder
                 context.SongsFolders.Remove(songsFolder);
 
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
 
             // Update Client
+            List<SongModel> songsToRemove = MyMusic.Songs.Where(s => s.SongsFolderId == songsFolderId).ToList();
+            foreach (SongModel song in songsToRemove)
+            {
+                MyMusic.Songs.Remove(song);
 
-
+                foreach (PlaylistModel playlist in PlaylistsManager.Playlists)
+                {
+                    playlist.Songs.Remove(song);
+                }
+            }
         }
         #endregion SortThis
 
@@ -475,7 +457,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             PopupVisibility = Visibility.Collapsed;
             SingleSongVisibility = Visibility.Collapsed;
-            PlaylistViewing = MyMusic;
+            PlaylistsManager.PlaylistViewing = MyMusic;
 
             // CLA
             string[] cmdLine = Environment.GetCommandLineArgs();
@@ -513,14 +495,14 @@ namespace MusicPlayer.MVVM.ViewModel
                 .ToListAsync();
 
             // 2. Fill Artists
-            _artists = new();
+            _artists = [];
             foreach (Artist artist in dbArtists)
             {
                 _artists.Add(new(artist));
             }
 
             // 3. Fill Genres
-            _genres = new();
+            _genres = [];
             foreach (Genre genre in dbGenres)
             {
                 _genres.Add(new(genre));
@@ -534,10 +516,9 @@ namespace MusicPlayer.MVVM.ViewModel
             }
 
             // 5. Fill Playlists
-            _playlists = new();
             foreach (Playlist playlist in dbPlaylists)
             {
-                _playlists.Add(new(playlist, _myMusic.Songs));
+                PlaylistsManager.Add(new(playlist, _myMusic.Songs));
             }
         }
 
@@ -640,13 +621,19 @@ namespace MusicPlayer.MVVM.ViewModel
                 if (amount == 0.0f)
                 {
                     if (ExternalInputHelper.IsKeyDown(0x11))
+                    {
                         SystemVolumeChanger.DecreaseSystemVolume(0.01f);
+                        SaveVolumeToDatabase();
+                    }
                     else
+                    {
                         PreviousSong();
+                    }
                 }
                 else
                 {
                     AudioPlayer.SetVolume(_settings.Volume - amount);
+                    SaveVolumeToDatabase();
                 }
             }
 
@@ -659,13 +646,19 @@ namespace MusicPlayer.MVVM.ViewModel
                 if (amount == 0.0f)
                 {
                     if (ExternalInputHelper.IsKeyDown(0x11))
+                    {
                         SystemVolumeChanger.IncreaseSystemVolume(0.01f);
+                        SaveVolumeToDatabase();
+                    }
                     else
+                    {
                         NextSong();
+                    }
                 }
                 else
                 {
                     AudioPlayer.SetVolume(_settings.Volume + amount);
+                    SaveVolumeToDatabase();
                 }
             }
         }
@@ -743,14 +736,29 @@ namespace MusicPlayer.MVVM.ViewModel
         }
         #endregion Slider
 
+        #region Volume
+        // TODO: move this
+        public async void SaveVolumeToDatabase()
+        {
+            using (DomainContext context = new())
+            {
+                Settings settings = context.Settings.FirstOrDefault(s => s.Id == Settings.Id);
+
+                // Update Database
+                settings.Volume = AudioPlayer.Volume;
+                await context.SaveChangesAsync();
+            }
+        }
+        #endregion Volume
+
         public void OpenMedia(SongModel song, bool singleSongMode = false)
         {
             AudioPlayer.OpenMedia(song);
 
             // TODO: mode can be SingleSong
-            if (PlaylistViewing != null)
+            if (PlaylistsManager.PlaylistViewing != null)
             {
-                PlaylistPlaying = PlaylistViewing;
+                PlaylistsManager.SetPlayingPlaylist(PlaylistsManager.PlaylistViewing);
 
                 if (singleSongMode)
                 {
@@ -775,12 +783,12 @@ namespace MusicPlayer.MVVM.ViewModel
             AudioPlayer.Pause();
 
             // Get song Index
-            int index = PlaylistPlaying.Songs.IndexOf(AudioPlayer.CurrentSong);
+            int index = PlaylistsManager.PlaylistPlaying.Songs.IndexOf(AudioPlayer.CurrentSong);
 
             // Play previous song if there is one
             if (index > 0)
             {
-                OpenMedia(PlaylistPlaying.Songs[index - 1]);
+                OpenMedia(PlaylistsManager.PlaylistPlaying.Songs[index - 1]);
             }
         }
 
@@ -792,19 +800,19 @@ namespace MusicPlayer.MVVM.ViewModel
             AudioPlayer.Pause();
 
             // Get song Index
-            int index = PlaylistPlaying.Songs.IndexOf(AudioPlayer.CurrentSong);
+            int index = PlaylistsManager.PlaylistPlaying.Songs.IndexOf(AudioPlayer.CurrentSong);
 
             // Play next song if there is one
-            if (index < PlaylistPlaying.Songs.Count - 1)
+            if (index < PlaylistsManager.PlaylistPlaying.Songs.Count - 1)
             {
-                OpenMedia(PlaylistPlaying.Songs[index + 1]);
+                OpenMedia(PlaylistsManager.PlaylistPlaying.Songs[index + 1]);
             }
             // If not, play first song
             else
             {
                 if (LoopPlaylistEnabled)
                 {
-                    OpenMedia(PlaylistPlaying.Songs[0]);
+                    OpenMedia(PlaylistsManager.PlaylistPlaying.Songs[0]);
                 }
             }
         }
@@ -815,19 +823,19 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Generate random
             Random random = new();
-            int rndIndex = random.Next(0, PlaylistPlaying.Songs.Count);
-            OpenMedia(PlaylistPlaying.Songs[rndIndex]);
+            int rndIndex = random.Next(0, PlaylistsManager.PlaylistPlaying.Songs.Count);
+            OpenMedia(PlaylistsManager.PlaylistPlaying.Songs[rndIndex]);
         }
 
         public void ShowPlaylist(int playlistId)
         {
-            if (PlaylistViewing != null)
+            if (PlaylistsManager.PlaylistViewing != null)
             {
-                PlaylistViewing.IsSelected = false;
+                PlaylistsManager.PlaylistViewing.IsSelected = false;
             }
 
-            PlaylistViewing = Playlists.FirstOrDefault(x => x.Id == playlistId);
-            PlaylistViewing.IsSelected = true;
+            PlaylistsManager.SetViewingPlaylist(PlaylistsManager.Playlists.FirstOrDefault(x => x.Id == playlistId));
+            PlaylistsManager.PlaylistViewing.IsSelected = true;
             CurrentView = PlaylistVM;
         }
 
@@ -838,7 +846,7 @@ namespace MusicPlayer.MVVM.ViewModel
                 Name = name,
                 Description = description,
                 ImagePath = "",
-                Songs = new List<PlaylistSong>(),
+                Songs = [],
                 // Id = ... SaveChanges adds this
             };
 
@@ -851,7 +859,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             // Add to Memory
             PlaylistModel playlistModel = new(playlist, MyMusic.Songs);
-            Playlists.Add(playlistModel);
+            PlaylistsManager.Add(playlistModel);
 
             return playlistModel;
         }
@@ -860,7 +868,7 @@ namespace MusicPlayer.MVVM.ViewModel
         {
             using (DomainContext context = new())
             {
-                Playlist playlistToDelete = context.Playlists.Where(p => p.Id == playlistId).FirstOrDefault();
+                Playlist? playlistToDelete = context.Playlists.FirstOrDefault(p => p.Id == playlistId);
 
                 if (playlistToDelete != null)
                 {
@@ -869,9 +877,7 @@ namespace MusicPlayer.MVVM.ViewModel
                     context.SaveChanges();
 
                     // Delete from Memory
-                    PlaylistModel playlistModelToDelete = Playlists.Where(x => x.Id == playlistId).FirstOrDefault();
-                    if (playlistModelToDelete != null)
-                        Playlists.Remove(playlistModelToDelete);
+                    PlaylistsManager.Remove(playlistId);
                 }
             }
         }
@@ -881,8 +887,8 @@ namespace MusicPlayer.MVVM.ViewModel
             // Intended: Does not Update songs releated to Playist
             using (DomainContext context = new())
             {
-                Playlist playlistToUpdate = await context.Playlists.Where(p => p.Id == playlistId).FirstOrDefaultAsync();
-                PlaylistModel playlistModelToUpdate = Playlists.Where(p => p.Id == playlistId).FirstOrDefault();
+                Playlist? playlistToUpdate = await context.Playlists.Where(p => p.Id == playlistId).FirstOrDefaultAsync();
+                PlaylistModel? playlistModelToUpdate = PlaylistsManager.Playlists.Where(p => p.Id == playlistId).FirstOrDefault();
 
                 if (playlistToUpdate != null)
                 {
@@ -907,6 +913,9 @@ namespace MusicPlayer.MVVM.ViewModel
             // Update Database
             using (DomainContext context = new())
             {
+                // Only add if it doesnt exist
+                if (await context.PlaylistSongs.AnyAsync(ps => ps.SongId == song.Id && ps.PlaylistId == playlist.Id)) return;
+
                 PlaylistSong playlistSong = new()
                 {
                     SongId = song.Id,
@@ -927,9 +936,8 @@ namespace MusicPlayer.MVVM.ViewModel
             // Update Database
             using (DomainContext context = new())
             {
-                PlaylistSong newPlaylistSong = await context.PlaylistSongs
-                    .Where(p => p.PlaylistId == playlist.Id)
-                    .Where(s => s.SongId == song.Id)
+                PlaylistSong? newPlaylistSong = await context.PlaylistSongs
+                    .Where(ps => ps.PlaylistId == playlist.Id && ps.SongId == song.Id)
                     .FirstOrDefaultAsync();
 
                 if (newPlaylistSong == null) return;
@@ -998,29 +1006,29 @@ namespace MusicPlayer.MVVM.ViewModel
             // If empty, set back to PlaylistViewing
             if (!string.IsNullOrEmpty(value))
             {
-                SearchingPlaylist = new()
+                PlaylistsManager.SetSearchingPlaylist(new()
                 {
-                    Id = PlaylistViewing.Id,
-                    Name = PlaylistViewing.Name,
-                    Songs = new(),
-                    Description = PlaylistViewing.Description,
-                };
-                ObservableCollection<SongModel> songs = new();
+                    Id = PlaylistsManager.PlaylistViewing.Id,
+                    Name = PlaylistsManager.PlaylistViewing.Name,
+                    Songs = [],
+                    Description = PlaylistsManager.PlaylistViewing.Description,
+                });
+                ObservableCollection<SongModel> songs = [];
 
-                for (int i = 0; i < PlaylistViewing.Songs.Count; i++)
+                for (int i = 0; i < PlaylistsManager.PlaylistViewing.Songs.Count; i++)
                 {
-                    if (PlaylistViewing.Songs[i].Title.ToLower().Contains(value.ToLower()))
+                    if (PlaylistsManager.PlaylistViewing.Songs[i].Title.ToLower().Contains(value.ToLower()))
                     {
-                        songs.Add(PlaylistViewing.Songs[i]);
+                        songs.Add(PlaylistsManager.PlaylistViewing.Songs[i]);
                     }
                 }
 
-                SearchingPlaylist.Songs = songs;
-                PlaylistViewing = SearchingPlaylist;
+                PlaylistsManager.SearchingPlaylist.Songs = songs;
+                PlaylistsManager.SetViewingPlaylist(PlaylistsManager.SearchingPlaylist);
             }
             else
             {
-                PlaylistViewing = Playlists.Where(x => x.Id == PlaylistViewing.Id).FirstOrDefault();
+                PlaylistsManager.SetViewingPlaylist(PlaylistsManager.Playlists.Where(x => x.Id == PlaylistsManager.PlaylistViewing.Id).FirstOrDefault());
             }
         }
 
@@ -1034,29 +1042,29 @@ namespace MusicPlayer.MVVM.ViewModel
             // If empty, set back to PlaylistViewing
             if (!string.IsNullOrEmpty(value))
             {
-                SearchingPlaylist = new()
+                PlaylistsManager.SetSearchingPlaylist(new()
                 {
-                    Id = PlaylistViewing.Id,
-                    Name = PlaylistViewing.Name,
-                    Songs = new(),
-                    Description = PlaylistViewing.Description,
-                };
-                ObservableCollection<SongModel> songs = new();
+                    Id = PlaylistsManager.PlaylistViewing.Id,
+                    Name = PlaylistsManager.PlaylistViewing.Name,
+                    Songs = [],
+                    Description = PlaylistsManager.PlaylistViewing.Description,
+                });
+                ObservableCollection<SongModel> songs = [];
 
-                for (int i = 0; i < PlaylistViewing.Songs.Count; i++)
+                for (int i = 0; i < PlaylistsManager.PlaylistViewing.Songs.Count; i++)
                 {
-                    if (PlaylistViewing.Songs[i].Title.ToLower().Contains(value.ToLower()))
+                    if (PlaylistsManager.PlaylistViewing.Songs[i].Title.ToLower().Contains(value.ToLower()))
                     {
-                        songs.Add(PlaylistViewing.Songs[i]);
+                        songs.Add(PlaylistsManager.PlaylistViewing.Songs[i]);
                     }
                 }
 
-                SearchingPlaylist.Songs = songs;
-                PlaylistViewing = SearchingPlaylist;
+                PlaylistsManager.SearchingPlaylist.Songs = songs;
+                PlaylistsManager.SetViewingPlaylist(PlaylistsManager.SearchingPlaylist);
             }
             else
             {
-                PlaylistViewing = MyMusic;
+                PlaylistsManager.SetViewingPlaylist(MyMusic);
             }
         }
     }

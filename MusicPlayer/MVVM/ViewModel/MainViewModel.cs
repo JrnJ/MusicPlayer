@@ -89,7 +89,7 @@ namespace MusicPlayer.MVVM.ViewModel
             HomeViewCommand = new(o =>
             {
                 Global.CurrentView = HomeVM;
-                Global.PlaylistViewing = Global.MyMusic;
+                Global.PlaylistsManager.PlaylistViewing = Global.MyMusic;
             });
 
             PlaylistsViewCommand = new(o =>

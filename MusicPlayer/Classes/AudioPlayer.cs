@@ -31,7 +31,7 @@ namespace MusicPlayer.Classes
         // Unsure about accesibility here
         public SystemMediaTransportControls MediaControls { get; private set; }
 
-        public MediaPlayer MediaPlayer { get; private set; }
+        public Windows.Media.Playback.MediaPlayer MediaPlayer { get; private set; }
 
         // Stoopid props
         private SongModel _currentSong;

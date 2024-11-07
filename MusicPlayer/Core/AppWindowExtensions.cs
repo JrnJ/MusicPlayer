@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
+
 using Windows.Storage;
 using Windows.Storage.Pickers;
+
 using WinRT.Interop;
 
 namespace MusicPlayer.Core
@@ -38,7 +39,7 @@ namespace MusicPlayer.Core
         /// </summary>
         /// <param name="folderPicker">Change FolderPicker behaviour</param>
         /// <returns>Folder Selected</returns>
-        public static async Task<StorageFolder> OpenFolderPicker(FolderPicker folderPicker = null)
+        public static async Task<StorageFolder> OpenFolderPicker(FolderPicker? folderPicker = null)
         {
             folderPicker ??= new();
 
@@ -72,7 +73,8 @@ namespace MusicPlayer.Core
         [DllImport("user32.dll")]
         private static extern uint GetSysColor(int nIndex);
 
-        public static Color GetBorderColor(this Window window) {
+        public static Color GetBorderColor(this Window window)
+        {
             var hwnd = new WindowInteropHelper(window).EnsureHandle;
             var dpi = VisualTreeHelper.GetDpi(window);
             var borderThickness = SystemParameters.WindowResizeBorderThickness;
@@ -80,7 +82,8 @@ namespace MusicPlayer.Core
             var topBorderHeight = (int)Math.Ceiling(borderThickness.Top * dpi.DpiScaleY);
             var rightBorderWidth = (int)Math.Ceiling(borderThickness.Right * dpi.DpiScaleX);
             var bottomBorderHeight = (int)Math.Ceiling(borderThickness.Bottom * dpi.DpiScaleY);
-            var rect = new RECT {
+            var rect = new RECT
+            {
                 left = 0,
                 top = 0,
                 right = leftBorderWidth + rightBorderWidth,
@@ -95,7 +98,8 @@ namespace MusicPlayer.Core
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct RECT {
+        private struct RECT
+        {
             public int left;
             public int top;
             public int right;

@@ -4,21 +4,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MusicPlayer.Shared.Models;
+using MusicPlayer.Database;
 
 #nullable disable
 
-namespace MusicPlayer.Shared.Migrations
+namespace MusicPlayer.Database.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    [Migration("20231114121037_songsSongsFolderReleation")]
-    partial class songsSongsFolderReleation
+    [Migration("20240926100748_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
             modelBuilder.Entity("MusicPlayer.Shared.Models.Artist", b =>
                 {
@@ -94,6 +94,9 @@ namespace MusicPlayer.Shared.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("SongId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Index")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("PlaylistId", "SongId");

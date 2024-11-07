@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Windows.Media.Media3D;
 
 namespace MusicPlayer.Core
 {

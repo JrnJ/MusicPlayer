@@ -45,7 +45,7 @@
             <!-- Songs -->
             <Grid Grid.Row="2" >
                 <ScrollViewer>
-                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Path=Global.PlaylistViewing.Songs}" Margin="0, 0, 8, 0">
+                    <ItemsControl x:Name="Songs" ItemsSource="{Binding Path=Global.PlaylistsManager.PlaylistViewing.Songs}" Margin="0, 0, 8, 0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <RadioButton GroupName="AlbumSongs" Style="{StaticResource AlbumSong}"
@@ -57,7 +57,7 @@
                                             <MenuItem Header="Play" 
                                                   Command="{Binding PlacementTarget.Tag.SelectSongCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                   CommandParameter="{Binding Id}" />
-                                            <MenuItem Header="Add to" ItemsSource="{Binding PlacementTarget.Tag.Global.Playlists, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                            <MenuItem Header="Add to" ItemsSource="{Binding PlacementTarget.Tag.Global.PlaylistsManager.Playlists, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                                 <MenuItem.ItemTemplate>
                                                     <DataTemplate>
                                                         <MenuItem Header="{Binding Name}"

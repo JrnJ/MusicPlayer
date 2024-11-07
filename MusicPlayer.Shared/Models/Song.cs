@@ -23,12 +23,15 @@ namespace MusicPlayer.Shared.Models
 
         public TimeSpan Duration { get; set; }
 
-        // Foreign Key
+        // Foreign Keys
         [ForeignKey(nameof(SongsFolder))]
         [Required]
         public int SongsFolderId { get; set; }
-
         public virtual SongsFolder SongsFolder { get; set; }
+
+        [ForeignKey(nameof(Album))]
+        public int? AlbumId { get; set; }
+        public virtual Album? Album { get; set; }
 
         // Junction Tables
         public virtual ICollection<ArtistSong> Artists { get; set; } // Artists Song has

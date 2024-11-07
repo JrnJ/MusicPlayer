@@ -84,9 +84,9 @@ namespace MusicPlayer.MVVM.View
                 Timer.Stop();
 
                 // Get+Set song
-                SongModel song = GlobalViewModel.Instance.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == SongId);
+                SongModel song = GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing.Songs.FirstOrDefault(x => x.Id == SongId);
                 meow.DataContext = song;
-                PreviousMoveIndex = GlobalViewModel.Instance.PlaylistViewing.Songs.IndexOf(song);
+                PreviousMoveIndex = GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing.Songs.IndexOf(song);
 
                 // Element Visuals
                 ElementSelected.Visibility = Visibility.Hidden;
@@ -107,8 +107,8 @@ namespace MusicPlayer.MVVM.View
             LastPoint = p;
             ElementSelected = (sender as RadioButton);
             SongId = (int)ElementSelected.CommandParameter;
-            FirstMoveIndex = GlobalViewModel.Instance.PlaylistViewing.Songs
-                .IndexOf(GlobalViewModel.Instance.PlaylistViewing.Songs.Where(s => s.Id == SongId).FirstOrDefault());
+            FirstMoveIndex = GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing.Songs
+                .IndexOf(GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing.Songs.Where(s => s.Id == SongId).FirstOrDefault());
             Timer.Start();
 
             AppWindowExtensions.GetMainWindow().MouseMove += WindowMouseMove;
@@ -218,7 +218,7 @@ namespace MusicPlayer.MVVM.View
                 if (PreviousMoveIndex != ElementsPassed)
                 {
                     // Move Songs
-                    GlobalViewModel.Instance.SwapSongInPlaylistClient(GlobalViewModel.Instance.PlaylistViewing, PreviousMoveIndex, ElementsPassed);
+                    GlobalViewModel.Instance.SwapSongInPlaylistClient(GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing, PreviousMoveIndex, ElementsPassed);
 
                     // Reset
                     PreviousMoveIndex = ElementsPassed;
@@ -242,7 +242,7 @@ namespace MusicPlayer.MVVM.View
                 meow.Visibility = Visibility.Hidden;
 
                 // TODO2
-                GlobalViewModel.Instance.SwapSongInPlaylistDatabase(GlobalViewModel.Instance.PlaylistViewing, FirstMoveIndex, ElementsPassed);
+                GlobalViewModel.Instance.SwapSongInPlaylistDatabase(GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing, FirstMoveIndex, ElementsPassed);
             }
         }
     }
