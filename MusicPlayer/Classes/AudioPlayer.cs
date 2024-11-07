@@ -26,12 +26,26 @@ namespace MusicPlayer.Classes
         Stopped = 5
     }
 
+    internal enum MediaControlsButton
+    {
+        Play,
+        Pause,
+        Stop,
+        Record,
+        FastForward,
+        Rewind,
+        Next,
+        Previous,
+        ChannelUp,
+        ChannelDown
+    }
+
     internal class AudioPlayer : ObservableObject, ISearchCommandAddon
     {
         // Unsure about accesibility here
         public SystemMediaTransportControls MediaControls { get; private set; }
 
-        public Windows.Media.Playback.MediaPlayer MediaPlayer { get; private set; }
+        protected Windows.Media.Playback.MediaPlayer MediaPlayer { get; }
 
         // Stoopid props
         private SongModel _currentSong;
@@ -63,6 +77,9 @@ namespace MusicPlayer.Classes
         public AudioPlayerState CurrentState => (AudioPlayerState)MediaPlayer.CurrentState;
 
         public event EventHandler<AudioPlayerState>? OnStateChanged;
+        public event EventHandler<MediaControlsButton>? OnAudioKeyPress;
+        public event EventHandler? AudioEnded;
+        public event EventHandler<double>? VolumeChanged;
 
         // Discord Integration
         private AudioServer _audioServer;
@@ -83,10 +100,6 @@ namespace MusicPlayer.Classes
 
             // Configuration
             ConfigureMediaPlayer();
-            MediaPlayer.CurrentStateChanged += (MediaPlayer sender, object args) =>
-            {
-                OnStateChanged?.Invoke(this, CurrentState);
-            };
 
             // TODO
             //ConfigureSearchOptions(GlobalViewModel.Instance.GlobalSearch);
@@ -103,17 +116,6 @@ namespace MusicPlayer.Classes
         {
             SMTC();
 
-            //MediaPlayer.SystemMediaTransportControls.IsPlayEnabled = false;
-            //MediaPlayer.SystemMediaTransportControls.IsPauseEnabled = false;
-            //MediaPlayer.SystemMediaTransportControls.IsStopEnabled = false;
-
-            //// Properties
-            //MediaPlayer.CommandManager.IsEnabled = true;
-
-            //// Events
-            //MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
-            //MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
-
             // SMTC
             //MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
             //MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true; 
@@ -124,12 +126,15 @@ namespace MusicPlayer.Classes
         private void SMTC()
         {
             // MediaControls Event enabling
-            MediaPlayer.CommandManager.IsEnabled = true;
+            MediaPlayer.CommandManager.IsEnabled = false;
             MediaPlayer.CommandManager.PreviousBehavior.EnablingRule = MediaCommandEnablingRule.Always;
             MediaPlayer.CommandManager.NextBehavior.EnablingRule = MediaCommandEnablingRule.Always;
             MediaPlayer.CommandManager.PlayBehavior.EnablingRule = MediaCommandEnablingRule.Always;
             MediaPlayer.CommandManager.PauseBehavior.EnablingRule = MediaCommandEnablingRule.Always;
 
+            // Enable inputs, but dont let default behaviour take over
+            MediaPlayer.SystemMediaTransportControls.IsPreviousEnabled = true;
+            MediaPlayer.SystemMediaTransportControls.IsNextEnabled = true;
             MediaPlayer.SystemMediaTransportControls.IsPlayEnabled = true;
             MediaPlayer.SystemMediaTransportControls.IsPauseEnabled = true;
             MediaPlayer.SystemMediaTransportControls.IsStopEnabled = true;
@@ -137,6 +142,9 @@ namespace MusicPlayer.Classes
             // SystemMediaTransportControls Visual
             MediaPlayer.SystemMediaTransportControls.IsEnabled = true;
             MediaPlayer.MediaOpened += MediaPlayerMediaOpened;
+
+            MediaPlayer.MediaEnded += (sender, args) => AudioEnded?.Invoke(this, EventArgs.Empty);
+            MediaPlayer.VolumeChanged += (sender, args) => VolumeChanged?.Invoke(this, sender.Volume);
 
             // Catch MediaControl clicks
             MediaPlayer.SystemMediaTransportControls.ButtonPressed += SystemMediaTransportControls_ButtonPressed;
@@ -149,18 +157,7 @@ namespace MusicPlayer.Classes
 
         private void SystemMediaTransportControls_ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
         {
-            switch (args.Button)
-            {
-                case SystemMediaTransportControlsButton.Play:
-                case SystemMediaTransportControlsButton.Pause:
-                    // PausePlay();
-                    break;
-                case SystemMediaTransportControlsButton.Previous:
-                    
-                    break;
-                case SystemMediaTransportControlsButton.Next:
-                    break;
-            }
+            OnAudioKeyPress?.Invoke(this, (MediaControlsButton)args.Button);
         }
 
         private void UpdateSMTCDisplay()
@@ -335,6 +332,7 @@ namespace MusicPlayer.Classes
             MediaPlayer.Play();
 
             Timer.Start();
+            OnStateChanged?.Invoke(this, AudioPlayerState.Playing);
 
             // Notify Server
             if (AudioServer != null)
@@ -351,6 +349,7 @@ namespace MusicPlayer.Classes
             MediaPlayer.Pause();
 
             Timer.Stop();
+            OnStateChanged?.Invoke(this, AudioPlayerState.Paused);
 
             // Notify Server
             if (AudioServer != null)

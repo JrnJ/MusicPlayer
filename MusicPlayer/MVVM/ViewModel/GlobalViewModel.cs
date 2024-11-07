@@ -227,11 +227,6 @@ namespace MusicPlayer.MVVM.ViewModel
             ConfirmBox = new();
             EditPlaylistBox = new();
 
-            //AudioPlayer.MediaPlayer.AudioCategory
-            //AudioPlayer.MediaPlayer.AudioStateMonitor
-            //AudioPlayer.MediaPlayer.PlaybackMediaMarkers
-            //AudioPlayer.MediaPlayer.PlaybackSession
-
             //DiscordGameSDKWrapper = new("1035920401445957722");
         }
 
@@ -527,11 +522,11 @@ namespace MusicPlayer.MVVM.ViewModel
                 // Volume = AppSettinggs.Volume
             };
 
-            AudioPlayer.MediaPlayer.MediaEnded += MediaPlayerMediaEnded;
-            AudioPlayer.MediaPlayer.VolumeChanged += MediaPlayerVolumeChanged;
+            AudioPlayer.AudioEnded += MediaPlayerMediaEnded;
+            AudioPlayer.VolumeChanged += MediaPlayerVolumeChanged;
 
             // SMTC
-            AudioPlayer.MediaPlayer.SystemMediaTransportControls.ButtonPressed += SystemMediaTransportControlsButtonPressed;
+            AudioPlayer.OnAudioKeyPress += AudioPlayer_OnAudioKeyPress;
 
             // Timer Tick Event
             AudioPlayer.Timer.Tick += Timer_Tick;
@@ -542,60 +537,70 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         #region MediaPlayerEvents
-        private void SystemMediaTransportControlsButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
+        private void AudioPlayer_OnAudioKeyPress(object? sender, MediaControlsButton button)
         {
-            if (args.Button == SystemMediaTransportControlsButton.Previous)
+            switch (button)
             {
-                // 0x11:    CTRL / VK_MENU
-                // 0x12:    ALT / VK_MENU
-                float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
+                case MediaControlsButton.Play:
+                case MediaControlsButton.Pause:
+                    AudioPlayer.PausePlay();
+                    break;
+                case MediaControlsButton.Previous:
+                    {
+                        // 0x11:    CTRL / VK_MENU
+                        // 0x12:    ALT / VK_MENU
+                        float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
 
-                if (amount == 0.0f)
-                {
-                    if (ExternalInputHelper.IsKeyDown(0x11))
-                    {
-                        SystemVolumeChanger.DecreaseSystemVolume(0.01f);
-                        SaveVolumeToDatabase();
+                        if (amount == 0.0f)
+                        {
+                            if (ExternalInputHelper.IsKeyDown(0x11))
+                            {
+                                SystemVolumeChanger.DecreaseSystemVolume(0.01f);
+                                SaveVolumeToDatabase();
+                            }
+                            else
+                            {
+                                PreviousSong();
+                            }
+                        }
+                        else
+                        {
+                            AudioPlayer.SetVolume(_settings.Volume - amount);
+                            SaveVolumeToDatabase();
+                        }
                     }
-                    else
-                    {
-                        PreviousSong();
-                    }
-                }
-                else
-                {
-                    AudioPlayer.SetVolume(_settings.Volume - amount);
-                    SaveVolumeToDatabase();
-                }
-            }
+                   
+                    break;
 
-            if (args.Button == SystemMediaTransportControlsButton.Next)
-            {
-                // 0x11:    CTRL / VK_MENU
-                // 0x12:    ALT / VK_MENU
-                float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
+                case MediaControlsButton.Next:
+                    {
+                        // 0x11:    CTRL / VK_MENU
+                        // 0x12:    ALT / VK_MENU
+                        float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
 
-                if (amount == 0.0f)
-                {
-                    if (ExternalInputHelper.IsKeyDown(0x11))
-                    {
-                        SystemVolumeChanger.IncreaseSystemVolume(0.01f);
-                        SaveVolumeToDatabase();
+                        if (amount == 0.0f)
+                        {
+                            if (ExternalInputHelper.IsKeyDown(0x11))
+                            {
+                                SystemVolumeChanger.IncreaseSystemVolume(0.01f);
+                                SaveVolumeToDatabase();
+                            }
+                            else
+                            {
+                                NextSong();
+                            }
+                        }
+                        else
+                        {
+                            AudioPlayer.SetVolume(_settings.Volume + amount);
+                            SaveVolumeToDatabase();
+                        }
                     }
-                    else
-                    {
-                        NextSong();
-                    }
-                }
-                else
-                {
-                    AudioPlayer.SetVolume(_settings.Volume + amount);
-                    SaveVolumeToDatabase();
-                }
+                    break;
             }
         }
 
-        private void MediaPlayerMediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
+        private void MediaPlayerMediaEnded(object? sender, EventArgs e)
         {
             if (ShufflePlaylistEnabled)
             {
@@ -607,15 +612,15 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        private void MediaPlayerVolumeChanged(Windows.Media.Playback.MediaPlayer sender, object args)
+        private void MediaPlayerVolumeChanged(object? sender, double volume)
         {
             // Apply volume change to settings
-            Settings.Volume = sender.Volume;
+            Settings.Volume = volume;
         }
 
         #endregion MediaPlayerEvents
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object? sender, EventArgs e)
         {
             UpdateTime();
         }
