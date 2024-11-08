@@ -40,9 +40,9 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         // Current View
-        private object _currentView;
+        private object? _currentView;
 
-        public object CurrentView
+        public object? CurrentView
         {
             get { return _currentView; }
             set { _currentView = value; OnPropertyChanged(); }
@@ -61,7 +61,7 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _settings = value; OnPropertyChanged(); }
         }
 
-        private ObservableCollection<SongsFolderModel> _songsFolders;
+        private ObservableCollection<SongsFolderModel> _songsFolders = [];
 
         public ObservableCollection<SongsFolderModel> SongsFolders
         {
@@ -79,7 +79,7 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         // Data
-        private ObservableCollection<ArtistModel> _artists;
+        private ObservableCollection<ArtistModel> _artists = [];
 
         public ObservableCollection<ArtistModel> Artists
         {
@@ -87,7 +87,7 @@ namespace MusicPlayer.MVVM.ViewModel
             set { _artists = value; OnPropertyChanged(); }
         }
 
-        private ObservableCollection<GenreModel> _genres;
+        private ObservableCollection<GenreModel> _genres = [];
 
         public ObservableCollection<GenreModel> Genres
         {
@@ -96,7 +96,7 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         // Playlists
-        private PlaylistModel _myMusic;
+        private PlaylistModel _myMusic = new();
 
         public PlaylistModel MyMusic
         {
@@ -209,6 +209,9 @@ namespace MusicPlayer.MVVM.ViewModel
             _appWindowTitlebarManager = new();
 
             // Before Others
+            _audioPlayer = new();
+            ConfigureAudioPlayer();
+
             _playlistsManager = new();
 
             // Create ViewModels
@@ -219,8 +222,9 @@ namespace MusicPlayer.MVVM.ViewModel
             _globalSearch = new();
 
             // Configuration
-            NewConfigure();
+            AsyncGlobalViewModel();
             // Configure();
+
             SystemVolumeChanger = new();
 
             // Set BoxModels :: This isnt mandatory btw
@@ -365,15 +369,16 @@ namespace MusicPlayer.MVVM.ViewModel
         #endregion SortThis
 
         #region Configuration
-        public async void NewConfigure()
+        public async void AsyncGlobalViewModel()
         {
-            using (DomainContext context = new())
-            {
-                LoadSettings(context);
-                LoadCache(context);
-            }
+            await Configure();
+        }
 
-            ConfigureAudioPlayer();
+        public async Task Configure()
+        {
+            LoadSettings();
+            LoadFromDatabase();
+
             AudioPlayer.Volume = Settings.Volume;
             // TODO3
             // Method for reading all files to check if they still exist
@@ -400,43 +405,57 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        public async void LoadCache(DomainContext context)
+        private void ConfigureAudioPlayer()
         {
-            // 1. Read from Database
-            // 1.1 Read Artists
-            List<Artist> dbArtists = await context.Artists.ToListAsync();
+            AudioPlayer.AudioEnded += MediaPlayerMediaEnded;
+            AudioPlayer.VolumeChanged += MediaPlayerVolumeChanged;
 
-            // 1.2 Read Genres
-            List<Genre> dbGenres = await context.Genres.ToListAsync();
+            // SMTC
+            AudioPlayer.OnAudioKeyPress += AudioPlayer_OnAudioKeyPress;
 
-            // 1.3 Read Songs
+            // Timer Tick Event
+            AudioPlayer.Timer.Tick += (sender, e) => UpdateTime();
+
+            // Slider Values
+            CurrentTime = "0:00";
+            FinalTime = "0:00";
+        }
+
+        #region Loading
+        public async void LoadSettings()
+        {
+            List<SongsFolder> songsFolders = await DbHelper.GetSongsFolders();
+            foreach (SongsFolder songsFolder in songsFolders)
+            {
+                _songsFolders.Add(new(songsFolder));
+            }
+
+            Settings? settings = await DbHelper.GetSettings(1) ?? throw new Exception("No settings found with id: 1!");
+            _settings = new(settings, _songsFolders);
+        }
+
+        public async void LoadFromDatabase()
+        {
+            using DomainContext context = new();
+
+            // Artists & Genres
+            var loadArtistsTask = LoadArtists(context);
+            var loadGenresTask = LoadGenres(context);
+
+            // Run async, but wait until both are done
+            await Task.WhenAll(loadArtistsTask, loadGenresTask);
+
+            // Read Songs
             List<Song> dbSongs = await context.Songs
                 .Include(s => s.Artists)
                 .ThenInclude(a => a.Artist)
                 .Include(g => g.Genres)
                 .ToListAsync();
 
-            // 1.4 Read Playlists
-            List<Playlist> dbPlaylists = await context.Playlists
-                .Include(p => p.Songs)
-                .ToListAsync();
-
-            // 2. Fill Artists
-            _artists = [];
-            foreach (Artist artist in dbArtists)
-            {
-                _artists.Add(new(artist));
-            }
-
-            // 3. Fill Genres
-            _genres = [];
-            foreach (Genre genre in dbGenres)
-            {
-                _genres.Add(new(genre));
-            }
+            // Read Playlists
+            List<Playlist> dbPlaylists = await DbHelper.GetPlaylists(context);
 
             // 4. Fill Songs
-            _myMusic = new();
             foreach (Song song in dbSongs)
             {
                 _myMusic.Songs.Add(new(song, _artists, _genres));
@@ -449,23 +468,22 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
 
-        public async void LoadSettings(DomainContext context)
+        private async Task LoadArtists(DomainContext context)
         {
-            // 1. Read from Database
-            List<Settings> dbSettings = await context.Settings
-                .Include(s => s.SongsFolders)
-                .ToListAsync();
-            List<SongsFolder> dbSongsFolders = await context.SongsFolders
-                .ToListAsync();
-
-            // 2. Fill Models
-            _songsFolders = new();
-            foreach (SongsFolder songsFolder in dbSongsFolders)
+            List<Artist> dbArtists = await DbHelper.GetArtists(context);
+            foreach (Artist artist in dbArtists)
             {
-                _songsFolders.Add(new(songsFolder));
+                _artists.Add(new(artist));
             }
+        }
 
-            _settings = new(dbSettings[0], SongsFolders);
+        private async Task LoadGenres(DomainContext context)
+        {
+            List<Genre> dbGenres = await DbHelper.GetGenres(context);
+            foreach (Genre genre in dbGenres)
+            {
+                _genres.Add(new(genre));
+            }
         }
 
         public async Task Validate()
@@ -513,28 +531,7 @@ namespace MusicPlayer.MVVM.ViewModel
 
             }
         }
-
-        private void ConfigureAudioPlayer()
-        {
-            // AudioPlayer
-            AudioPlayer = new()
-            {
-                // Volume = AppSettinggs.Volume
-            };
-
-            AudioPlayer.AudioEnded += MediaPlayerMediaEnded;
-            AudioPlayer.VolumeChanged += MediaPlayerVolumeChanged;
-
-            // SMTC
-            AudioPlayer.OnAudioKeyPress += AudioPlayer_OnAudioKeyPress;
-
-            // Timer Tick Event
-            AudioPlayer.Timer.Tick += Timer_Tick;
-
-            // Slider Values
-            CurrentTime = "0:00";
-            FinalTime = "0:00";
-        }
+        #endregion Loading
 
         #region MediaPlayerEvents
         private void AudioPlayer_OnAudioKeyPress(object? sender, MediaControlsButton button)
@@ -619,11 +616,6 @@ namespace MusicPlayer.MVVM.ViewModel
         }
 
         #endregion MediaPlayerEvents
-
-        private void Timer_Tick(object? sender, EventArgs e)
-        {
-            UpdateTime();
-        }
 
         private void UpdateTime()
         {

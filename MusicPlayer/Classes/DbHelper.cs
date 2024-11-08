@@ -71,6 +71,13 @@ namespace MusicPlayer.Classes
         #endregion Songs
 
         #region Playlist
+        public static async Task<List<Playlist>> GetPlaylists(DomainContext context)
+        {
+            return await context.Playlists
+                .Include(p => p.Songs)
+                .ToListAsync();
+        }
+
         public static async Task<Playlist> CreatePlaylist(string name, string description)
         {
             using DomainContext context = new();
@@ -170,7 +177,9 @@ namespace MusicPlayer.Classes
         {
             using DomainContext context = new();
 
-            Playlist? playlist = await context.Playlists.FirstOrDefaultAsync(p => p.Id == playlistId);
+            Playlist? playlist = await context.Playlists
+                .Include(p => p.Songs)
+                .FirstOrDefaultAsync(p => p.Id == playlistId);
             if (playlist == null) return;
 
             PlaylistSong? oldSong = playlist.Songs.FirstOrDefault(sm => sm.Index == oldIndex);
@@ -185,6 +194,11 @@ namespace MusicPlayer.Classes
         #endregion Playlist
 
         #region Artists
+        public static async Task<List<Artist>> GetArtists(DomainContext context)
+        {
+            return await context.Artists.ToListAsync();
+        }
+
         public static async Task<Artist> CreateArtist(string name)
         {
             using DomainContext context = new();
@@ -231,6 +245,11 @@ namespace MusicPlayer.Classes
         #endregion Artists
 
         #region Genres
+        public static async Task<List<Genre>> GetGenres(DomainContext context)
+        {
+            return await context.Genres.ToListAsync();
+        }
+
         public static async Task CreateGenre(string name)
         {
             using DomainContext context = new();
@@ -274,6 +293,20 @@ namespace MusicPlayer.Classes
         #endregion Genres
 
         #region Settings
+        public static async Task<Settings?> GetSettings(int settingsId)
+        {
+            using DomainContext context = new();
+            return await context.Settings
+                .Include(s => s.SongsFolders)
+                .FirstOrDefaultAsync(s => s.Id == settingsId);
+        }
+
+        public static async Task<List<SongsFolder>> GetSongsFolders()
+        {
+            using DomainContext context = new();
+            return await context.SongsFolders.ToListAsync();
+        }
+
         public static async Task SetVolume(double volume, int settingsId)
         {
             using DomainContext context = new();

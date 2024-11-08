@@ -87,8 +87,8 @@ namespace MusicPlayer.MVVM.ViewModel
             //
             _playPauseButton = new(
             [
+                new("pause", "/Images/Icons/pause_icon.png"),
                 new("play", "/Images/Icons/play_icon.png"),
-                new("pause", "/Images/Icons/pause_icon.png")
             ]);
 
             // Create ViewModels
@@ -147,11 +147,11 @@ namespace MusicPlayer.MVVM.ViewModel
                 switch (state)
                 {
                     case AudioPlayerState.Playing:
-                        PlayPauseButton.Alter("play");
+                        PlayPauseButton.Alter("pause");
                         break;
 
                     default:
-                        PlayPauseButton.Alter("pause");
+                        PlayPauseButton.Alter("play");
                         break;
                 }
             };

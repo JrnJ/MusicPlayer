@@ -42,15 +42,12 @@ namespace MusicPlayer.Classes
 
     internal class AudioPlayer : ObservableObject, ISearchCommandAddon
     {
-        // Unsure about accesibility here
-        public SystemMediaTransportControls MediaControls { get; private set; }
-
         protected Windows.Media.Playback.MediaPlayer MediaPlayer { get; }
 
         // Stoopid props
-        private SongModel _currentSong;
+        private SongModel? _currentSong;
 
-        public SongModel CurrentSong
+        public SongModel? CurrentSong
         {
             get =>_currentSong;
             set { _currentSong = value; OnPropertyChanged(); }
@@ -82,9 +79,9 @@ namespace MusicPlayer.Classes
         public event EventHandler<double>? VolumeChanged;
 
         // Discord Integration
-        private AudioServer _audioServer;
+        private AudioServer? _audioServer;
 
-        public AudioServer AudioServer
+        public AudioServer? AudioServer
         {
             get { return _audioServer; }
             set { _audioServer = value; OnPropertyChanged(); }
@@ -162,6 +159,8 @@ namespace MusicPlayer.Classes
 
         private void UpdateSMTCDisplay()
         {
+            if (CurrentSong == null) return;
+
             // Text
             MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Type = MediaPlaybackType.Video;
             MediaPlayer.SystemMediaTransportControls.DisplayUpdater.VideoProperties.Title = CurrentSong.Title;
@@ -186,11 +185,6 @@ namespace MusicPlayer.Classes
             MediaPlayer.SystemMediaTransportControls.DisplayUpdater.Update();
         }
         #endregion SMTC
-
-        //private void CommandManager_NextReceived(MediaPlaybackCommandManager sender, MediaPlaybackCommandManagerNextReceivedEventArgs args)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         private void ConfigureAudioServer()
         {
@@ -258,7 +252,7 @@ namespace MusicPlayer.Classes
         #endregion Private
 
         #region SearchOptions
-        private SearchBarOption PlaySongSearchBarOption { get; set; }
+        private SearchBarOption? PlaySongSearchBarOption { get; set; }
 
         public void ConfigureSearchOptions(GlobalSearch globalSearch)
         {
@@ -268,7 +262,7 @@ namespace MusicPlayer.Classes
                 Keywords = { "play", "start" },
                 Command = new(o =>
                 {
-                    string text = o != null ? o.ToString() : "";
+                    string text = o != null ? (o.ToString() ?? "") : "";
                     MessageBox.Show("Parameter: " + text);
                 }),
             };
@@ -277,7 +271,7 @@ namespace MusicPlayer.Classes
             globalSearch.AddSearchBarOption(PlaySongSearchBarOption);
         }
 
-        private void PlaySongSearchBarOption_BeforeSearchOptionShow(object sender, string e)
+        private void PlaySongSearchBarOption_BeforeSearchOptionShow(object? sender, string e)
         {
             foreach (SongModel song in GlobalViewModel.Instance.MyMusic.Songs)
             {

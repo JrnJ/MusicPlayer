@@ -28,7 +28,7 @@ namespace MusicPlayer.MVVM.Model
             set { _volume = value; OnPropertyChanged(); }
         }
 
-        private ObservableCollection<SongsFolderModel> _songsFolders = new();
+        private ObservableCollection<SongsFolderModel> _songsFolders = [];
 
         public ObservableCollection<SongsFolderModel> SongsFolders
         {

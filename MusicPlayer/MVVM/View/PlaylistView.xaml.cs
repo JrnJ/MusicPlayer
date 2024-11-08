@@ -218,7 +218,10 @@ namespace MusicPlayer.MVVM.View
                 if (PreviousMoveIndex != ElementsPassed)
                 {
                     // Move Songs
-                    GlobalViewModel.Instance.SwapSongInPlaylist(GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing, PreviousMoveIndex, ElementsPassed);
+                    if (GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing != null)
+                    {
+                        GlobalViewModel.Instance.SwapSongInPlaylist(GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing, PreviousMoveIndex, ElementsPassed);
+                    }
 
                     // Reset
                     PreviousMoveIndex = ElementsPassed;
@@ -242,7 +245,7 @@ namespace MusicPlayer.MVVM.View
                 meow.Visibility = Visibility.Hidden;
 
                 // TODO2
-                GlobalViewModel.Instance.SwapSongInPlaylist(GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing, FirstMoveIndex, ElementsPassed);
+                //GlobalViewModel.Instance.SwapSongInPlaylist(GlobalViewModel.Instance.PlaylistsManager.PlaylistViewing, FirstMoveIndex, ElementsPassed);
             }
         }
     }
