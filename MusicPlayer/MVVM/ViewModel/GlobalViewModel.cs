@@ -402,7 +402,7 @@ namespace MusicPlayer.MVVM.ViewModel
                     Path = cmdLine[1]
                 };
                 StorageFile storageFile = await StorageFile.GetFileFromPathAsync(cmdLine[1]);
-                OpenMedia(new(song, _artists, _genres), true);
+                OpenMedia(new SongModel(song), true);
             }
         }
 

@@ -109,6 +109,15 @@ namespace MusicPlayer.MVVM.Model
 
         public SongModel() { }
 
+        public SongModel(Song song)
+        {
+            _id = song.Id;
+            _path = song.Path;
+            _title = "Idk";
+            _year = 0;
+            _duration = TimeSpan.FromSeconds(200);
+        }
+
         public SongModel(Song song, ObservableCollection<ArtistModel> allArtists, ObservableCollection<GenreModel> allGenres)
         {
             _id = song.Id;
