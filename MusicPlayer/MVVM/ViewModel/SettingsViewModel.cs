@@ -97,7 +97,6 @@ namespace MusicPlayer.MVVM.ViewModel
             StorageFolder folder = await AppWindowExtensions.OpenFolderPicker();
             if (folder == null) return;
 
-            using DomainContext context = new();
             Global.AddSongsFolder(folder);
         }
     }

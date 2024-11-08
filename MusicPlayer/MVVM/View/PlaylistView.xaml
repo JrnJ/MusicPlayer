@@ -135,6 +135,9 @@
                                             <MenuItem Header="Move Down" 
                                                   Command="{Binding PlacementTarget.Tag.MoveSongDownCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                   CommandParameter="{Binding Id}" />
+                                            <MenuItem Header="Properties" 
+                                                  Command="{Binding PlacementTarget.Tag.PropertiesCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding Id}" />
                                         </ContextMenu>
                                     </RadioButton.ContextMenu>
                                 </RadioButton>

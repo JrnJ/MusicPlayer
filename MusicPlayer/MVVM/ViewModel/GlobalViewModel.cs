@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 using Windows.Media;
@@ -536,65 +537,68 @@ namespace MusicPlayer.MVVM.ViewModel
         #region MediaPlayerEvents
         private void AudioPlayer_OnAudioKeyPress(object? sender, MediaControlsButton button)
         {
-            switch (button)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                case MediaControlsButton.Play:
-                case MediaControlsButton.Pause:
-                    AudioPlayer.PausePlay();
-                    break;
-                case MediaControlsButton.Previous:
-                    {
-                        // 0x11:    CTRL / VK_MENU
-                        // 0x12:    ALT / VK_MENU
-                        float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
-
-                        if (amount == 0.0f)
+                switch (button)
+                {
+                    case MediaControlsButton.Play:
+                    case MediaControlsButton.Pause:
+                        AudioPlayer.PausePlay();
+                        break;
+                    case MediaControlsButton.Previous:
                         {
-                            if (ExternalInputHelper.IsKeyDown(0x11))
+                            // 0x11:    CTRL / VK_MENU
+                            // 0x12:    ALT / VK_MENU
+                            float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
+
+                            if (amount == 0.0f)
                             {
-                                SystemVolumeChanger.DecreaseSystemVolume(0.01f);
-                                SaveVolumeToDatabase();
+                                if (ExternalInputHelper.IsKeyDown(0x11))
+                                {
+                                    SystemVolumeChanger.DecreaseSystemVolume(0.01f);
+                                    SaveVolumeToDatabase();
+                                }
+                                else
+                                {
+                                    PreviousSong();
+                                }
                             }
                             else
                             {
-                                PreviousSong();
+                                AudioPlayer.SetVolume(_settings.Volume - amount);
+                                SaveVolumeToDatabase();
                             }
                         }
-                        else
-                        {
-                            AudioPlayer.SetVolume(_settings.Volume - amount);
-                            SaveVolumeToDatabase();
-                        }
-                    }
-                   
-                    break;
 
-                case MediaControlsButton.Next:
-                    {
-                        // 0x11:    CTRL / VK_MENU
-                        // 0x12:    ALT / VK_MENU
-                        float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
+                        break;
 
-                        if (amount == 0.0f)
+                    case MediaControlsButton.Next:
                         {
-                            if (ExternalInputHelper.IsKeyDown(0x11))
+                            // 0x11:    CTRL / VK_MENU
+                            // 0x12:    ALT / VK_MENU
+                            float amount = ExternalInputHelper.IsKeyDown(0x12) ? (ExternalInputHelper.IsKeyDown(0x11) ? 0.01f : 0.10f) : 0.0f;
+
+                            if (amount == 0.0f)
                             {
-                                SystemVolumeChanger.IncreaseSystemVolume(0.01f);
-                                SaveVolumeToDatabase();
+                                if (ExternalInputHelper.IsKeyDown(0x11))
+                                {
+                                    SystemVolumeChanger.IncreaseSystemVolume(0.01f);
+                                    SaveVolumeToDatabase();
+                                }
+                                else
+                                {
+                                    NextSong();
+                                }
                             }
                             else
                             {
-                                NextSong();
+                                AudioPlayer.SetVolume(_settings.Volume + amount);
+                                SaveVolumeToDatabase();
                             }
                         }
-                        else
-                        {
-                            AudioPlayer.SetVolume(_settings.Volume + amount);
-                            SaveVolumeToDatabase();
-                        }
-                    }
-                    break;
-            }
+                        break;
+                }
+            });
         }
 
         private void MediaPlayerMediaEnded(object? sender, EventArgs e)
@@ -668,6 +672,14 @@ namespace MusicPlayer.MVVM.ViewModel
         public void OpenMedia(SongModel song, bool singleSongMode = false)
         {
             AudioPlayer.OpenMedia(song);
+            if (song.Image == null)
+            {
+                BitmapImage? bitmap = AudioProperties.GetAlbumArt(song.Path);
+                if (bitmap != null)
+                {
+                    song.Image = bitmap;
+                }
+            }
 
             // TODO: mode can be SingleSong
             if (PlaylistsManager.PlaylistViewing != null)
@@ -697,6 +709,7 @@ namespace MusicPlayer.MVVM.ViewModel
             AudioPlayer.Pause();
 
             // Get song Index
+            if (PlaylistsManager.PlaylistPlaying == null) return;
             int index = PlaylistsManager.PlaylistPlaying.Songs.IndexOf(AudioPlayer.CurrentSong);
 
             // Play previous song if there is one
@@ -714,6 +727,7 @@ namespace MusicPlayer.MVVM.ViewModel
             AudioPlayer.Pause();
 
             // Get song Index
+            if (PlaylistsManager.PlaylistPlaying == null) return;
             int index = PlaylistsManager.PlaylistPlaying.Songs.IndexOf(AudioPlayer.CurrentSong);
 
             // Play next song if there is one
@@ -906,6 +920,11 @@ namespace MusicPlayer.MVVM.ViewModel
             }
         }
         #endregion Searching
+
+        public void ShowSongEditor(int songId)
+        {
+
+        }
     }
 }
 

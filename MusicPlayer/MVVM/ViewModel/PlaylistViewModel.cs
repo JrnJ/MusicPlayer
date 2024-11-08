@@ -20,22 +20,16 @@ namespace MusicPlayer.MVVM.ViewModel
 
         // Song Commands
         public RelayCommand SelectSongCommand { get; set; }
-
         public RelayCommand RemoveSongCommand { get; set; }
-
         public RelayCommand AddSongToPlaylistCommand { get; set; }
-
         public RelayCommand MoveSongUpCommand { get; set; }
-
         public RelayCommand MoveSongDownCommand { get; set; }
+        public RelayCommand PropertiesCommand { get; set; }
 
         // View Commands
         public RelayCommand EditPlaylistCommand { get; set; }
-
         public RelayCommand DeletePlaylistCommand { get; set; }
-
         public RelayCommand LoopPlaylistCommand { get; set; }
-
         public RelayCommand ShufflePlaylistCommand { get; set; }
 
         // Properties
@@ -121,6 +115,12 @@ namespace MusicPlayer.MVVM.ViewModel
                     Global.PlaylistsManager.PlaylistViewing.Songs.Move(songIndex, songIndex + 1);
                     //Global.SavePlaylists();
                 }
+            });
+
+            PropertiesCommand = new(o =>
+            {
+                int songId = (int)o;
+                Global.ShowSongEditor(songId);
             });
 
             EditPlaylistCommand = new(o =>
